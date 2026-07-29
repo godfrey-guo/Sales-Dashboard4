@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>數字廣告業績儀表板</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js"></script>
+<style>
+:root { color-scheme: light; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: "Noto Sans TC", -apple-system, "Segoe UI", "Microsoft JhengHei", sans-serif; background: #f7f8fa; color: #1a1d23; }
+.top { background: #263E44; color: #fff; padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; }
+.top h1 { font-size: 19px; font-weight: 700; }
+.top .snap { font-size: 12px; color: #b9ccd0; }
+.wrap { max-width: 1100px; margin: 0 auto; padding: 20px; }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 18px; }
+.kpi { background: #fff; border: 1px solid #e4e7ec; border-top: 3px solid #E6F31E; border-radius: 12px; padding: 16px; }
+.kpi .k { font-size: 12px; color: #5a6271; font-weight: 600; }
+.kpi .v { font-size: 26px; font-weight: 700; color: #263E44; margin-top: 4px; }
+.kpi .n { font-size: 11px; color: #9aa3ad; margin-top: 2px; }
+.card { background: #fff; border: 1px solid #e4e7ec; border-radius: 12px; padding: 16px; margin-bottom: 18px; }
+.card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.card h2 { font-size: 15px; font-weight: 700; color: #263E44; }
+.card-head button { padding: 5px 10px; font-size: 12px; border: 1px solid #263E44; color: #263E44; background: #fff; border-radius: 8px; cursor: pointer; }
+.card-head button:hover { background: #eef3f4; }
+.chart-box { position: relative; height: 300px; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { padding: 8px 10px; text-align: right; border-bottom: 1px solid #f0f1f3; }
+th:first-child, td:first-child { text-align: left; }
+th { color: #5a6271; background: #fafbfc; font-weight: 600; }
+tfoot td { font-weight: 700; color: #263E44; border-top: 2px solid #263E44; }
+.note { font-size: 12px; color: #9aa3ad; margin-top: 8px; }
+@media (max-width: 560px){ .wrap { padding: 14px; } .top { padding: 14px 16px; } .kpi .v { font-size: 22px; } }
+</style>
+</head>
+<body>
+<div class="top">
+  <div><h1>📊 數字廣告業績儀表板</h1></div>
+  <div class="snap">資料快照：2026/07/29</div>
+</div>
+<div class="wrap">
+  <div class="kpis" id="kpis"></div>
+  <div class="card">
+    <div class="card-head"><h2>📈 2026 每月業績趨勢（已簽約）</h2><button onclick="dl()">⬇ 下載 CSV</button></div>
+    <div class="chart-box"><canvas id="trend"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><h2>📋 每月業績明細</h2></div>
+    <table id="tbl"><thead><tr><th>月份</th><th>業績（元）</th><th>委刊單數</th></tr></thead><tbody></tbody>
+    <tfoot><tr><td>全年</td><td id="ft-sale"></td><td id="ft-ins"></td></tr></tfoot></table>
+    <div class="note">※ 全年委刊單為去重後數字（跨月委刊單只計一次），故小於各月加總。</div>
+  </div>
+  <div class="note">資料來源：DOS 業績系統（已簽約 signed）。此為靜態快照，由儀表板一鍵同步產生。完整維度／客單價／滲透率／建案分析頁建置中。</div>
+</div>
+<script>
+const M = [[1,33512902,1155],[2,24777915,1041],[3,35128227,1235],[4,38439151,1223],[5,42084033,1254],[6,39529738,1178],[7,42057013,1196],[8,33512161,907],[9,13783215,418],[10,3979919,149],[11,1328361,37],[12,1788670,34]];
+const ANNUAL_SALE = 309921305, ANNUAL_INS = 3954;
+const fmtN = n => Math.round(n).toLocaleString("en-US");
+const fmtWan = n => { const x=Math.round(n); if(Math.abs(x)>=1e8) return (x/1e8).toFixed(2).replace(/\.?0+$/,"")+"億"; if(Math.abs(x)>=1e4) return Math.round(x/1e4).toLocaleString("en-US")+"萬"; return x.toLocaleString("en-US"); };
+document.getElementById("kpis").innerHTML = [
+  ["全年總業績", fmtWan(ANNUAL_SALE)+"元", fmtN(ANNUAL_SALE)],
+  ["全年委刊單", fmtN(ANNUAL_INS), "distinct 去重"],
+  ["月均業績", fmtWan(ANNUAL_SALE/12)+"元", fmtN(ANNUAL_SALE/12)]
+].map(([k,v,n])=>`<div class="kpi"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join("");
+new Chart(document.getElementById("trend"), { type:"bar",
+  data:{ labels:M.map(m=>m[0]+"月"), datasets:[{label:"業績",data:M.map(m=>m[1]),backgroundColor:"#263E44",borderRadius:4}] },
+  options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>"NT$"+fmtN(c.raw)}}}, scales:{y:{ticks:{callback:v=>(v/1e6)+"M"}}} } });
+document.querySelector("#tbl tbody").innerHTML = M.map(m=>`<tr><td>${m[0]}月</td><td>${fmtN(m[1])}</td><td>${fmtN(m[2])}</td></tr>`).join("");
+document.getElementById("ft-sale").textContent = fmtN(ANNUAL_SALE);
+document.getElementById("ft-ins").textContent = fmtN(ANNUAL_INS)+"（去重）";
+function dl(){ const rows=[["月份","業績(元)","委刊單數"],...M.map(m=>[m[0]+"月",m[1],m[2]])]; const csv="﻿"+rows.map(r=>r.join(",")).join("\r\n"); const b=new Blob([csv],{type:"text/csv;charset=utf-8"}); const a=document.createElement("a"); a.href=URL.createObjectURL(b); a.download="2026每月業績.csv"; a.click(); }
+</script>
+</body>
+</html>
