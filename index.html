@@ -96,7 +96,7 @@ tbody tr:hover { background: #f8fafc; }
     </section>
 
     <section id="page-proj" class="hide">
-      <div class="pagetitle">建案分析（房產 · 7月快照，隨篩選即時算）</div>
+      <div class="pagetitle">建案分析（合作建案隨月份/季度即時算；在線建案為 7/29 預測系統快照，不隨月份變）</div>
       <div class="kpis" id="proj-kpis"></div>
       <div class="card"><div class="card-head"><h2>💎 有無價值貢獻</h2></div><div class="kpis" id="proj-value" style="margin:0"></div>
         <div class="note">合作建案：已簽約房產且有縣市＋行政區。有價值滲透率＝有價值合作 ÷ 有價值在線。</div></div>
@@ -204,7 +204,7 @@ function curLabel(){const mo=val("f-month"),qt=val("f-quarter");if(mo)return mo+
 function matchSales(r){return selSales.size===0||selSales.has(r.sales);}
 function matchRegion(r){return selRegion.size===0||selRegion.has((r.region||"")+"|"+(r.section||""));}
 function fRows(){const ms=curMonths(),ch=val("f-ch"),ad=val("f-ad");return ROWS.filter(r=>(!ms||ms.includes(r.m))&&(!ch||r.ch===ch)&&(!ad||r.ad===ad)&&matchSales(r)&&matchRegion(r));}
-function fHouse(){const ad=val("f-ad");return HOUSE.filter(r=>matchSales(r)&&matchRegion(r));}
+function fHouse(){const ms=curMonths();return HOUSE.filter(r=>(!ms||ms.includes(r.m))&&matchSales(r)&&matchRegion(r));}
 function fOnline(){return ONLINE.filter(r=>matchSales(r)&&matchRegion(r));}
 
 function agg(rows){let s=0;const cu=new Set(),ins=new Set();for(const r of rows){s+=r.sale;if(r.cust!=-1)cu.add(r.cust);if(r.ins)ins.add(r.ins);}return{sale:s,cust:cu.size,ins:ins.size,arpu:cu.size?s/cu.size:0};}
