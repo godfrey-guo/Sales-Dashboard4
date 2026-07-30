@@ -153,10 +153,11 @@ tbody tr:hover { background: #f8fafc; }
     </section>
 
     <section id="page-region" class="hide">
-      <div class="pagetitle">🗺️ 區域歷年戰情 <span style="font-size:12px;color:#9aa3ad;font-weight:400">公司整體 · YoY 同期（今年至今 vs 去年同期）</span></div>
+      <div class="pagetitle">🗺️ 區域歷年戰情 <span style="font-size:12px;color:#9aa3ad;font-weight:400">上方共用篩選（業務/課/組/地區/月份/站台）同步套用 · YoY 同期</span></div>
       <div class="bar" style="margin-bottom:14px">
         <div class="tabs" id="rg-level" style="margin:0"><div class="tab active" data-lv="city">縣市</div><div class="tab" data-lv="dist">行政區</div></div>
-        <div class="ctrl"><label>搜尋責任區</label><input id="rg-search" placeholder="輸入縣市/行政區…" style="padding:6px 10px;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:13px"></div>
+        <div class="ctrl"><label>年</label><select id="rg-year"><option value="yoy">同期比較(25 vs 26)</option><option value="26">只看 2026</option><option value="25">只看 2025</option></select></div>
+        <div class="ctrl"><label>搜尋</label><input id="rg-search" placeholder="輸入縣市/行政區…" style="padding:6px 10px;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:13px"></div>
         <button class="treebtn" onclick="dlRegion()">⬇ 下載 CSV</button>
         <span class="note" id="rg-note"></span>
       </div>
@@ -176,11 +177,11 @@ const ADN={"on-site":"站內廣告","remarketing":"再行銷","digitm":"數媒-�
 document.getElementById("snap").textContent="資料快照："+PDATA.snapshot;
 const wanLabel={id:"wanLabel",afterDatasetsDraw(c){const t=c.config.type,x=c.ctx;c.data.datasets.forEach((ds,di)=>{c.getDatasetMeta(di).data.forEach((el,i)=>{const v=ds.data[i];if(!v)return;x.save();x.font="bold 11px sans-serif";x.textAlign="center";x.textBaseline="middle";if(t==="bar"){x.fillStyle="#263E44";x.fillText(fmtWan(v),el.x,el.y-8);}else{const p=el.tooltipPosition();x.lineWidth=3;x.strokeStyle="rgba(0,0,0,.4)";x.strokeText(fmtWan(v),p.x,p.y);x.fillStyle="#fff";x.fillText(fmtWan(v),p.x,p.y);}x.restore();});});}};
 
-let ROWS=[], HOUSE=[], ONLINE=[], REGIONS={city:{},dist:{}}, curDim="cls", projDim="grp", rgLevel="city", YTD=7, trendChart, chChart, rgChart;
+let ROWS=[], HOUSE=[], ONLINE=[], YOY=[], curDim="cls", projDim="grp", rgLevel="city", rgYear="yoy", YTD=7, trendChart, chChart, rgChart;
 const selSales=new Set(), selRegion=new Set(); // 空=全部
 
-Promise.all([fetch("./data.json").then(r=>r.json()), fetch("./proj_rows.json").then(r=>r.json()), fetch("./regions.json").then(r=>r.json()).catch(()=>({city:{},dist:{}}))]).then(([d,pr,rg])=>{
-  REGIONS=rg;
+Promise.all([fetch("./data.json").then(r=>r.json()), fetch("./proj_rows.json").then(r=>r.json()), fetch("./yoy.json").then(r=>r.json()).catch(()=>({cols:[],dicts:{},rows:[]}))]).then(([d,pr,yy])=>{
+  if(yy&&yy.rows&&yy.rows.length){const c=yy.cols,gy=n=>c.indexOf(n),FF=['region','section','cls','grp','sales','ch','ad'];YOY=yy.rows.map(r=>{const o={y:r[gy('y')],m:r[gy('m')],sale:r[gy('sale')]};FF.forEach(f=>o[f]=yy.dicts[f][r[gy(f)]]);return o;});}
   const gi=n=>d.cols.indexOf(n), F=['ins','ad','ch','cls','grp','sales','region','section','customer','industry','slot'];
   ROWS=d.rows.map(r=>{const o={m:r[gi('m')],sale:r[gi('sale')],cust:r[gi('cust')]};F.forEach(f=>o[f]=d.dicts[f][r[gi(f)]]);return o;});
   const hc=pr.house_cols, oc=pr.online_cols;
@@ -263,8 +264,8 @@ function fOnline(){return ONLINE.filter(r=>matchSales(r)&&matchRegion(r));}
 function agg(rows){let s=0;const cu=new Set(),ins=new Set();for(const r of rows){s+=r.sale;if(r.cust!=-1)cu.add(r.cust);if(r.ins)ins.add(r.ins);}return{sale:s,cust:cu.size,ins:ins.size,arpu:cu.size?s/cu.size:0};}
 function groupBy(rows,f){const m={};for(const r of rows){const k=r[f]||"（未填）";(m[k]=m[k]||[]).push(r);}return Object.entries(m).map(([k,v])=>({name:k,...agg(v)})).sort((a,b)=>b.sale-a.sale);}
 
-function renderAll(){ const p=document.getElementById("pageSel").value; document.getElementById("status").textContent=curLabel()+" · "+fmtN(fRows().length)+" 筆"; renderPerf(); renderProj(); renderTeam(); }
-document.getElementById("pageSel").addEventListener("change",e=>{const p=e.target.value;["perf","proj","team","okr","region"].forEach(x=>document.getElementById("page-"+x).classList.toggle("hide",x!==p));document.querySelector("#app > .bar").style.display=((p==="okr"||p==="region")?"none":"");if(p==="okr")renderOKR();if(p==="region")renderRegion();});
+function renderAll(){ document.getElementById("status").textContent=curLabel()+" · "+fmtN(fRows().length)+" 筆"; renderPerf(); renderProj(); renderTeam(); if(YOY.length)renderRegion(); }
+document.getElementById("pageSel").addEventListener("change",e=>{const p=e.target.value;["perf","proj","team","okr","region"].forEach(x=>document.getElementById("page-"+x).classList.toggle("hide",x!==p));document.querySelector("#app > .bar").style.display=(p==="okr"?"none":"");if(p==="okr")renderOKR();if(p==="region")renderRegion();});
 
 // ---------- 業績總覽 ----------
 function renderPerf(){
@@ -456,41 +457,57 @@ function exportReport(){
 }
 function renderAmoeba(){renderAmRef();loadReport();renderAmList();}
 
-// ---------- 區域歷年戰情 ----------
+// ---------- 區域歷年戰情（用 YoY 明細 + 共用篩選）----------
 function buildRegion(){
   YTD=parseInt((PDATA.snapshot||"2026/07").split("/")[1])||7;
   document.querySelectorAll("#rg-level .tab").forEach(t=>t.addEventListener("click",()=>{sw("#rg-level",t);rgLevel=t.dataset.lv;document.getElementById("rg-pick").dataset.lv="";renderRegion();}));
+  document.getElementById("rg-year").addEventListener("change",()=>{rgYear=document.getElementById("rg-year").value;renderRegion();});
   document.getElementById("rg-search").addEventListener("input",renderRegion);
   document.getElementById("rg-pick").addEventListener("change",renderRgChart);
 }
+function fYoy(){const ch=val("f-ch"),ad=val("f-ad");return YOY.filter(r=>(!ch||r.ch===ch)&&(!ad||r.ad===ad)&&matchSales(r)&&matchRegion(r));}
+function rgPeriod(){return curMonths()||[...Array(YTD)].map((_,i)=>i+1);}
+function rgAgg(){
+  const rows=fYoy(),per=rgPeriod(),acc={};
+  const nameOf=r=>rgLevel==="city"?r.region:(r.section?r.region+"｜"+r.section:null);
+  for(const r of rows){const n=nameOf(r);if(!n)continue;const a=acc[n]||(acc[n]={s25:0,s26:0,fy25:0});
+    if(r.y===25){if(per.includes(r.m))a.s25+=r.sale;a.fy25+=r.sale;}else if(per.includes(r.m))a.s26+=r.sale;}
+  return acc;
+}
 function rgRows(){
-  const src=REGIONS[rgLevel]||{}, q=document.getElementById("rg-search").value.trim();
-  let out=Object.entries(src).map(([name,v])=>{
-    const y26=v.y26.slice(0,YTD).reduce((a,b)=>a+b,0), y25=v.y25.slice(0,YTD).reduce((a,b)=>a+b,0), fy25=v.y25.reduce((a,b)=>a+b,0);
-    return {name,y26,y25,fy25,yoy:y25?(y26-y25)/y25*100:null,prog:fy25?y26/fy25*100:0};
-  }).filter(x=>x.y26||x.y25);
-  if(q) out=out.filter(x=>x.name.includes(q));
-  return out.sort((a,b)=>b.y26-a.y26);
+  const acc=rgAgg(),q=document.getElementById("rg-search").value.trim();
+  let out=Object.entries(acc).map(([name,v])=>({name,s25:v.s25,s26:v.s26,fy25:v.fy25,yoy:v.s25?(v.s26-v.s25)/v.s25*100:null,prog:v.fy25?v.s26/v.fy25*100:0}));
+  if(q)out=out.filter(x=>x.name.includes(q));
+  const sk=rgYear==="25"?"s25":"s26";
+  return out.filter(x=>x.s25||x.s26).sort((a,b)=>b[sk]-a[sk]);
 }
 function renderRegion(){
-  document.getElementById("rg-note").textContent="「至今」＝1–"+YTD+"月，與去年同期比";
-  const rows=rgRows();
-  document.querySelector("#rg-tbl tbody").innerHTML=rows.map(x=>{
-    const badge=x.yoy==null?"—":`<b style="color:${x.yoy>=0?'#1f7a4d':'#b53b65'}">${x.yoy>=0?'▲ 超前 ':'▼ 落後 '}${Math.abs(x.yoy).toFixed(1)}%</b>`;
-    return `<tr><td>${x.name.replace('｜','-')}</td><td>${fmtN(x.y26)}</td><td>${fmtN(x.y25)}</td><td>${badge}</td><td>${fmtN(x.fy25)}</td><td>${x.prog.toFixed(0)}%</td></tr>`;
-  }).join("")||`<tr><td colspan="6" class="note">查無資料</td></tr>`;
+  if(!YOY.length){document.getElementById("rg-note").textContent="資料載入中…";return;}
+  document.getElementById("rg-note").textContent="期間 "+(curMonths()?curLabel():"1–"+YTD+"月")+"　範圍 "+(selSales.size?selSales.size+" 業務":"全業務")+"／"+(selRegion.size?selRegion.size+" 區":"全區");
+  const rows=rgRows(),head=document.querySelector("#rg-tbl thead tr"),body=document.querySelector("#rg-tbl tbody");
+  if(rgYear==="yoy"){
+    head.innerHTML="<th>區域</th><th>2026 期間</th><th>2025 同期</th><th>YoY 超前/落後</th><th>2025 全年</th><th>今年進度</th>";
+    body.innerHTML=rows.map(x=>{const b=x.yoy==null?"—":`<b style="color:${x.yoy>=0?'#1f7a4d':'#b53b65'}">${x.yoy>=0?'▲ 超前 ':'▼ 落後 '}${Math.abs(x.yoy).toFixed(1)}%</b>`;return `<tr><td>${x.name.replace('｜','-')}</td><td>${fmtN(x.s26)}</td><td>${fmtN(x.s25)}</td><td>${b}</td><td>${fmtN(x.fy25)}</td><td>${x.prog.toFixed(0)}%</td></tr>`;}).join("")||`<tr><td colspan="6" class="note">查無資料</td></tr>`;
+  }else{
+    const yr=rgYear==="25"?"2025":"2026",key=rgYear==="25"?"s25":"s26",tot=rows.reduce((s,x)=>s+x[key],0)||1;
+    head.innerHTML=`<th>區域</th><th>${yr} 期間業績</th><th>占比</th>`;
+    body.innerHTML=rows.map(x=>`<tr><td>${x.name.replace('｜','-')}</td><td>${fmtN(x[key])}</td><td>${(x[key]/tot*100).toFixed(1)}%</td></tr>`).join("")||`<tr><td colspan="3" class="note">查無資料</td></tr>`;
+  }
   const pick=document.getElementById("rg-pick");
   if(pick.dataset.lv!==rgLevel){pick.innerHTML="";rows.forEach(x=>{const o=document.createElement("option");o.value=x.name;o.textContent=x.name.replace('｜','-');pick.appendChild(o);});pick.dataset.lv=rgLevel;}
   renderRgChart();
 }
 function renderRgChart(){
-  const name=document.getElementById("rg-pick").value, v=(REGIONS[rgLevel]||{})[name];
-  if(!v){if(rgChart)rgChart.destroy();return;}
+  const name=document.getElementById("rg-pick").value;
+  const rows=fYoy().filter(r=>(rgLevel==="city"?r.region:(r.section?r.region+"｜"+r.section:""))===name);
+  if(!name||!rows.length){if(rgChart)rgChart.destroy();return;}
+  const y25=Array(12).fill(0),y26=Array(12).fill(0);
+  rows.forEach(r=>{(r.y===25?y25:y26)[r.m-1]+=r.sale;});
   const labels=[...Array(12)].map((_,i)=>(i+1)+"月");
   if(rgChart)rgChart.destroy();
-  rgChart=new Chart(document.getElementById("rgChart"),{type:"bar",data:{labels,datasets:[{label:"2025",data:v.y25,backgroundColor:"#a7c0c5",borderRadius:3},{label:"2026",data:v.y26,backgroundColor:"#263E44",borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"top"},tooltip:{callbacks:{label:c=>c.dataset.label+"：NT$"+fmtN(c.raw)}}},scales:{y:{ticks:{callback:v=>(v/1e6)+"M"}}}}});
+  rgChart=new Chart(document.getElementById("rgChart"),{type:"bar",data:{labels,datasets:[{label:"2025",data:y25,backgroundColor:"#a7c0c5",borderRadius:3},{label:"2026",data:y26,backgroundColor:"#263E44",borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"top"},tooltip:{callbacks:{label:c=>c.dataset.label+"：NT$"+fmtN(c.raw)}}},scales:{y:{ticks:{callback:v=>(v/1e6)+"M"}}}}});
 }
-function dlRegion(){const rows=rgRows();dl("區域歷年戰情_"+(rgLevel==="city"?"縣市":"行政區")+".csv",[["區域","2026至今","2025同期","YoY%","2025全年","今年進度%"],...rows.map(x=>[x.name.replace('｜','-'),x.y26,x.y25,(x.yoy!=null?x.yoy.toFixed(1)+"%":""),x.fy25,x.prog.toFixed(0)+"%"])]);}
+function dlRegion(){const rows=rgRows();if(rgYear==="yoy"){dl("區域戰情_"+(rgLevel==="city"?"縣市":"行政區")+".csv",[["區域","2026期間","2025同期","YoY%","2025全年","進度%"],...rows.map(x=>[x.name.replace('｜','-'),x.s26,x.s25,(x.yoy!=null?x.yoy.toFixed(1)+"%":""),x.fy25,x.prog.toFixed(0)+"%"])]);}else{const key=rgYear==="25"?"s25":"s26";dl("區域_"+rgYear+".csv",[["區域",rgYear+"期間業績"],...rows.map(x=>[x.name.replace('｜','-'),x[key]])]);}}
 
 function dl(fn,rows){const csv="﻿"+rows.map(r=>r.map(c=>'"'+String(c==null?"":c).replace(/"/g,'""')+'"').join(",")).join("\r\n");const b=new Blob([csv],{type:"text/csv;charset=utf-8"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=fn;document.body.appendChild(a);a.click();setTimeout(()=>a.remove(),200);}
 </script>
