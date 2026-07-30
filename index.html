@@ -71,6 +71,20 @@ tbody tr:hover { background: #f8fafc; }
 .bar2 > i { display:block; height:100%; background:#263E44; border-radius:6px; }
 .kr .tiers { font-size:11px; color:#9aa3ad; }
 .kr input { width:90px; text-align:right; padding:4px 6px; border:1px solid #d1d5db; border-radius:6px; font:inherit; font-size:13px; }
+.am-split { display:grid; grid-template-columns:340px 1fr; gap:16px; align-items:start; }
+@media (max-width: 820px){ .am-split { grid-template-columns:1fr; } }
+.am-data .ref { display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px solid #f0f1f3; font-size:13px; }
+.am-data .ref b { color:#263E44; }
+.am-f { margin-bottom:12px; }
+.am-f > label { display:block; font-size:13px; font-weight:700; color:#263E44; margin-bottom:5px; }
+.am-f textarea { width:100%; border:1px solid #d1d5db; border-radius:8px; padding:8px 10px; font:inherit; font-size:13px; resize:vertical; }
+.stars { display:inline-block; margin-bottom:6px; }
+.stars span { font-size:20px; color:#d1d5db; cursor:pointer; }
+.stars span.on { color:#E6B800; }
+.act-row { display:grid; grid-template-columns:1fr 90px 120px 70px 24px; gap:6px; margin-bottom:6px; }
+.act-row input, .act-row select { border:1px solid #d1d5db; border-radius:6px; padding:5px 6px; font:inherit; font-size:12.5px; }
+.act-row .del { cursor:pointer; color:#b53b65; text-align:center; align-self:center; }
+@media (max-width: 560px){ .act-row { grid-template-columns:1fr 1fr; } }
 @media (max-width: 560px){ .wrap { padding: 14px; } .kpis { grid-template-columns: 1fr 1fr; } .kpi .v { font-size: 20px; } .pop{width:280px;} }
 </style>
 </head>
@@ -78,7 +92,7 @@ tbody tr:hover { background: #f8fafc; }
 <div class="top">
   <h1>📊 數字廣告業績儀表板</h1>
   <div class="right">
-    <select id="pageSel"><option value="perf">📈 業績總覽</option><option value="proj">🏗️ 建案分析</option><option value="team">🎯 課組戰情</option><option value="okr">🏅 OKR 考核</option></select>
+    <select id="pageSel"><option value="perf">📈 業績總覽</option><option value="proj">🏗️ 建案分析</option><option value="team">🎯 課組戰情</option><option value="okr">🏅 OKR 考核</option><option value="amoeba">🧭 顧問建議書</option></select>
     <span class="snap" id="snap"></span>
   </div>
 </div>
@@ -137,6 +151,29 @@ tbody tr:hover { background: #f8fafc; }
       </div>
       <div id="okr-body"></div>
     </section>
+
+    <section id="page-amoeba" class="hide">
+      <div class="pagetitle">🧭 阿米巴顧問建議書 <span style="font-size:12px;color:#9aa3ad;font-weight:400">看圖說故事 · PDCA</span></div>
+      <div class="bar" style="margin-bottom:14px">
+        <div class="ctrl"><label>部門</label><select id="am-dept"></select></div>
+        <div class="ctrl"><label>月份</label><select id="am-month"></select></div>
+        <button class="treebtn" id="am-new">＋ 開新建議書</button>
+        <button class="treebtn" id="am-export">⬇ 匯出報告(.md)</button>
+        <span class="note" id="am-status"></span>
+      </div>
+      <div class="am-split">
+        <div class="card am-data"><div class="card-head"><h2>📊 部門當月數據（自動帶入）</h2></div><div id="am-ref"></div>
+          <div class="note">🤖 想要 AI 診斷草稿？在 Cowork 跟我說「幫 <b>某部門</b> 寫本月阿米巴診斷」，我依數據生 3 點建議，你貼進右邊微調。</div></div>
+        <div class="card am-edit">
+          <div class="am-f"><label>① 整體評價</label><div id="am-stars" class="stars"></div><textarea id="am-overall" rows="2" placeholder="對本月業績的綜合點評…"></textarea></div>
+          <div class="am-f"><label>② 落後原因診斷（5Why / 柏拉圖）</label><textarea id="am-diag" rows="3" placeholder="針對未達標項目的根因…"></textarea></div>
+          <div class="am-f"><label>③ 顧問具體建議（阿米巴哲學 · 定價即經營）</label><textarea id="am-rec" rows="3" placeholder="具體可執行的指導…"></textarea></div>
+          <div class="am-f"><label>④ 部門行動承諾（SMART）</label><div id="am-actions"></div><button class="treebtn" id="am-addact" style="margin-top:6px">＋ 新增行動項</button></div>
+          <div style="display:flex;gap:8px;margin-top:12px"><button class="treebtn" id="am-save" style="background:#eef3f4">💾 存草稿</button><button class="treebtn" id="am-publish" style="background:#E6F31E;border-color:#d2df13;font-weight:700">📢 發佈</button></div>
+        </div>
+      </div>
+      <div class="card"><div class="card-head"><h2>📋 建議書列表</h2></div><div class="tbl-wrap"><table id="am-list"><thead><tr><th>部門</th><th>月份</th><th>評分</th><th>狀態</th><th>更新</th><th></th></tr></thead><tbody></tbody></table></div></div>
+    </section>
   </div>
 </div>
 <script>
@@ -160,7 +197,7 @@ Promise.all([fetch("./data.json").then(r=>r.json()), fetch("./proj_rows.json").t
   // 下拉
   fill("f-month",[...Array(12)].map((_,i)=>[String(i+1),(i+1)+"月"]));
   fill("f-ch",[...new Set(ROWS.map(r=>r.ch))].filter(x=>x).sort().map(v=>[v,v]));
-  buildSalesTree(); buildRegionTree(); buildOkrScope();
+  buildSalesTree(); buildRegionTree(); buildOkrScope(); buildAmoeba();
   document.getElementById("loading").classList.add("hide"); document.getElementById("app").classList.remove("hide");
   document.getElementById("f-month").addEventListener("change",()=>{if(val("f-month"))document.getElementById("f-quarter").value="";renderAll();});
   document.getElementById("f-quarter").addEventListener("change",()=>{if(val("f-quarter"))document.getElementById("f-month").value="";renderAll();});
@@ -235,7 +272,7 @@ function agg(rows){let s=0;const cu=new Set(),ins=new Set();for(const r of rows)
 function groupBy(rows,f){const m={};for(const r of rows){const k=r[f]||"（未填）";(m[k]=m[k]||[]).push(r);}return Object.entries(m).map(([k,v])=>({name:k,...agg(v)})).sort((a,b)=>b.sale-a.sale);}
 
 function renderAll(){ const p=document.getElementById("pageSel").value; document.getElementById("status").textContent=curLabel()+" · "+fmtN(fRows().length)+" 筆"; renderPerf(); renderProj(); renderTeam(); }
-document.getElementById("pageSel").addEventListener("change",e=>{const p=e.target.value;["perf","proj","team","okr"].forEach(x=>document.getElementById("page-"+x).classList.toggle("hide",x!==p));document.querySelector("#app > .bar").style.display=(p==="okr"?"none":"");if(p==="okr")renderOKR();});
+document.getElementById("pageSel").addEventListener("change",e=>{const p=e.target.value;["perf","proj","team","okr","amoeba"].forEach(x=>document.getElementById("page-"+x).classList.toggle("hide",x!==p));document.querySelector("#app > .bar").style.display=((p==="okr"||p==="amoeba")?"none":"");if(p==="okr")renderOKR();if(p==="amoeba")renderAmoeba();});
 
 // ---------- 業績總覽 ----------
 function renderPerf(){
@@ -362,6 +399,70 @@ function renderOKR(){
   }).join("");
   document.querySelectorAll("#okr-body input").forEach(inp=>inp.addEventListener("input",()=>{const id=inp.dataset.m,v=inp.value;if(v)localStorage.setItem(mKey(id),v);else localStorage.removeItem(mKey(id));renderOKR();}));
 }
+
+// ---------- 阿米巴顧問建議書 ----------
+let amStars=0;
+function buildAmoeba(){
+  const d=document.getElementById("am-dept"); d.innerHTML="";
+  [...new Set(ROWS.map(r=>r.grp))].filter(x=>x&&x!=="(未分組)").sort().forEach(g=>{const o=document.createElement("option");o.value=g;o.textContent=g.replace("業務","").replace(" - ","-");d.appendChild(o);});
+  const m=document.getElementById("am-month");
+  for(let i=1;i<=12;i++){const o=document.createElement("option");o.value=i;o.textContent=i+"月";if(i===7)o.selected=true;m.appendChild(o);}
+  const st=document.getElementById("am-stars"); st.innerHTML="";
+  for(let i=1;i<=5;i++){const sp=document.createElement("span");sp.textContent="★";sp.onclick=()=>{amStars=i;paintStars();};st.appendChild(sp);}
+  d.addEventListener("change",loadReport); m.addEventListener("change",loadReport);
+  document.getElementById("am-new").onclick=clearForm;
+  document.getElementById("am-addact").onclick=()=>addActRow();
+  document.getElementById("am-save").onclick=()=>saveReport("draft");
+  document.getElementById("am-publish").onclick=()=>saveReport("published");
+  document.getElementById("am-export").onclick=exportReport;
+}
+function paintStars(){document.querySelectorAll("#am-stars span").forEach((s,i)=>s.classList.toggle("on",i<amStars));}
+function amKey(){return "amoeba_report_"+document.getElementById("am-dept").value+"_"+document.getElementById("am-month").value;}
+function refData(){
+  const dept=document.getElementById("am-dept").value, mo=+document.getElementById("am-month").value;
+  const rows=ROWS.filter(r=>r.grp===dept&&r.m===mo), a=agg(rows);
+  let on=0,re=0; rows.forEach(r=>{if(r.ad==="on-site")on+=r.sale;else if(r.ad==="remarketing"||r.ad==="agent")re+=r.sale;});
+  const h=HOUSE.filter(r=>r.grp===dept&&r.m===mo), o=ONLINE.filter(r=>r.grp===dept), st=projStats(h,o);
+  const tgt=localStorage.getItem("dm_target_2026_"+dept), rate=tgt?(a.sale/+tgt*100).toFixed(1)+"%":"—";
+  return {sale:a.sale,cust:a.cust,arpu:a.arpu,ins:a.ins,onsite:a.sale?(on/a.sale*100).toFixed(1):0,remkt:a.sale?(re/a.sale*100).toFixed(1):0,pen:st.pen,rate};
+}
+function renderAmRef(){
+  const r=refData();
+  document.getElementById("am-ref").innerHTML=[["當月業績",fmtWan(r.sale)+"元"],["目標達成率",r.rate],["客戶家數",fmtN(r.cust)+" 家"],["客單價",fmtN(r.arpu)+" 元"],["委刊單",fmtN(r.ins)+" 張"],["站內占比",r.onsite+"%"],["再行銷占比",r.remkt+"%"],["建案滲透率",(r.pen!=null?r.pen.toFixed(1)+"%":"—")]].map(x=>`<div class="ref"><span>${x[0]}</span><b>${x[1]}</b></div>`).join("");
+}
+function addActRow(a){a=a||{task:"",owner:"",due:"",status:"pending"};
+  const div=document.createElement("div");div.className="act-row";
+  div.innerHTML=`<input placeholder="改善措施" value="${(a.task||"").replace(/"/g,'&quot;')}"><input placeholder="負責人" value="${(a.owner||"").replace(/"/g,'&quot;')}"><input type="date" value="${a.due||""}"><select><option value="pending"${a.status==="pending"?" selected":""}>待辦</option><option value="doing"${a.status==="doing"?" selected":""}>進行</option><option value="done"${a.status==="done"?" selected":""}>完成</option></select><span class="del">✕</span>`;
+  div.querySelector(".del").onclick=()=>div.remove(); document.getElementById("am-actions").appendChild(div);
+}
+function collectActions(){return [...document.querySelectorAll("#am-actions .act-row")].map(d=>{const i=d.querySelectorAll("input"),s=d.querySelector("select");return {task:i[0].value,owner:i[1].value,due:i[2].value,status:s.value};}).filter(a=>a.task);}
+function clearForm(){amStars=0;paintStars();document.getElementById("am-overall").value="";document.getElementById("am-diag").value="";document.getElementById("am-rec").value="";document.getElementById("am-actions").innerHTML="";document.getElementById("am-status").textContent="新建議書（未儲存）";}
+function loadReport(){
+  renderAmRef();
+  const raw=localStorage.getItem(amKey());
+  if(!raw){clearForm();return;}
+  const r=JSON.parse(raw); amStars=r.score||0; paintStars();
+  document.getElementById("am-overall").value=r.overall||"";document.getElementById("am-diag").value=r.diagnosis||"";document.getElementById("am-rec").value=r.recommend||"";
+  document.getElementById("am-actions").innerHTML="";(r.actions||[]).forEach(addActRow);
+  document.getElementById("am-status").textContent=(r.status==="published"?"已發佈":"草稿")+" · 更新 "+(r.updated||"");
+}
+function saveReport(status){
+  const rep={dept:document.getElementById("am-dept").value,month:document.getElementById("am-month").value,score:amStars,overall:document.getElementById("am-overall").value,diagnosis:document.getElementById("am-diag").value,recommend:document.getElementById("am-rec").value,actions:collectActions(),status,updated:new Date().toLocaleString("zh-TW")};
+  localStorage.setItem(amKey(),JSON.stringify(rep));
+  document.getElementById("am-status").textContent=(status==="published"?"✓ 已發佈":"✓ 已存草稿")+" · "+rep.updated; renderAmList();
+}
+function renderAmList(){
+  const rows=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith("amoeba_report_")){try{rows.push(JSON.parse(localStorage.getItem(k)));}catch(e){}}}
+  rows.sort((a,b)=>(b.month)-(a.month));
+  document.querySelector("#am-list tbody").innerHTML=rows.map(r=>`<tr><td>${r.dept.replace("業務","").replace(" - ","-")}</td><td>${r.month}月</td><td>${"★".repeat(r.score||0)||"—"}</td><td>${r.status==="published"?"已發佈":"草稿"}</td><td style="font-size:11px">${r.updated||""}</td><td><a style="color:#263E44;cursor:pointer" onclick="openReport('${r.dept}','${r.month}')">開啟</a></td></tr>`).join("")||`<tr><td colspan="6" class="note">尚無建議書</td></tr>`;
+}
+function openReport(dept,month){document.getElementById("am-dept").value=dept;document.getElementById("am-month").value=month;loadReport();window.scrollTo(0,0);}
+function exportReport(){
+  const dept=document.getElementById("am-dept").value.replace("業務","").replace(" - ","-"),mo=document.getElementById("am-month").value,r=refData(),acts=collectActions();
+  const md=`# 阿米巴顧問建議書 — ${dept} ${mo}月\n\n## 部門當月數據\n- 業績：${fmtN(r.sale)} 元｜目標達成率：${r.rate}\n- 客戶家數：${r.cust} 家｜客單價：${r.arpu} 元｜委刊單：${r.ins} 張\n- 站內占比 ${r.onsite}%｜再行銷占比 ${r.remkt}%｜建案滲透率 ${r.pen!=null?r.pen.toFixed(1)+"%":"—"}\n\n## 一、整體評價（${"★".repeat(amStars)||"未評"}）\n${document.getElementById("am-overall").value}\n\n## 二、落後原因診斷\n${document.getElementById("am-diag").value}\n\n## 三、顧問具體建議\n${document.getElementById("am-rec").value}\n\n## 四、部門行動承諾\n`+(acts.length?acts.map(a=>`- [ ] ${a.task}（負責：${a.owner}｜期限：${a.due}｜狀態：${a.status}）`).join("\n"):"（待部門填寫）")+"\n";
+  const b=new Blob([md],{type:"text/markdown;charset=utf-8"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=`阿米巴建議書_${dept}_${mo}月.md`;a.click();
+}
+function renderAmoeba(){renderAmRef();loadReport();renderAmList();}
 
 function dl(fn,rows){const csv="﻿"+rows.map(r=>r.map(c=>'"'+String(c==null?"":c).replace(/"/g,'""')+'"').join(",")).join("\r\n");const b=new Blob([csv],{type:"text/csv;charset=utf-8"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=fn;document.body.appendChild(a);a.click();setTimeout(()=>a.remove(),200);}
 </script>
