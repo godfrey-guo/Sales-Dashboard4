@@ -56,6 +56,21 @@ tbody tr:hover { background: #f8fafc; }
 .hide { display: none; }
 .pagetitle { font-size: 16px; font-weight: 700; color: #263E44; margin: 4px 0 14px; }
 #loading { padding: 40px; text-align: center; color: #5a6271; }
+.okr-o { background:#fff; border:1px solid #e4e7ec; border-radius:12px; padding:16px; margin-bottom:16px; }
+.okr-o h3 { font-size:15px; color:#263E44; margin-bottom:2px; }
+.okr-o .w { font-size:12px; color:#9aa3ad; margin-bottom:12px; }
+.kr { border-top:1px solid #f0f1f3; padding:12px 0; }
+.kr:first-of-type { border-top:none; }
+.kr.manual { background:#fafbf3; margin:0 -8px; padding:12px 8px; border-radius:8px; }
+.kr .kh { display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap; }
+.kr .knm { font-size:13.5px; font-weight:600; color:#1a1d23; }
+.kr .kv { font-size:15px; font-weight:700; color:#263E44; }
+.kr .lv { font-size:12px; font-weight:700; padding:1px 8px; border-radius:20px; margin-left:6px; }
+.lv.優 { background:#dff3e6; color:#1f7a4d; } .lv.佳 { background:#fff3d6; color:#8a6300; } .lv.可 { background:#eef3f4; color:#5a6271; } .lv.未達 { background:#fdeaea; color:#b53b65; }
+.bar2 { height:10px; background:#eef1f3; border-radius:6px; margin:8px 0 5px; overflow:hidden; }
+.bar2 > i { display:block; height:100%; background:#263E44; border-radius:6px; }
+.kr .tiers { font-size:11px; color:#9aa3ad; }
+.kr input { width:90px; text-align:right; padding:4px 6px; border:1px solid #d1d5db; border-radius:6px; font:inherit; font-size:13px; }
 @media (max-width: 560px){ .wrap { padding: 14px; } .kpis { grid-template-columns: 1fr 1fr; } .kpi .v { font-size: 20px; } .pop{width:280px;} }
 </style>
 </head>
@@ -63,7 +78,7 @@ tbody tr:hover { background: #f8fafc; }
 <div class="top">
   <h1>📊 數字廣告業績儀表板</h1>
   <div class="right">
-    <select id="pageSel"><option value="perf">📈 業績總覽</option><option value="proj">🏗️ 建案分析</option><option value="team">🎯 課組戰情</option></select>
+    <select id="pageSel"><option value="perf">📈 業績總覽</option><option value="proj">🏗️ 建案分析</option><option value="team">🎯 課組戰情</option><option value="okr">🏅 OKR 考核</option></select>
     <span class="snap" id="snap"></span>
   </div>
 </div>
@@ -113,6 +128,15 @@ tbody tr:hover { background: #f8fafc; }
         <div class="tbl-wrap"><table id="team-tbl"><thead><tr><th>課組</th><th>業績總額</th><th>目標</th><th>達成率</th><th>客單價(全年)</th><th>客單價成長率</th><th>滲透率</th><th>有價值合作</th><th>無價值合作</th><th>站內占比</th><th>再行銷占比</th></tr></thead><tbody></tbody></table></div>
       </div>
     </section>
+
+    <section id="page-okr" class="hide">
+      <div class="pagetitle">H2 OKR 考核 <span id="okr-snap" style="font-size:12px;color:#9aa3ad;font-weight:400"></span></div>
+      <div class="bar" style="margin-bottom:14px">
+        <div class="ctrl"><label>檢視對象</label><select id="okr-scope"></select></div>
+        <span class="note">實績自動接 DOS（H2＝7–12月）；灰底 KR 需手動輸入。門檻為範例個人基準，可日後改。</span>
+      </div>
+      <div id="okr-body"></div>
+    </section>
   </div>
 </div>
 <script>
@@ -136,7 +160,7 @@ Promise.all([fetch("./data.json").then(r=>r.json()), fetch("./proj_rows.json").t
   // 下拉
   fill("f-month",[...Array(12)].map((_,i)=>[String(i+1),(i+1)+"月"]));
   fill("f-ch",[...new Set(ROWS.map(r=>r.ch))].filter(x=>x).sort().map(v=>[v,v]));
-  buildSalesTree(); buildRegionTree();
+  buildSalesTree(); buildRegionTree(); buildOkrScope();
   document.getElementById("loading").classList.add("hide"); document.getElementById("app").classList.remove("hide");
   document.getElementById("f-month").addEventListener("change",()=>{if(val("f-month"))document.getElementById("f-quarter").value="";renderAll();});
   document.getElementById("f-quarter").addEventListener("change",()=>{if(val("f-quarter"))document.getElementById("f-month").value="";renderAll();});
@@ -211,7 +235,7 @@ function agg(rows){let s=0;const cu=new Set(),ins=new Set();for(const r of rows)
 function groupBy(rows,f){const m={};for(const r of rows){const k=r[f]||"（未填）";(m[k]=m[k]||[]).push(r);}return Object.entries(m).map(([k,v])=>({name:k,...agg(v)})).sort((a,b)=>b.sale-a.sale);}
 
 function renderAll(){ const p=document.getElementById("pageSel").value; document.getElementById("status").textContent=curLabel()+" · "+fmtN(fRows().length)+" 筆"; renderPerf(); renderProj(); renderTeam(); }
-document.getElementById("pageSel").addEventListener("change",e=>{["perf","proj","team"].forEach(x=>document.getElementById("page-"+x).classList.toggle("hide",x!==e.target.value));});
+document.getElementById("pageSel").addEventListener("change",e=>{const p=e.target.value;["perf","proj","team","okr"].forEach(x=>document.getElementById("page-"+x).classList.toggle("hide",x!==p));document.querySelector("#app > .bar").style.display=(p==="okr"?"none":"");if(p==="okr")renderOKR();});
 
 // ---------- 業績總覽 ----------
 function renderPerf(){
@@ -279,6 +303,65 @@ function renderTeam(){
 function dlTeam(){const rows=fRows(),byg={};rows.forEach(r=>{(byg[r.grp]=byg[r.grp]||[]).push(r);});const h=fHouse(),o=fOnline(),hb={},ob={};h.forEach(r=>{(hb[r.grp]=hb[r.grp]||[]).push(r);});o.forEach(r=>{(ob[r.grp]=ob[r.grp]||[]).push(r);});
   const out=ORDER.map(full=>{const a=agg(byg[full]||[]);let on=0,re=0;(byg[full]||[]).forEach(r=>{if(r.ad==="on-site")on+=r.sale;else if(r.ad==="remarketing"||r.ad==="agent")re+=r.sale;});const st=projStats(hb[full]||[],ob[full]||[]);const g=(PDATA.growth[full]||{});const t=getTarget(full);return [full.replace("業務","").replace(" - ","-"),a.sale,(t||""),(t?(a.sale/t*100).toFixed(1)+"%":""),(g.arpu2026!=null?g.arpu2026:a.arpu),(g.growth!=null?g.growth+"%":""),(st.pen!=null?st.pen.toFixed(1)+"%":""),st.coopv,st.coopn,(a.sale?(on/a.sale*100).toFixed(1):0)+"%",(a.sale?(re/a.sale*100).toFixed(1):0)+"%"];});
   dl("課組戰情.csv",[["課組","業績總額","目標","達成率","客單價全年","客單價成長率","滲透率","有價值合作","無價值合作","站內占比","再行銷占比"],...out]);}
+
+// ---------- OKR 考核 ----------
+const OKR=[
+ {o:"O1 極大化 H2 營收動能，突破下半年新高",w:35,krs:[
+   {name:"Q3 業績（Jul–Sep）",unit:"萬",auto:"q3",br:[[400,500,0,40],[500,600,40,60],[600,700,60,100]]},
+   {name:"Q4 業績（Oct–Dec）",unit:"萬",auto:"q4",br:[[400,500,0,40],[500,600,40,60],[600,700,60,100]]}]},
+ {o:"O2 深化站內與數媒再行銷綜效，帶動跨產品包套",w:25,krs:[
+   {name:"H2 再行銷總業績",unit:"萬",auto:"remkt",br:[[50,100,0,40],[100,140,40,60],[140,200,60,100]]},
+   {name:"影音＋再行銷 跨產品包套組數",unit:"組",manual:"combo1",br:[[0,1,0,40],[1,2,40,60],[2,3,60,100]]},
+   {name:"企劃協同客製包套（含再行銷）組數",unit:"組",manual:"combo2",br:[[0,1,0,40],[1,2,40,60],[2,3,60,100]]}]},
+ {o:"O3 鞏固核心客戶基本盤，拉升整體客單價",w:15,krs:[
+   {name:"服務總客戶家數（H2）",unit:"家",auto:"cust",br:[[0,30,0,40],[30,50,40,60],[50,70,60,100]]},
+   {name:"平均客單價（H2）",unit:"萬",auto:"arpu",br:[[6,8,0,40],[8,10,40,60],[10,13.6,60,100]]}]}
+];
+function buildOkrScope(){
+  const s=document.getElementById("okr-scope");
+  s.innerHTML='<option value="all">整體</option>';
+  const og1=document.createElement("optgroup");og1.label="課組";
+  [...new Set(ROWS.map(r=>r.grp))].filter(x=>x&&x!=="(未分組)").sort().forEach(g=>{const o=document.createElement("option");o.value="grp:"+g;o.textContent=g.replace("業務","").replace(" - ","-");og1.appendChild(o);});
+  s.appendChild(og1);
+  const og2=document.createElement("optgroup");og2.label="業務員";
+  [...new Set(ROWS.map(r=>r.sales))].filter(x=>x).sort().forEach(n=>{const o=document.createElement("option");o.value="sales:"+n;o.textContent=n;og2.appendChild(o);});
+  s.appendChild(og2);
+  s.addEventListener("change",renderOKR);
+}
+function okrRows(){const v=document.getElementById("okr-scope").value;if(v.startsWith("grp:"))return ROWS.filter(r=>r.grp===v.slice(4));if(v.startsWith("sales:"))return ROWS.filter(r=>r.sales===v.slice(6));return ROWS;}
+function autoVal(k,rows){
+  const H=[7,8,9,10,11,12];
+  const sum=(ms,f)=>rows.filter(r=>ms.includes(r.m)&&(!f||f(r))).reduce((s,r)=>s+r.sale,0);
+  if(k==="q3")return sum([7,8,9])/1e4;
+  if(k==="q4")return sum([10,11,12])/1e4;
+  if(k==="remkt")return sum(H,r=>r.ad==="remarketing"||r.ad==="agent")/1e4;
+  if(k==="cust"){const c=new Set();rows.forEach(r=>{if(H.includes(r.m)&&r.cust!=-1)c.add(r.cust);});return c.size;}
+  if(k==="arpu"){const c=new Set();let s=0;rows.forEach(r=>{if(H.includes(r.m)){s+=r.sale;if(r.cust!=-1)c.add(r.cust);}});return c.size?(s/c.size)/1e4:0;}
+  return 0;
+}
+function evalKR(v,br){
+  if(v<br[0][0])return{pct:0,lv:"未達"};
+  for(let i=0;i<br.length;i++){const[lo,hi,plo,phi]=br[i];if(v<hi||i===br.length-1){const p=v>=hi?phi:plo+(v-lo)/(hi-lo)*(phi-plo);return{pct:Math.min(100,Math.round(p)),lv:i===0?"可":i===1?"佳":"優"};}}
+  return{pct:100,lv:"優"};
+}
+function mKey(id){return "okr_"+document.getElementById("okr-scope").value+"_"+id;}
+function renderOKR(){
+  const s=document.getElementById("okr-scope");document.getElementById("okr-snap").textContent="· 對象："+s.options[s.selectedIndex].textContent;
+  const rows=okrRows();
+  document.getElementById("okr-body").innerHTML=OKR.map(o=>{
+    const krs=o.krs.map(k=>{
+      let v;
+      if(k.auto)v=autoVal(k.auto,rows); else {const mv=localStorage.getItem(mKey(k.manual));v=mv?+mv:0;}
+      const e=evalKR(v,k.br), last=k.br[k.br.length-1];
+      const vtxt=k.auto?(k.unit==="萬"?fmtN(Math.round(v))+"萬":fmtN(v)+k.unit):"";
+      const tiers=`門檻：可 ${k.br[0][0]}–${k.br[0][1]}｜佳 ${k.br[1][0]}–${k.br[1][1]}｜優 ${last[0]}+ (${k.unit})`;
+      const right=k.manual?`<input type="number" data-m="${k.manual}" value="${localStorage.getItem(mKey(k.manual))||''}" placeholder="輸入"> ${k.unit}`:`<span class="kv">${vtxt}</span>`;
+      return `<div class="kr ${k.manual?'manual':''}"><div class="kh"><span class="knm">${k.name}${k.manual?' ✍手動':''}</span><span>${right} <span class="lv ${e.lv}">${e.lv} ${e.pct}%</span></span></div><div class="bar2"><i style="width:${e.pct}%"></i></div><div class="tiers">${tiers}</div></div>`;
+    }).join("");
+    return `<div class="okr-o"><h3>${o.o}</h3><div class="w">權重 ${o.w}%</div>${krs}</div>`;
+  }).join("");
+  document.querySelectorAll("#okr-body input").forEach(inp=>inp.addEventListener("input",()=>{const id=inp.dataset.m,v=inp.value;if(v)localStorage.setItem(mKey(id),v);else localStorage.removeItem(mKey(id));renderOKR();}));
+}
 
 function dl(fn,rows){const csv="﻿"+rows.map(r=>r.map(c=>'"'+String(c==null?"":c).replace(/"/g,'""')+'"').join(",")).join("\r\n");const b=new Blob([csv],{type:"text/csv;charset=utf-8"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=fn;document.body.appendChild(a);a.click();setTimeout(()=>a.remove(),200);}
 </script>
