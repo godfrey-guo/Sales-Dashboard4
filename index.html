@@ -9,66 +9,180 @@
 :root { color-scheme: light; }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: "Noto Sans TC", -apple-system, "Segoe UI", "Microsoft JhengHei", sans-serif; background: #f7f8fa; color: #1a1d23; }
-.top { background: #263E44; color: #fff; padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; }
-.top h1 { font-size: 19px; font-weight: 700; }
+.top { background: #263E44; color: #fff; padding: 14px 22px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.top h1 { font-size: 18px; font-weight: 700; }
+.top .right { display: flex; align-items: center; gap: 12px; }
 .top .snap { font-size: 12px; color: #b9ccd0; }
-.wrap { max-width: 1100px; margin: 0 auto; padding: 20px; }
-.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 18px; }
-.kpi { background: #fff; border: 1px solid #e4e7ec; border-top: 3px solid #E6F31E; border-radius: 12px; padding: 16px; }
+.top select { font: inherit; font-size: 14px; font-weight: 700; padding: 7px 12px; border-radius: 8px; border: 2px solid #E6F31E; background: #263E44; color: #E6F31E; cursor: pointer; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 20px; }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.kpi { background: #fff; border: 1px solid #e4e7ec; border-top: 3px solid #E6F31E; border-radius: 12px; padding: 14px 16px; }
 .kpi .k { font-size: 12px; color: #5a6271; font-weight: 600; }
-.kpi .v { font-size: 26px; font-weight: 700; color: #263E44; margin-top: 4px; }
+.kpi .v { font-size: 24px; font-weight: 700; color: #263E44; margin-top: 4px; }
 .kpi .n { font-size: 11px; color: #9aa3ad; margin-top: 2px; }
-.card { background: #fff; border: 1px solid #e4e7ec; border-radius: 12px; padding: 16px; margin-bottom: 18px; }
-.card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.card { background: #fff; border: 1px solid #e4e7ec; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+.card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px; flex-wrap: wrap; }
 .card h2 { font-size: 15px; font-weight: 700; color: #263E44; }
 .card-head button { padding: 5px 10px; font-size: 12px; border: 1px solid #263E44; color: #263E44; background: #fff; border-radius: 8px; cursor: pointer; }
 .card-head button:hover { background: #eef3f4; }
 .chart-box { position: relative; height: 300px; }
-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-th, td { padding: 8px 10px; text-align: right; border-bottom: 1px solid #f0f1f3; }
+table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+th, td { padding: 7px 9px; text-align: right; border-bottom: 1px solid #f0f1f3; white-space: nowrap; }
 th:first-child, td:first-child { text-align: left; }
-th { color: #5a6271; background: #fafbfc; font-weight: 600; }
+th { color: #5a6271; background: #fafbfc; font-weight: 600; position: sticky; top: 0; }
+tbody tr:hover { background: #f8fafc; }
 tfoot td { font-weight: 700; color: #263E44; border-top: 2px solid #263E44; }
+.tbl-wrap { max-height: 460px; overflow: auto; border: 1px solid #f0f1f3; border-radius: 8px; }
+.tabs { display: flex; gap: 6px; margin-bottom: 10px; }
+.tab { padding: 5px 12px; border: 1px solid #d1d5db; border-radius: 8px; background: #fff; font-size: 12.5px; cursor: pointer; }
+.tab.active { background: #eef3f4; border-color: #263E44; color: #263E44; font-weight: 700; }
 .note { font-size: 12px; color: #9aa3ad; margin-top: 8px; }
-@media (max-width: 560px){ .wrap { padding: 14px; } .top { padding: 14px 16px; } .kpi .v { font-size: 22px; } }
+.pill { display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:600; }
+.pill.v { background:#eef7ea; color:#1f7a4d; }
+.hide { display: none; }
+.pagetitle { font-size: 16px; font-weight: 700; color: #263E44; margin: 4px 0 14px; }
+@media (max-width: 560px){ .wrap { padding: 14px; } .top { padding: 12px 14px; } .kpi .v { font-size: 20px; } .kpis { grid-template-columns: 1fr 1fr; } }
 </style>
 </head>
 <body>
 <div class="top">
-  <div><h1>📊 數字廣告業績儀表板</h1></div>
-  <div class="snap">資料快照：2026/07/29</div>
+  <h1>📊 數字廣告業績儀表板</h1>
+  <div class="right">
+    <select id="pageSel">
+      <option value="perf">📈 業績總覽</option>
+      <option value="proj">🏗️ 建案分析</option>
+      <option value="team">🎯 課組戰情</option>
+    </select>
+    <span class="snap" id="snap"></span>
+  </div>
 </div>
 <div class="wrap">
-  <div class="kpis" id="kpis"></div>
-  <div class="card">
-    <div class="card-head"><h2>📈 2026 每月業績趨勢（已簽約）</h2><button onclick="dl()">⬇ 下載 CSV</button></div>
-    <div class="chart-box"><canvas id="trend"></canvas></div>
-  </div>
-  <div class="card">
-    <div class="card-head"><h2>📋 每月業績明細</h2></div>
-    <table id="tbl"><thead><tr><th>月份</th><th>業績（元）</th><th>委刊單數</th></tr></thead><tbody></tbody>
-    <tfoot><tr><td>全年</td><td id="ft-sale"></td><td id="ft-ins"></td></tr></tfoot></table>
-    <div class="note">※ 全年委刊單為去重後數字（跨月委刊單只計一次），故小於各月加總。</div>
-  </div>
-  <div class="note">資料來源：DOS 業績系統（已簽約 signed）。此為靜態快照，由儀表板一鍵同步產生。完整維度／客單價／滲透率／建案分析頁建置中。</div>
+
+  <!-- 業績總覽 -->
+  <section id="page-perf">
+    <div class="pagetitle">業績總覽 · 2026 全年（已簽約）</div>
+    <div class="kpis" id="perf-kpis"></div>
+    <div class="card">
+      <div class="card-head"><h2>📈 每月業績趨勢</h2><button onclick="dlPerf()">⬇ 下載 CSV</button></div>
+      <div class="chart-box"><canvas id="trend"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h2>📋 每月業績明細</h2></div>
+      <table id="perf-tbl"><thead><tr><th>月份</th><th>業績（元）</th><th>委刊單數</th></tr></thead><tbody></tbody>
+      <tfoot><tr><td>全年</td><td id="pf-sale"></td><td id="pf-ins"></td></tr></tfoot></table>
+      <div class="note">※ 全年委刊單為去重數字（跨月只計一次），故小於各月加總。</div>
+    </div>
+  </section>
+
+  <!-- 建案分析 -->
+  <section id="page-proj" class="hide">
+    <div class="pagetitle" id="proj-title">建案分析</div>
+    <div class="kpis" id="proj-kpis"></div>
+    <div class="card">
+      <div class="card-head"><h2>💎 有無價值貢獻</h2></div>
+      <div class="kpis" id="proj-value" style="margin:0"></div>
+      <div class="note">有價值滲透率 ＝ 有價值合作建案 ÷ 有價值在線建案。合作建案定義：已簽約房產類且有縣市＋行政區。</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h2>📋 維度明細</h2><button onclick="dlProj()">⬇ 下載 CSV</button></div>
+      <div class="tabs" id="proj-tabs">
+        <div class="tab active" data-dim="by_group">業務組</div>
+        <div class="tab" data-dim="by_city">縣市</div>
+      </div>
+      <div class="tbl-wrap">
+        <table id="proj-tbl"><thead><tr>
+          <th>名稱</th><th>合作建案</th><th>在線建案</th><th>滲透率</th><th>有價值合作</th><th>業績(元)</th><th>客單價(元)</th>
+        </tr></thead><tbody></tbody></table>
+      </div>
+      <div class="note" id="proj-note"></div>
+    </div>
+  </section>
+
+  <!-- 課組戰情 -->
+  <section id="page-team" class="hide">
+    <div class="pagetitle">課組戰情</div>
+    <div class="card"><p style="color:#5a6271;font-size:14px;line-height:1.7">此頁建置中 🚧<br>規劃內容：業務一課(1/2組)、二課(3/4組) 的達成率、業績總額、客單價、滲透率、站內 vs 再行銷占比。<br><b>達成率需先匯入目標資料</b>（目前系統目標為空）。</p></div>
+  </section>
+
 </div>
 <script>
-const M = [[1,33512902,1155],[2,24777915,1041],[3,35128227,1235],[4,38439151,1223],[5,42084033,1254],[6,39529738,1178],[7,42057013,1196],[8,33512161,907],[9,13783215,418],[10,3979919,149],[11,1328361,37],[12,1788670,34]];
-const ANNUAL_SALE = 309921305, ANNUAL_INS = 3954;
+const DATA = {"snapshot": "2026/07/29", "period": "2026年7月（單月）", "perf": {"annual_sale": 309921305, "annual_ins": 3954, "monthly": [[1, 33512902, 1155], [2, 24777915, 1041], [3, 35128227, 1235], [4, 38439151, 1223], [5, 42084033, 1254], [6, 39529738, 1178], [7, 42057013, 1196], [8, 33512161, 907], [9, 13783215, 418], [10, 3979919, 149], [11, 1328361, 37], [12, 1788670, 34]]}, "proj": {"online_total": 6140, "online_value": 1468, "coop_total": 771, "coop_value": 339, "coop_novalue": 424, "sale": 37395562, "customers": 364, "arpu": 102735, "pen": 12.6, "pen_value": 23.1, "by_city": [{"name": "桃園市", "coop": 139, "coopv": 71, "online": 762, "onlinev": 240, "pen": 18.2, "sale": 7342326, "cust": 57, "arpu": 128813}, {"name": "高雄市", "coop": 87, "coopv": 33, "online": 619, "onlinev": 152, "pen": 14.1, "sale": 4054667, "cust": 37, "arpu": 109586}, {"name": "台中市", "coop": 83, "coopv": 50, "online": 924, "onlinev": 274, "pen": 9.0, "sale": 4743892, "cust": 42, "arpu": 112950}, {"name": "新北市", "coop": 82, "coopv": 64, "online": 483, "onlinev": 244, "pen": 17.0, "sale": 9252290, "cust": 46, "arpu": 201137}, {"name": "台北市", "coop": 69, "coopv": 48, "online": 295, "onlinev": 174, "pen": 23.4, "sale": 5133007, "cust": 44, "arpu": 116659}, {"name": "台南市", "coop": 53, "coopv": 18, "online": 767, "onlinev": 98, "pen": 6.9, "sale": 2175660, "cust": 32, "arpu": 67989}, {"name": "新竹縣", "coop": 40, "coopv": 12, "online": 254, "onlinev": 53, "pen": 15.7, "sale": 1192074, "cust": 27, "arpu": 44151}, {"name": "屏東縣", "coop": 36, "coopv": 2, "online": 253, "onlinev": 15, "pen": 14.2, "sale": 378397, "cust": 23, "arpu": 16452}, {"name": "宜蘭縣", "coop": 35, "coopv": 10, "online": 268, "onlinev": 42, "pen": 13.1, "sale": 583432, "cust": 28, "arpu": 20837}, {"name": "彰化縣", "coop": 34, "coopv": 7, "online": 462, "onlinev": 35, "pen": 7.4, "sale": 659318, "cust": 30, "arpu": 21977}, {"name": "苗栗縣", "coop": 31, "coopv": 9, "online": 225, "onlinev": 36, "pen": 13.8, "sale": 612829, "cust": 19, "arpu": 32254}, {"name": "雲林縣", "coop": 21, "coopv": 5, "online": 233, "onlinev": 26, "pen": 9.0, "sale": 217107, "cust": 7, "arpu": 31015}, {"name": "南投縣", "coop": 20, "coopv": 4, "online": 138, "onlinev": 13, "pen": 14.5, "sale": 142164, "cust": 17, "arpu": 8363}, {"name": "新竹市", "coop": 14, "coopv": 2, "online": 135, "onlinev": 24, "pen": 10.4, "sale": 305227, "cust": 10, "arpu": 30523}, {"name": "嘉義縣", "coop": 9, "coopv": 1, "online": 92, "onlinev": 11, "pen": 9.8, "sale": 63575, "cust": 1, "arpu": 63575}, {"name": "嘉義市", "coop": 8, "coopv": 0, "online": 62, "onlinev": 8, "pen": 12.9, "sale": 190105, "cust": 6, "arpu": 31684}, {"name": "花蓮縣", "coop": 5, "coopv": 1, "online": 80, "onlinev": 9, "pen": 6.2, "sale": 22313, "cust": 5, "arpu": 4463}, {"name": "基隆市", "coop": 5, "coopv": 2, "online": 37, "onlinev": 8, "pen": 13.5, "sale": 159779, "cust": 5, "arpu": 31956}, {"name": "", "coop": 0, "coopv": 0, "online": 0, "onlinev": 0, "pen": null, "sale": 167400, "cust": 1, "arpu": 167400}], "by_group": [{"name": "業務一課 - 業務一組", "coop": 194, "coopv": 106, "online": 1168, "onlinev": 378, "pen": 16.6, "sale": 12282882, "cust": 108, "arpu": 113730}, {"name": "業務二課 - 業務四組", "coop": 191, "coopv": 54, "online": 1571, "onlinev": 260, "pen": 12.2, "sale": 6798252, "cust": 88, "arpu": 77253}, {"name": "業務一課 - 業務二組", "coop": 187, "coopv": 103, "online": 1023, "onlinev": 401, "pen": 18.3, "sale": 11715811, "cust": 94, "arpu": 124636}, {"name": "業務二課 - 業務三組", "coop": 158, "coopv": 66, "online": 1757, "onlinev": 348, "pen": 9.0, "sale": 5762481, "cust": 89, "arpu": 64747}, {"name": "設計課 - 設計組", "coop": 45, "coopv": 10, "online": 348, "onlinev": 51, "pen": 12.9, "sale": 836136, "cust": 38, "arpu": 22004}]}};
 const fmtN = n => Math.round(n).toLocaleString("en-US");
 const fmtWan = n => { const x=Math.round(n); if(Math.abs(x)>=1e8) return (x/1e8).toFixed(2).replace(/\.?0+$/,"")+"億"; if(Math.abs(x)>=1e4) return Math.round(x/1e4).toLocaleString("en-US")+"萬"; return x.toLocaleString("en-US"); };
-document.getElementById("kpis").innerHTML = [
-  ["全年總業績", fmtWan(ANNUAL_SALE)+"元", fmtN(ANNUAL_SALE)],
-  ["全年委刊單", fmtN(ANNUAL_INS), "distinct 去重"],
-  ["月均業績", fmtWan(ANNUAL_SALE/12)+"元", fmtN(ANNUAL_SALE/12)]
+document.getElementById("snap").textContent = "資料快照：" + DATA.snapshot;
+
+// ---- 頁面切換 ----
+function showPage(p){
+  ["perf","proj","team"].forEach(x => document.getElementById("page-"+x).classList.toggle("hide", x!==p));
+  if (p==="perf") renderPerf();
+}
+document.getElementById("pageSel").addEventListener("change", e => showPage(e.target.value));
+
+// ---- 業績總覽 ----
+let trendChart;
+function renderPerf(){
+  const P=DATA.perf;
+  document.getElementById("perf-kpis").innerHTML = [
+    ["全年總業績", fmtWan(P.annual_sale)+"元", fmtN(P.annual_sale)],
+    ["全年委刊單", fmtN(P.annual_ins), "distinct 去重"],
+    ["月均業績", fmtWan(P.annual_sale/12)+"元", fmtN(Math.round(P.annual_sale/12))]
+  ].map(([k,v,n])=>`<div class="kpi"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join("");
+  document.querySelector("#perf-tbl tbody").innerHTML = P.monthly.map(m=>`<tr><td>${m[0]}月</td><td>${fmtN(m[1])}</td><td>${fmtN(m[2])}</td></tr>`).join("");
+  document.getElementById("pf-sale").textContent = fmtN(P.annual_sale);
+  document.getElementById("pf-ins").textContent = fmtN(P.annual_ins)+"（去重）";
+  if (trendChart) return;
+  trendChart = new Chart(document.getElementById("trend"), { type:"bar",
+    data:{ labels:P.monthly.map(m=>m[0]+"月"), datasets:[{label:"業績",data:P.monthly.map(m=>m[1]),backgroundColor:"#263E44",borderRadius:4}] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>"NT$"+fmtN(c.raw)}}}, scales:{y:{ticks:{callback:v=>(v/1e6)+"M"}}} } });
+}
+function dlPerf(){ const r=[["月份","業績(元)","委刊單數"],...DATA.perf.monthly.map(m=>[m[0]+"月",m[1],m[2]])]; dl("2026每月業績.csv", r); }
+
+// ---- 建案分析 ----
+const J = DATA.proj;
+let curDim="by_group";
+document.getElementById("proj-title").textContent = "建案分析 · " + DATA.period;
+document.getElementById("proj-kpis").innerHTML = [
+  ["合作建案數", fmtN(J.coop_total), "已簽約房產·有縣市+行政區"],
+  ["在線建案數", fmtN(J.online_total), "預測系統快照"],
+  ["整體滲透率", J.pen+"%", "合作 ÷ 在線"],
+  ["客單價", fmtWan(J.arpu)+"元", fmtN(J.arpu)+" ·業績÷客戶數"],
+  ["房產業績", fmtWan(J.sale)+"元", fmtN(J.sale)]
 ].map(([k,v,n])=>`<div class="kpi"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join("");
-new Chart(document.getElementById("trend"), { type:"bar",
-  data:{ labels:M.map(m=>m[0]+"月"), datasets:[{label:"業績",data:M.map(m=>m[1]),backgroundColor:"#263E44",borderRadius:4}] },
-  options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>"NT$"+fmtN(c.raw)}}}, scales:{y:{ticks:{callback:v=>(v/1e6)+"M"}}} } });
-document.querySelector("#tbl tbody").innerHTML = M.map(m=>`<tr><td>${m[0]}月</td><td>${fmtN(m[1])}</td><td>${fmtN(m[2])}</td></tr>`).join("");
-document.getElementById("ft-sale").textContent = fmtN(ANNUAL_SALE);
-document.getElementById("ft-ins").textContent = fmtN(ANNUAL_INS)+"（去重）";
-function dl(){ const rows=[["月份","業績(元)","委刊單數"],...M.map(m=>[m[0]+"月",m[1],m[2]])]; const csv="﻿"+rows.map(r=>r.join(",")).join("\r\n"); const b=new Blob([csv],{type:"text/csv;charset=utf-8"}); const a=document.createElement("a"); a.href=URL.createObjectURL(b); a.download="2026每月業績.csv"; a.click(); }
+document.getElementById("proj-value").innerHTML = [
+  ["有價值合作建案", fmtN(J.coop_value), "合作中屬有價值"],
+  ["無價值合作建案", fmtN(J.coop_novalue), "合作中屬無價值"],
+  ["有價值在線建案", fmtN(J.online_value), "預測系統標記"],
+  ["有價值滲透率", (J.pen_value!=null?J.pen_value+"%":"—"), "有價值合作 ÷ 有價值在線"]
+].map(([k,v,n])=>`<div class="kpi"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join("");
+function renderProj(){
+  const arr = J[curDim];
+  document.querySelector("#proj-tbl tbody").innerHTML = arr.map(x=>
+    `<tr><td>${x.name}</td><td>${fmtN(x.coop)}</td><td>${fmtN(x.online)}</td>`+
+    `<td>${x.pen!=null?x.pen+"%":"—"}</td><td>${fmtN(x.coopv)}</td><td>${fmtN(x.sale)}</td><td>${fmtN(x.arpu)}</td></tr>`
+  ).join("");
+  document.getElementById("proj-note").textContent = curDim==="by_group"
+    ? "※ 業務組滲透率＝該組合作建案 ÷ 該組在線建案（在線依業務員對應組）。"
+    : "※ 縣市滲透率＝該縣市合作建案 ÷ 該縣市在線建案。";
+}
+document.querySelectorAll("#proj-tabs .tab").forEach(t=>t.addEventListener("click",()=>{
+  document.querySelectorAll("#proj-tabs .tab").forEach(x=>x.classList.remove("active"));
+  t.classList.add("active"); curDim=t.dataset.dim; renderProj();
+}));
+renderProj();
+function dlProj(){
+  const arr=J[curDim]; const nm=curDim==="by_group"?"業務組":"縣市";
+  const r=[[nm,"合作建案","在線建案","滲透率","有價值合作","業績(元)","客單價(元)"],
+    ...arr.map(x=>[x.name,x.coop,x.online,(x.pen!=null?x.pen+"%":""),x.coopv,x.sale,x.arpu])];
+  dl(`建案分析_${DATA.period}_${nm}.csv`, r);
+}
+
+// ---- CSV ----
+function dl(filename, rows){
+  const csv="﻿"+rows.map(r=>r.map(c=>'"'+String(c==null?"":c).replace(/"/g,'""')+'"').join(",")).join("\r\n");
+  const b=new Blob([csv],{type:"text/csv;charset=utf-8"}); const a=document.createElement("a");
+  a.href=URL.createObjectURL(b); a.download=filename; document.body.appendChild(a); a.click(); setTimeout(()=>a.remove(),200);
+}
+renderPerf();
 </script>
 </body>
 </html>
