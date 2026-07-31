@@ -379,17 +379,33 @@ function sumTarget(key,people,ratio){const ts=people.map(p=>(OKR_TARGETS[p]||{})
 function tierLv(rate,t){if(rate>=t.opt)return"優";if(rate>=t.good)return"佳";if(rate>=t.ok)return"可";return"未達";}
 function mKey(id){return "okr_"+(selOkr.size?[...selOkr].sort().join("|"):"all")+"_"+id;}
 function fmtKR(v,unit){if(unit==="元")return fmtN(Math.round(v))+"元";if(unit==="萬")return (Math.round(v*10)/10).toLocaleString("en-US")+"萬";return fmtN(v)+unit;}
+function faceSVG(lv,size){size=size||24;const M={"優":["#d3ecc6","M8,14.5 Q13,21 18,14.5"],"佳":["#e4edca","M8,15 Q13,19 18,15"],"可":["#e7eaee","M8.5,16 L17.5,16"],"未達":["#f6dde3","M8,17.5 Q13,13.5 18,17.5"],"啟動":["#e7eaee","M8.5,16 L17.5,16"],"無目標":["#eef1f3","M9,16 L17,16"]};const[c,m]=M[lv]||M["可"];return `<svg width="${size}" height="${size}" viewBox="0 0 26 26" style="vertical-align:middle;flex:none"><circle cx="13" cy="13" r="11.5" fill="${c}"/><circle cx="9.6" cy="11" r="1.25" fill="#3a3a3a"/><circle cx="16.4" cy="11" r="1.25" fill="#3a3a3a"/><path d="${m}" stroke="#3a3a3a" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg>`;}
+function okrAchievements(people,rows){
+  const out=[];
+  const q3=autoVal("q3",rows),tq3=sumTarget("q3",people); if(tq3&&q3/tq3>=0.6)out.push(`Q3 業績已達 ${(q3/tq3*100).toFixed(0)}%（${fmtKR(q3,"萬")}）`);
+  const cust=autoVal("cust",rows),tc=sumTarget("cust",people); if(tc&&cust/tc>=0.6)out.push(`已服務 ${cust} 家客戶（目標 ${tc}）`);
+  const arpu=autoVal("arpu",rows),ta=sumTarget("arpu",people,true); if(ta&&arpu>=ta)out.push(`客單價 ${fmtN(Math.round(arpu))} 元，已達標 💰`);
+  if(YOY.length){const P=new Set(people),reg={};YOY.forEach(r=>{if(!P.has(r.sales)||!r.region||r.m>YTD)return;const a=reg[r.region]||(reg[r.region]={a:0,b:0});if(r.y===26)a.a+=r.sale;else a.b+=r.sale;});const best=Object.entries(reg).filter(([k,v])=>v.b>0).map(([k,v])=>({k,y:(v.a-v.b)/v.b*100})).sort((a,b)=>b.y-a.y)[0];if(best&&best.y>3)out.push(`${best.k} 較去年同期 +${best.y.toFixed(0)}% 📈`);}
+  return out;
+}
 function renderOKR(){
   const people=okrPeople(), rows=okrRows(), withT=people.filter(p=>OKR_TARGETS[p]).length;
   document.getElementById("okr-snap").textContent="· 對象："+(selOkr.size?[...selOkr].slice(0,3).join("、")+(selOkr.size>3?" 等"+selOkr.size+"人":""):"二課全體")+(withT?"":"（此範圍尚無考核目標，目前僅二課已建）");
-  document.getElementById("okr-body").innerHTML=OKR.map(o=>{
+  const ach=okrAchievements(people,rows);
+  const mood=ach.length>=2?"優":ach.length===1?"佳":"可";
+  const line=mood==="優"?"表現亮眼，繼續保持！":mood==="佳"?"有好的開始，再加把勁！":"全力衝刺，數字會說話！";
+  const summary=`<div class="okr-o" style="background:#f6faf2;border-color:#dbe8cf"><div style="display:flex;align-items:center;gap:14px">${faceSVG(mood,52)}<div><div style="font-weight:700;color:#263E44;font-size:15px">${line}</div><div style="font-size:12.5px;color:#5a6271;margin-top:5px;line-height:1.7">${ach.length?"✨ "+ach.join("　｜　"):"目前尚無亮點數據，開始接單累積吧！"}</div></div></div></div>`;
+  document.getElementById("okr-body").innerHTML=summary+OKR.map(o=>{
     const krs=o.krs.map(k=>{
       const tgt=sumTarget(k.key,people,k.ratio);
       let act; if(k.auto)act=autoVal(k.auto,rows); else{const mv=localStorage.getItem(mKey(k.key));act=mv?+mv:0;}
-      const rate=tgt?act/tgt*100:null, lv=rate==null?"未達":tierLv(rate,k.t), pct=rate==null?0:Math.min(100,Math.round(rate));
+      let rate=tgt?act/tgt*100:null, lv, badge;
+      if(rate==null){lv="無目標";badge=`<span class="lv 可">無目標</span>`;}
+      else if(act<=0){lv="啟動";badge=`<span class="lv 可">尚未啟動</span>`;}
+      else{lv=tierLv(rate,k.t);badge=`<span class="lv ${lv}">${lv} ${rate.toFixed(0)}%</span>`;}
+      const pct=rate==null?0:Math.min(100,Math.round(rate));
       const right=k.manual?`目標 ${tgt==null?"—":fmtKR(tgt,k.unit)}　實績 <input type="number" data-m="${k.key}" value="${localStorage.getItem(mKey(k.key))||''}" placeholder="輸入" style="width:64px"> ${k.unit}`:`目標 ${tgt==null?"—":fmtKR(tgt,k.unit)}　實績 <b class="kv">${fmtKR(act,k.unit)}</b>`;
-      const badge=rate==null?`<span class="lv 可">無目標</span>`:`<span class="lv ${lv}">${lv} ${rate.toFixed(0)}%</span>`;
-      return `<div class="kr ${k.manual?'manual':''}"><div class="kh"><span class="knm">${k.name}${k.manual?' ✍手動':''}</span><span>${right} ${badge}</span></div><div class="bar2"><i style="width:${pct}%"></i></div><div class="tiers">達成率＝實績÷目標　門檻 可≥${k.t.ok}% 佳≥${k.t.good}% 優≥${k.t.opt}%</div></div>`;
+      return `<div class="kr ${k.manual?'manual':''}"><div class="kh"><span class="knm" style="display:inline-flex;align-items:center;gap:6px">${faceSVG(lv)} ${k.name}${k.manual?' ✍手動':''}</span><span>${right} ${badge}</span></div><div class="bar2"><i style="width:${pct}%"></i></div><div class="tiers">達成率＝實績÷目標　門檻 可≥${k.t.ok}% 佳≥${k.t.good}% 優≥${k.t.opt}%</div></div>`;
     }).join("");
     return `<div class="okr-o"><h3>${o.o}</h3>${krs}</div>`;
   }).join("");
