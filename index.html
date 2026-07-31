@@ -146,7 +146,7 @@ tbody tr:hover { background: #f8fafc; }
     <section id="page-okr" class="hide">
       <div class="pagetitle">H2 OKR 考核 <span id="okr-snap" style="font-size:12px;color:#9aa3ad;font-weight:400"></span></div>
       <div class="bar" style="margin-bottom:14px">
-        <div class="ctrl"><label>檢視對象</label><select id="okr-scope"></select></div>
+        <div class="ctrl" style="position:relative"><label>檢視對象</label><button class="treebtn" id="btn-okr">全部 ▾</button><div class="pop" id="pop-okr"></div></div>
         <span class="note">實績自動接 DOS（H2＝7–12月）；灰底 KR 需手動輸入。門檻為範例個人基準，可日後改。</span>
       </div>
       <div id="okr-body"></div>
@@ -180,7 +180,7 @@ document.getElementById("snap").textContent="資料快照："+PDATA.snapshot;
 const wanLabel={id:"wanLabel",afterDatasetsDraw(c){const t=c.config.type,x=c.ctx;c.data.datasets.forEach((ds,di)=>{c.getDatasetMeta(di).data.forEach((el,i)=>{const v=ds.data[i];if(!v)return;x.save();x.font="bold 11px sans-serif";x.textAlign="center";x.textBaseline="middle";if(t==="bar"){x.fillStyle="#263E44";x.fillText(fmtWan(v),el.x,el.y-8);}else{const p=el.tooltipPosition();x.lineWidth=3;x.strokeStyle="rgba(0,0,0,.4)";x.strokeText(fmtWan(v),p.x,p.y);x.fillStyle="#fff";x.fillText(fmtWan(v),p.x,p.y);}x.restore();});});}};
 
 let ROWS=[], HOUSE=[], ONLINE=[], YOY=[], curDim="cls", projDim="grp", rgLevel="city", rgYear="yoy", YTD=7, trendChart, chChart, rgChart;
-const selSales=new Set(), selRegion=new Set(); // 空=全部
+const selSales=new Set(), selRegion=new Set(), selOkr=new Set(); // 空=全部
 
 Promise.all([fetch("./data.json").then(r=>r.json()), fetch("./proj_rows.json").then(r=>r.json()), fetch("./yoy.json").then(r=>r.json()).catch(()=>({cols:[],dicts:{},rows:[]}))]).then(([d,pr,yy])=>{
   if(yy&&yy.rows&&yy.rows.length){const c=yy.cols,gy=n=>c.indexOf(n),FF=['region','section','cls','grp','sales','ch','ad'];YOY=yy.rows.map(r=>{const o={y:r[gy('y')],m:r[gy('m')],sale:r[gy('sale')]};FF.forEach(f=>o[f]=yy.dicts[f][r[gy(f)]]);return o;});}
@@ -207,7 +207,8 @@ function val(id){return document.getElementById(id).value;}
 function sw(sel,t){document.querySelectorAll(sel+" .tab").forEach(x=>x.classList.remove("active"));t.classList.add("active");}
 
 // ---------- 多選樹狀 ----------
-function makeTree(popId, btnId, tree, sel, label){
+function makeTree(popId, btnId, tree, sel, label, onChange){
+  const fire=()=>(onChange||renderAll)();
   const pop=document.getElementById(popId), btn=document.getElementById(btnId);
   pop.innerHTML='<div class="act"><a data-a="all">全選</a><a data-a="clear">清除</a></div>';
   const root=document.createElement("div"); pop.appendChild(root);
@@ -221,7 +222,7 @@ function makeTree(popId, btnId, tree, sel, label){
     else { const sp=document.createElement("span"); sp.className="tg"; row.appendChild(sp); }
     row.appendChild(cb); row.appendChild(lb);
     lb.onclick=()=>{cb.checked=!cb.checked;cb.onchange();};
-    cb.onchange=()=>{ leaves.forEach(k=>cb.checked?sel.add(k):sel.delete(k)); refresh(); renderAll(); };
+    cb.onchange=()=>{ leaves.forEach(k=>cb.checked?sel.add(k):sel.delete(k)); refresh(); fire(); };
     el.appendChild(row);
     if(n.children){ const kids=document.createElement("div"); kids.className="kids"; n.children.forEach(c=>kids.appendChild(node(c))); el.appendChild(kids); }
     el._cb=cb; el._leaves=leaves;
@@ -232,8 +233,8 @@ function makeTree(popId, btnId, tree, sel, label){
     root.querySelectorAll(".node").forEach(el=>{ const on=el._leaves.filter(k=>sel.has(k)).length; el._cb.checked=on===el._leaves.length&&on>0; el._cb.indeterminate=on>0&&on<el._leaves.length; });
     btn.textContent=label+"："+(sel.size===0?"全部":sel.size+" 項")+" ▾"; btn.classList.toggle("on",sel.size>0);
   }
-  pop.querySelector('[data-a="all"]').onclick=()=>{root.querySelectorAll(".node").forEach(el=>el._leaves.forEach(k=>sel.add(k)));refresh();renderAll();};
-  pop.querySelector('[data-a="clear"]').onclick=()=>{sel.clear();refresh();renderAll();};
+  pop.querySelector('[data-a="all"]').onclick=()=>{root.querySelectorAll(".node").forEach(el=>el._leaves.forEach(k=>sel.add(k)));refresh();fire();};
+  pop.querySelector('[data-a="clear"]').onclick=()=>{sel.clear();refresh();fire();};
   btn.onclick=(e)=>{e.stopPropagation();document.querySelectorAll(".pop").forEach(p=>{if(p!==pop)p.classList.remove("open");});pop.classList.toggle("open");};
   pop.onclick=e=>e.stopPropagation();
   refresh();
@@ -350,17 +351,12 @@ const OKR=[
    {name:"平均客單價（H2）",unit:"萬",auto:"arpu",br:[[6,8,0,40],[8,10,40,60],[10,13.6,60,100]]}]}
 ];
 function buildOkrScope(){
-  const s=document.getElementById("okr-scope");
-  s.innerHTML='<option value="all">整體</option>';
-  const og1=document.createElement("optgroup");og1.label="課組";
-  [...new Set(ROWS.map(r=>r.grp))].filter(x=>x&&x!=="(未分組)").sort().forEach(g=>{const o=document.createElement("option");o.value="grp:"+g;o.textContent=g.replace("業務","").replace(" - ","-");og1.appendChild(o);});
-  s.appendChild(og1);
-  const og2=document.createElement("optgroup");og2.label="業務員";
-  [...new Set(ROWS.map(r=>r.sales))].filter(x=>x).sort().forEach(n=>{const o=document.createElement("option");o.value="sales:"+n;o.textContent=n;og2.appendChild(o);});
-  s.appendChild(og2);
-  s.addEventListener("change",renderOKR);
+  const h={};
+  ROWS.forEach(r=>{ if(!r.sales)return; (h[r.cls]=h[r.cls]||{})[r.grp]=(h[r.cls]||{})[r.grp]||new Set(); h[r.cls][r.grp].add(r.sales); });
+  const tree=Object.keys(h).sort().map(cls=>({label:cls,children:Object.keys(h[cls]).sort().map(grp=>({label:grp.replace("業務","").replace(" - ","-"),children:[...h[cls][grp]].sort().map(s=>({label:s,key:s}))}))}));
+  makeTree("pop-okr","btn-okr",tree,selOkr,"檢視對象",renderOKR);
 }
-function okrRows(){const v=document.getElementById("okr-scope").value;if(v.startsWith("grp:"))return ROWS.filter(r=>r.grp===v.slice(4));if(v.startsWith("sales:"))return ROWS.filter(r=>r.sales===v.slice(6));return ROWS;}
+function okrRows(){return selOkr.size?ROWS.filter(r=>selOkr.has(r.sales)):ROWS;}
 function autoVal(k,rows){
   const H=[7,8,9,10,11,12];
   const sum=(ms,f)=>rows.filter(r=>ms.includes(r.m)&&(!f||f(r))).reduce((s,r)=>s+r.sale,0);
@@ -376,9 +372,9 @@ function evalKR(v,br){
   for(let i=0;i<br.length;i++){const[lo,hi,plo,phi]=br[i];if(v<hi||i===br.length-1){const p=v>=hi?phi:plo+(v-lo)/(hi-lo)*(phi-plo);return{pct:Math.min(100,Math.round(p)),lv:i===0?"可":i===1?"佳":"優"};}}
   return{pct:100,lv:"優"};
 }
-function mKey(id){return "okr_"+document.getElementById("okr-scope").value+"_"+id;}
+function mKey(id){return "okr_"+(selOkr.size?[...selOkr].sort().join("|"):"all")+"_"+id;}
 function renderOKR(){
-  const s=document.getElementById("okr-scope");document.getElementById("okr-snap").textContent="· 對象："+s.options[s.selectedIndex].textContent;
+  document.getElementById("okr-snap").textContent="· 對象："+(selOkr.size?[...selOkr].slice(0,3).join("、")+(selOkr.size>3?" 等"+selOkr.size+"人":""):"全部");
   const rows=okrRows();
   document.getElementById("okr-body").innerHTML=OKR.map(o=>{
     const krs=o.krs.map(k=>{
