@@ -161,6 +161,7 @@ tbody tr:hover { background: #f8fafc; }
         <button class="treebtn" onclick="dlRegion()">⬇ 下載 CSV</button>
         <span class="note" id="rg-note"></span>
       </div>
+      <div class="card" id="rg-summary" style="background:#f4f7f2;border-color:#dfe8d8"></div>
       <div class="card"><div class="card-head"><h2>📊 逐月同期比較（2025 vs 2026）</h2><select id="rg-pick" style="font:inherit;font-size:13px;padding:6px 10px;border:1px solid #d1d5db;border-radius:8px"></select></div><div class="chart-box"><canvas id="rgChart"></canvas></div></div>
       <div class="card"><div class="card-head"><h2>📋 各區同期戰情（依今年業績排序）</h2></div>
         <div class="tbl-wrap"><table id="rg-tbl"><thead><tr><th>區域</th><th>2026 至今</th><th>2025 同期</th><th>YoY 超前/落後</th><th>2025 全年</th><th>今年進度</th></tr></thead><tbody></tbody></table></div>
@@ -169,9 +170,9 @@ tbody tr:hover { background: #f8fafc; }
   </div>
 </div>
 <script>
-const PDATA = {"snapshot": "2026/07/30", "growth": {"業務一課 - 業務一組": {"growth": -3.2, "arpu2026": 444408}, "業務一課 - 業務二組": {"growth": -7.5, "arpu2026": 441757}, "業務二課 - 業務三組": {"growth": -18.7, "arpu2026": 250060}, "業務二課 - 業務四組": {"growth": -17.7, "arpu2026": 331974}, "設計課 - 設計組": {"growth": 5.9, "arpu2026": 180463}}};
+const PDATA = {"snapshot": "2026/07/31", "growth": {"業務一課 - 業務一組": {"growth": -3.2, "arpu2026": 444408}, "業務一課 - 業務二組": {"growth": -7.5, "arpu2026": 441757}, "業務二課 - 業務三組": {"growth": -18.7, "arpu2026": 250060}, "業務二課 - 業務四組": {"growth": -17.7, "arpu2026": 331974}, "設計課 - 設計組": {"growth": 5.9, "arpu2026": 180463}}};
 const fmtN=n=>Math.round(n).toLocaleString("en-US");
-const fmtWan=n=>{const x=Math.round(n);if(Math.abs(x)>=1e8)return (x/1e8).toFixed(2).replace(/\.?0+$/,"")+"億";if(Math.abs(x)>=1e4)return Math.round(x/1e4).toLocaleString("en-US")+"萬";return x.toLocaleString("en-US");};
+const fmtWan=n=>{const x=Math.round(n);if(Math.abs(x)>=1e8)return (x/1e8).toLocaleString("en-US",{maximumFractionDigits:2})+"億";if(Math.abs(x)>=1e4)return (x/1e4).toLocaleString("en-US",{maximumFractionDigits:1})+"萬";return x.toLocaleString("en-US");};
 const PERIODS={H1:[1,2,3,4,5,6],H2:[7,8,9,10,11,12],Q1:[1,2,3],Q2:[4,5,6],Q3:[7,8,9],Q4:[10,11,12]};
 const ADN={"on-site":"站內廣告","remarketing":"再行銷","digitm":"數媒-站內","agent":"數媒-再行銷"};
 document.getElementById("snap").textContent="資料快照："+PDATA.snapshot;
@@ -470,13 +471,15 @@ function rgPeriod(){return curMonths()||[...Array(YTD)].map((_,i)=>i+1);}
 function rgAgg(){
   const rows=fYoy(),per=rgPeriod(),acc={};
   const nameOf=r=>rgLevel==="city"?r.region:(r.section?r.region+"｜"+r.section:null);
-  for(const r of rows){const n=nameOf(r);if(!n)continue;const a=acc[n]||(acc[n]={s25:0,s26:0,fy25:0});
-    if(r.y===25){if(per.includes(r.m))a.s25+=r.sale;a.fy25+=r.sale;}else if(per.includes(r.m))a.s26+=r.sale;}
+  for(const r of rows){const n=nameOf(r);if(!n)continue;const a=acc[n]||(acc[n]={s25:0,s26:0,fy25:0,bs:{}});
+    if(r.y===25){if(per.includes(r.m))a.s25+=r.sale;a.fy25+=r.sale;}
+    else if(per.includes(r.m)){a.s26+=r.sale;a.bs[r.sales]=(a.bs[r.sales]||0)+r.sale;}}
   return acc;
 }
 function rgRows(){
   const acc=rgAgg(),q=document.getElementById("rg-search").value.trim();
-  let out=Object.entries(acc).map(([name,v])=>({name,s25:v.s25,s26:v.s26,fy25:v.fy25,yoy:v.s25?(v.s26-v.s25)/v.s25*100:null,prog:v.fy25?v.s26/v.fy25*100:0}));
+  let out=Object.entries(acc).map(([name,v])=>{const L=Object.entries(v.bs||{}).sort((a,b)=>b[1]-a[1])[0];
+    return {name,s25:v.s25,s26:v.s26,fy25:v.fy25,yoy:v.s25?(v.s26-v.s25)/v.s25*100:null,prog:v.fy25?v.s26/v.fy25*100:0,lead:L?L[0]:"",leadS:L?L[1]:0};});
   if(q)out=out.filter(x=>x.name.includes(q));
   const sk=rgYear==="25"?"s25":"s26";
   return out.filter(x=>x.s25||x.s26).sort((a,b)=>b[sk]-a[sk]);
@@ -486,16 +489,32 @@ function renderRegion(){
   document.getElementById("rg-note").textContent="期間 "+(curMonths()?curLabel():"1–"+YTD+"月")+"　範圍 "+(selSales.size?selSales.size+" 業務":"全業務")+"／"+(selRegion.size?selRegion.size+" 區":"全區");
   const rows=rgRows(),head=document.querySelector("#rg-tbl thead tr"),body=document.querySelector("#rg-tbl tbody");
   if(rgYear==="yoy"){
-    head.innerHTML="<th>區域</th><th>2026 期間</th><th>2025 同期</th><th>YoY 超前/落後</th><th>2025 全年</th><th>今年進度</th>";
-    body.innerHTML=rows.map(x=>{const b=x.yoy==null?"—":`<b style="color:${x.yoy>=0?'#1f7a4d':'#b53b65'}">${x.yoy>=0?'▲ 超前 ':'▼ 落後 '}${Math.abs(x.yoy).toFixed(1)}%</b>`;return `<tr><td>${x.name.replace('｜','-')}</td><td>${fmtN(x.s26)}</td><td>${fmtN(x.s25)}</td><td>${b}</td><td>${fmtN(x.fy25)}</td><td>${x.prog.toFixed(0)}%</td></tr>`;}).join("")||`<tr><td colspan="6" class="note">查無資料</td></tr>`;
+    head.innerHTML="<th>區域</th><th>主力業務</th><th>2026 期間</th><th>2025 同期</th><th>YoY 成長/衰退</th><th>2025 全年</th><th>今年進度</th>";
+    body.innerHTML=rows.map(x=>{const b=x.yoy==null?"—":`<b style="color:${x.yoy>=0?'#1f7a4d':'#b53b65'}">${x.yoy>=0?'▲ 成長 ':'▼ 衰退 '}${Math.abs(x.yoy).toFixed(1)}%</b>`;return `<tr><td>${x.name.replace('｜','-')}</td><td>${x.lead||'—'}</td><td>${fmtWan(x.s26)}</td><td>${fmtWan(x.s25)}</td><td>${b}</td><td>${fmtWan(x.fy25)}</td><td>${x.prog.toFixed(0)}%</td></tr>`;}).join("")||`<tr><td colspan="7" class="note">查無資料</td></tr>`;
   }else{
     const yr=rgYear==="25"?"2025":"2026",key=rgYear==="25"?"s25":"s26",tot=rows.reduce((s,x)=>s+x[key],0)||1;
-    head.innerHTML=`<th>區域</th><th>${yr} 期間業績</th><th>占比</th>`;
-    body.innerHTML=rows.map(x=>`<tr><td>${x.name.replace('｜','-')}</td><td>${fmtN(x[key])}</td><td>${(x[key]/tot*100).toFixed(1)}%</td></tr>`).join("")||`<tr><td colspan="3" class="note">查無資料</td></tr>`;
+    head.innerHTML=`<th>區域</th><th>主力業務</th><th>${yr} 期間業績</th><th>占比</th>`;
+    body.innerHTML=rows.map(x=>`<tr><td>${x.name.replace('｜','-')}</td><td>${x.lead||'—'}</td><td>${fmtWan(x[key])}</td><td>${(x[key]/tot*100).toFixed(1)}%</td></tr>`).join("")||`<tr><td colspan="4" class="note">查無資料</td></tr>`;
   }
+  renderRgSummary(rows);
   const pick=document.getElementById("rg-pick");
   if(pick.dataset.lv!==rgLevel){pick.innerHTML="";rows.forEach(x=>{const o=document.createElement("option");o.value=x.name;o.textContent=x.name.replace('｜','-');pick.appendChild(o);});pick.dataset.lv=rgLevel;}
   renderRgChart();
+}
+function renderRgSummary(rows){
+  const el=document.getElementById("rg-summary"); if(!el)return;
+  const yv=rows.filter(x=>x.yoy!=null);
+  const t26=rows.reduce((s,x)=>s+x.s26,0), t25=rows.reduce((s,x)=>s+x.s25,0);
+  const ov=t25?((t26-t25)/t25*100):0;
+  const grow=yv.filter(x=>x.yoy>=0).length, drop=yv.filter(x=>x.yoy<0).length;
+  const up=[...yv].sort((a,b)=>b.yoy-a.yoy)[0], dn=[...yv].sort((a,b)=>a.yoy-b.yoy)[0];
+  const scope=(selSales.size?selSales.size+" 位業務":"全業務")+"、"+(rgLevel==="city"?"縣市":"行政區");
+  const oc=ov>=0?"#1f7a4d":"#b53b65";
+  el.innerHTML=`<div style="font-size:13.5px;line-height:1.9;color:#1a1d23">
+    <b style="color:#263E44">📍 區域表現說明</b>（${scope}，期間 ${curMonths()?curLabel():"1–"+YTD+"月"}）<br>
+    整體同期 <b style="color:${oc}">${ov>=0?"成長":"衰退"} ${Math.abs(ov).toFixed(1)}%</b>（今年 ${fmtWan(t26)} vs 去年同期 ${fmtWan(t25)}）；共 ${yv.length} 區，<b style="color:#1f7a4d">${grow} 區成長</b>、<b style="color:#b53b65">${drop} 區衰退</b>。
+    ${up?`最強 <b>${up.name.replace('｜','-')}</b> ${up.yoy>=0?"+":""}${up.yoy.toFixed(1)}%（主力 ${up.lead||"—"}）；`:""}${dn&&dn!==up?`最弱 <b>${dn.name.replace('｜','-')}</b> ${dn.yoy.toFixed(1)}%（主力 ${dn.lead||"—"}）。`:""}
+  </div>`;
 }
 function renderRgChart(){
   const name=document.getElementById("rg-pick").value;
@@ -505,7 +524,7 @@ function renderRgChart(){
   rows.forEach(r=>{(r.y===25?y25:y26)[r.m-1]+=r.sale;});
   const labels=[...Array(12)].map((_,i)=>(i+1)+"月");
   if(rgChart)rgChart.destroy();
-  rgChart=new Chart(document.getElementById("rgChart"),{type:"bar",data:{labels,datasets:[{label:"2025",data:y25,backgroundColor:"#a7c0c5",borderRadius:3},{label:"2026",data:y26,backgroundColor:"#263E44",borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"top"},tooltip:{callbacks:{label:c=>c.dataset.label+"：NT$"+fmtN(c.raw)}}},scales:{y:{ticks:{callback:v=>(v/1e6)+"M"}}}}});
+  rgChart=new Chart(document.getElementById("rgChart"),{type:"bar",data:{labels,datasets:[{label:"2025",data:y25,backgroundColor:"#a7c0c5",borderRadius:3},{label:"2026",data:y26,backgroundColor:"#263E44",borderRadius:3}]},plugins:[wanLabel],options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:16}},plugins:{legend:{position:"top"},tooltip:{callbacks:{label:c=>c.dataset.label+"：NT$"+fmtN(c.raw)}}},scales:{y:{ticks:{callback:v=>(v/1e6)+"M"}}}}});
 }
 function dlRegion(){const rows=rgRows();if(rgYear==="yoy"){dl("區域戰情_"+(rgLevel==="city"?"縣市":"行政區")+".csv",[["區域","2026期間","2025同期","YoY%","2025全年","進度%"],...rows.map(x=>[x.name.replace('｜','-'),x.s26,x.s25,(x.yoy!=null?x.yoy.toFixed(1)+"%":""),x.fy25,x.prog.toFixed(0)+"%"])]);}else{const key=rgYear==="25"?"s25":"s26";dl("區域_"+rgYear+".csv",[["區域",rgYear+"期間業績"],...rows.map(x=>[x.name.replace('｜','-'),x[key]])]);}}
 
