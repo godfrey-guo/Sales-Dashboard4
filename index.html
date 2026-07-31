@@ -300,12 +300,28 @@ function renderProj(){
   document.getElementById("proj-kpis").innerHTML=[["合作建案數",fmtN(s.coop),"房產·有縣市+行政區"],["在線建案數",fmtN(s.online),"預測系統"],["整體滲透率",(s.pen!=null?s.pen.toFixed(1)+"%":"—"),"合作÷在線"],["客單價",fmtWan(s.arpu)+"元",fmtN(s.arpu)],["房產業績",fmtWan(s.sale)+"元",fmtN(s.sale)]].map(k=>`<div class="kpi"><div class="k">${k[0]}</div><div class="v">${k[1]}</div><div class="n">${k[2]}</div></div>`).join("");
   document.getElementById("proj-value").innerHTML=[["有價值合作",fmtN(s.coopv),""],["無價值合作",fmtN(s.coopn),""],["有價值在線",fmtN(s.onlinev),""],["有價值滲透率",(s.penv!=null?s.penv.toFixed(1)+"%":"—"),""]].map(k=>`<div class="kpi"><div class="k">${k[0]}</div><div class="v">${k[1]}</div><div class="n">${k[2]}</div></div>`).join("");
   // 維度表
-  const key=projDim; const hb={},ob={};
-  fHouse().forEach(r=>{(hb[r[key]]=hb[r[key]]||[]).push(r);});
-  fOnline().forEach(r=>{(ob[r[key]]=ob[r[key]]||[]).push(r);});
-  const names=[...new Set([...Object.keys(hb),...Object.keys(ob)])];
-  const rowsOut=names.map(nm=>{const st=projStats(hb[nm]||[],ob[nm]||[]);return{name:nm||"（未填）",...st};}).sort((a,b)=>b.coop-a.coop);
-  document.querySelector("#proj-tbl tbody").innerHTML=rowsOut.map(x=>`<tr><td>${x.name}</td><td>${fmtN(x.coop)}</td><td>${fmtN(x.online)}</td><td>${x.pen!=null?x.pen.toFixed(1)+"%":"—"}</td><td>${fmtN(x.coopv)}</td><td>${fmtN(x.sale)}</td><td>${fmtN(x.arpu)}</td></tr>`).join("");
+  const tb=document.querySelector("#proj-tbl tbody");
+  const cell=st=>`<td>${fmtN(st.coop)}</td><td>${fmtN(st.online)}</td><td>${st.pen!=null?st.pen.toFixed(1)+"%":"—"}</td><td>${fmtN(st.coopv)}</td><td>${fmtN(st.sale)}</td><td>${fmtN(st.arpu)}</td>`;
+  if(projDim==="region"){
+    const cities=[...new Set([...h,...o].map(r=>r.region).filter(x=>x))];
+    const crs=cities.map(city=>{const ch=h.filter(r=>r.region===city),co=o.filter(r=>r.region===city);return{city,st:projStats(ch,co),ch,co};}).sort((a,b)=>b.st.coop-a.st.coop);
+    let html="";
+    crs.forEach((cr,ci)=>{
+      html+=`<tr class="pcity" data-ci="${ci}" style="cursor:pointer;background:#f6f8f9;font-weight:600"><td><span class="exp" style="display:inline-block;width:14px;color:#8a97a0">▸</span>${cr.city}</td>${cell(cr.st)}</tr>`;
+      const secs=[...new Set([...cr.ch,...cr.co].map(r=>r.section))];
+      const srs=secs.map(sec=>{const sh=cr.ch.filter(r=>r.section===sec),so=cr.co.filter(r=>r.section===sec);return{sec:sec||"（未分區）",st:projStats(sh,so)};}).sort((a,b)=>b.st.coop-a.st.coop);
+      srs.forEach(sr=>{ html+=`<tr class="psub sub-${ci}" style="display:none"><td style="padding-left:30px;color:#5a6271">${sr.sec}</td>${cell(sr.st)}</tr>`; });
+    });
+    tb.innerHTML=html;
+    tb.querySelectorAll(".pcity").forEach(tr=>tr.addEventListener("click",()=>{const ci=tr.dataset.ci,exp=tr.querySelector(".exp"),open=exp.textContent==="▾";exp.textContent=open?"▸":"▾";tb.querySelectorAll(".sub-"+ci).forEach(s=>s.style.display=open?"none":"");}));
+  } else {
+    const key=projDim, hb={},ob={};
+    h.forEach(r=>{(hb[r[key]]=hb[r[key]]||[]).push(r);});
+    o.forEach(r=>{(ob[r[key]]=ob[r[key]]||[]).push(r);});
+    const names=[...new Set([...Object.keys(hb),...Object.keys(ob)])];
+    const rowsOut=names.map(nm=>({name:nm||"（未填）",...projStats(hb[nm]||[],ob[nm]||[])})).sort((a,b)=>b.coop-a.coop);
+    tb.innerHTML=rowsOut.map(x=>`<tr><td>${x.name}</td>${cell(x)}</tr>`).join("");
+  }
 }
 function dlProj(){const h=fHouse(),o=fOnline(),key=projDim,hb={},ob={};h.forEach(r=>{(hb[r[key]]=hb[r[key]]||[]).push(r);});o.forEach(r=>{(ob[r[key]]=ob[r[key]]||[]).push(r);});const names=[...new Set([...Object.keys(hb),...Object.keys(ob)])];const rowsOut=names.map(nm=>{const st=projStats(hb[nm]||[],ob[nm]||[]);return[nm,st.coop,st.online,(st.pen!=null?st.pen.toFixed(1)+"%":""),st.coopv,st.sale,st.arpu];});dl(`建案分析_${key}.csv`,[["名稱","合作建案","在線建案","滲透率","有價值合作","房產業績","客單價"],...rowsOut]);}
 
