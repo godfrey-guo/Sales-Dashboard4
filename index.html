@@ -173,6 +173,7 @@ tbody tr:hover { background: #f8fafc; }
 const PDATA = {"snapshot": "2026/07/31", "growth": {"業務一課 - 業務一組": {"growth": -3.2, "arpu2026": 444408}, "業務一課 - 業務二組": {"growth": -7.5, "arpu2026": 441757}, "業務二課 - 業務三組": {"growth": -18.7, "arpu2026": 250060}, "業務二課 - 業務四組": {"growth": -17.7, "arpu2026": 331974}, "設計課 - 設計組": {"growth": 5.9, "arpu2026": 180463}}};
 const fmtN=n=>Math.round(n).toLocaleString("en-US");
 const fmtWan=n=>{const x=Math.round(n);if(Math.abs(x)>=1e8)return (x/1e8).toLocaleString("en-US",{maximumFractionDigits:2})+"億";if(Math.abs(x)>=1e4)return (x/1e4).toLocaleString("en-US",{maximumFractionDigits:1})+"萬";return x.toLocaleString("en-US");};
+const fmtBoth=n=>`${fmtWan(n)}<span style="display:block;font-size:10px;color:#9aa3ad;font-weight:400">${fmtN(n)}</span>`;
 const PERIODS={H1:[1,2,3,4,5,6],H2:[7,8,9,10,11,12],Q1:[1,2,3],Q2:[4,5,6],Q3:[7,8,9],Q4:[10,11,12]};
 const ADN={"on-site":"站內廣告","remarketing":"再行銷","digitm":"數媒-站內","agent":"數媒-再行銷"};
 document.getElementById("snap").textContent="資料快照："+PDATA.snapshot;
@@ -490,11 +491,11 @@ function renderRegion(){
   const rows=rgRows(),head=document.querySelector("#rg-tbl thead tr"),body=document.querySelector("#rg-tbl tbody");
   if(rgYear==="yoy"){
     head.innerHTML="<th>區域</th><th>主力業務</th><th>2026 期間</th><th>2025 同期</th><th>YoY 成長/衰退</th><th>2025 全年</th><th>今年進度</th>";
-    body.innerHTML=rows.map(x=>{const b=x.yoy==null?"—":`<b style="color:${x.yoy>=0?'#1f7a4d':'#b53b65'}">${x.yoy>=0?'▲ 成長 ':'▼ 衰退 '}${Math.abs(x.yoy).toFixed(1)}%</b>`;return `<tr><td>${x.name.replace('｜','-')}</td><td>${x.lead||'—'}</td><td>${fmtWan(x.s26)}</td><td>${fmtWan(x.s25)}</td><td>${b}</td><td>${fmtWan(x.fy25)}</td><td>${x.prog.toFixed(0)}%</td></tr>`;}).join("")||`<tr><td colspan="7" class="note">查無資料</td></tr>`;
+    body.innerHTML=rows.map(x=>{const b=x.yoy==null?"—":`<b style="color:${x.yoy>=0?'#1f7a4d':'#b53b65'}">${x.yoy>=0?'▲ 成長 ':'▼ 衰退 '}${Math.abs(x.yoy).toFixed(1)}%</b>`;return `<tr><td>${x.name.replace('｜','-')}</td><td>${x.lead||'—'}</td><td>${fmtBoth(x.s26)}</td><td>${fmtBoth(x.s25)}</td><td>${b}</td><td>${fmtBoth(x.fy25)}</td><td>${x.prog.toFixed(0)}%</td></tr>`;}).join("")||`<tr><td colspan="7" class="note">查無資料</td></tr>`;
   }else{
     const yr=rgYear==="25"?"2025":"2026",key=rgYear==="25"?"s25":"s26",tot=rows.reduce((s,x)=>s+x[key],0)||1;
     head.innerHTML=`<th>區域</th><th>主力業務</th><th>${yr} 期間業績</th><th>占比</th>`;
-    body.innerHTML=rows.map(x=>`<tr><td>${x.name.replace('｜','-')}</td><td>${x.lead||'—'}</td><td>${fmtWan(x[key])}</td><td>${(x[key]/tot*100).toFixed(1)}%</td></tr>`).join("")||`<tr><td colspan="4" class="note">查無資料</td></tr>`;
+    body.innerHTML=rows.map(x=>`<tr><td>${x.name.replace('｜','-')}</td><td>${x.lead||'—'}</td><td>${fmtBoth(x[key])}</td><td>${(x[key]/tot*100).toFixed(1)}%</td></tr>`).join("")||`<tr><td colspan="4" class="note">查無資料</td></tr>`;
   }
   renderRgSummary(rows);
   const pick=document.getElementById("rg-pick");
