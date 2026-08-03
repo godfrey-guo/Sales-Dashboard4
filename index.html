@@ -170,7 +170,7 @@ tbody tr:hover { background: #f8fafc; }
   </div>
 </div>
 <script>
-const PDATA = {"snapshot": "2026/07/31", "growth": {"業務一課 - 業務一組": {"growth": -3.2, "arpu2026": 444408}, "業務一課 - 業務二組": {"growth": -7.5, "arpu2026": 441757}, "業務二課 - 業務三組": {"growth": -18.7, "arpu2026": 250060}, "業務二課 - 業務四組": {"growth": -17.7, "arpu2026": 331974}, "設計課 - 設計組": {"growth": 5.9, "arpu2026": 180463}}};
+const PDATA = {"snapshot": "2026/08/03", "growth": {"業務一課 - 業務一組": {"growth": -3.2, "arpu2026": 444408}, "業務一課 - 業務二組": {"growth": -7.5, "arpu2026": 441757}, "業務二課 - 業務三組": {"growth": -18.7, "arpu2026": 250060}, "業務二課 - 業務四組": {"growth": -17.7, "arpu2026": 331974}, "設計課 - 設計組": {"growth": 5.9, "arpu2026": 180463}}};
 const fmtN=n=>Math.round(n).toLocaleString("en-US");
 const fmtWan=n=>{const x=Math.round(n);if(Math.abs(x)>=1e8)return (x/1e8).toLocaleString("en-US",{maximumFractionDigits:2})+"億";if(Math.abs(x)>=1e4)return (x/1e4).toLocaleString("en-US",{maximumFractionDigits:1})+"萬";return x.toLocaleString("en-US");};
 const fmtBoth=n=>`${fmtWan(n)}<span style="display:block;font-size:10px;color:#9aa3ad;font-weight:400">${fmtN(n)}</span>`;
