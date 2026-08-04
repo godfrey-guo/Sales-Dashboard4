@@ -151,7 +151,10 @@ tbody tr:hover { background: #f8fafc; }
 
     <section id="page-team" class="hide">
       <div class="pagetitle">課組戰情（隨篩選即時算；成長率為全年 2025 vs 2026）</div>
-      <div class="note" style="margin-bottom:12px">💡 <b>目標</b>可直接輸入（存本機）。業績/客單價/占比隨上方篩選變；滲透率、有無價值為房產7月、客單價成長率為全年，屬課組層級。</div>
+      <div class="note" style="margin-bottom:12px">💡 <b>目標按季輸入</b>（存本機）：在下方面板填各組 Q1–Q4 目標，表格「目標／達成率」會依你上方選的期間自動累加（H1=Q1+Q2、全年=四季總和、單月=該季÷3）。業績/客單價/占比隨篩選變；滲透率、有無價值為房產7月、客單價成長率為全年。</div>
+      <details style="margin-bottom:12px"><summary style="cursor:pointer;font-weight:700;color:#263E44;padding:8px 0">⚙️ 設定各季目標（Q1–Q4，單位：元）</summary>
+        <div class="card" style="margin-top:8px"><div class="tbl-wrap"><table id="qtgt-tbl"><thead><tr><th>組別</th><th>Q1</th><th>Q2</th><th>Q3</th><th>Q4</th><th>全年合計</th></tr></thead><tbody></tbody></table></div></div>
+      </details>
       <div class="card"><div class="card-head"><h2>🎯 各課組達成戰情</h2><button onclick="dlTeam()">⬇ 下載 CSV</button></div>
         <div class="tbl-wrap"><table id="team-tbl"><thead><tr><th>課組</th><th>業績總額</th><th>目標</th><th>達成率</th><th>客單價(全年)</th><th>客單價成長率</th><th>滲透率</th><th>有價值合作</th><th>無價值合作</th><th>站內占比</th><th>再行銷占比</th></tr></thead><tbody></tbody></table></div>
       </div>
@@ -193,7 +196,7 @@ tbody tr:hover { background: #f8fafc; }
   </div>
 </div>
 <script>
-const PDATA = {"snapshot": "2026/08/04", "growth": {"業務一課 - 業務一組": {"growth": -3.2, "arpu2026": 444408}, "業務一課 - 業務二組": {"growth": -7.5, "arpu2026": 441757}, "業務二課 - 業務三組": {"growth": -18.7, "arpu2026": 250060}, "業務二課 - 業務四組": {"growth": -17.7, "arpu2026": 331974}, "設計課 - 設計組": {"growth": 5.9, "arpu2026": 180463}}, "pipe": {"曾方音": {"f": 99553, "q": 1131692, "p": 622493, "grp": "業務一課 - 業務二組"}, "呂佩宜": {"f": 114333, "q": 2145783, "p": 25662, "grp": "業務二課 - 業務三組"}, "簡艷華": {"f": 20000, "q": 621867, "p": 76087, "grp": "業務二課 - 業務四組"}, "黃淑萍": {"f": 309012, "q": 827996, "p": 597158, "grp": "業務一課 - 業務一組"}, "趙紹亨": {"f": 58310, "q": 345429, "p": 481116, "grp": "業務一課 - 業務一組"}, "楊儀菲": {"f": 339263, "q": 0, "p": 75000, "grp": "業務一課 - 業務二組"}, "陳怡雯": {"f": 731799, "q": 0, "p": 67470, "grp": "業務一課 - 業務二組"}, "曾家羚": {"f": 0, "q": 2778837, "p": 460979, "grp": "業務二課 - 業務三組"}, "簡順隆": {"f": 0, "q": 1904803, "p": 133946, "grp": "業務一課 - 業務二組"}, "姚蘋芸": {"f": 0, "q": 449486, "p": 127784, "grp": "業務二課 - 業務四組"}, "彭莉芳": {"f": 0, "q": 98982, "p": 306527, "grp": "業務一課 - 業務一組"}, "陳琬臻": {"f": 0, "q": 4951486, "p": 89916, "grp": "業務二課 - 業務三組"}, "鄧瑋婷": {"f": 0, "q": 331121, "p": 124462, "grp": "業務二課 - 業務四組"}, "張淑瑜": {"f": 0, "q": 0, "p": 281245, "grp": "業務一課"}, "許孟瑋": {"f": 0, "q": 0, "p": 21600, "grp": "業務二課"}, "吳子敬": {"f": 0, "q": 0, "p": 187500, "grp": "業務一課 - 業務二組"}, "程湣傑": {"f": 0, "q": 0, "p": 1912493, "grp": "媒體產品課 - 站台產品組"}, "李抒姮": {"f": 0, "q": 0, "p": 156952, "grp": "設計課 - 設計組"}, "仲綨柱": {"f": 0, "q": 0, "p": 314402, "grp": "業務一課 - 業務一組"}, "陳文昕": {"f": 0, "q": 0, "p": 943237, "grp": "行銷策略課 - 行銷一組"}, "趙斯蓓": {"f": 0, "q": 0, "p": 314342, "grp": "設計課 - 設計組"}}, "weekly": {"2026-W32": {"date": "2026/08/04", "cls": {"業務二課": {"signed": 29652313, "wpipe": 2998292}, "設計課": {"signed": 1427191, "wpipe": 329906}, "行銷策略課": {"signed": 0, "wpipe": 660266}, "媒體產品課": {"signed": 0, "wpipe": 1338745}, "業務一課": {"signed": 49660573, "wpipe": 4085136}}}}};
+const PDATA = {"snapshot": "2026/08/04", "growth": {"業務一課 - 業務一組": {"growth": -3.2, "arpu2026": 444408}, "業務一課 - 業務二組": {"growth": -7.5, "arpu2026": 441757}, "業務二課 - 業務三組": {"growth": -18.7, "arpu2026": 250060}, "業務二課 - 業務四組": {"growth": -17.7, "arpu2026": 331974}, "設計課 - 設計組": {"growth": 5.9, "arpu2026": 180463}}, "pipe": {"曾方音": {"f": 99553, "q": 1131692, "p": 622493, "grp": "業務一課 - 業務二組"}, "呂佩宜": {"f": 114333, "q": 2145783, "p": 25662, "grp": "業務二課 - 業務三組"}, "簡艷華": {"f": 20000, "q": 621867, "p": 76087, "grp": "業務二課 - 業務四組"}, "黃淑萍": {"f": 309012, "q": 827996, "p": 597158, "grp": "業務一課 - 業務一組"}, "趙紹亨": {"f": 58310, "q": 345429, "p": 481116, "grp": "業務一課 - 業務一組"}, "楊儀菲": {"f": 339263, "q": 0, "p": 75000, "grp": "業務一課 - 業務二組"}, "陳怡雯": {"f": 731799, "q": 0, "p": 67470, "grp": "業務一課 - 業務二組"}, "曾家羚": {"f": 0, "q": 2778837, "p": 460979, "grp": "業務二課 - 業務三組"}, "簡順隆": {"f": 0, "q": 1904803, "p": 133946, "grp": "業務一課 - 業務二組"}, "姚蘋芸": {"f": 0, "q": 449486, "p": 127784, "grp": "業務二課 - 業務四組"}, "彭莉芳": {"f": 0, "q": 98982, "p": 306527, "grp": "業務一課 - 業務一組"}, "陳琬臻": {"f": 0, "q": 4951486, "p": 89916, "grp": "業務二課 - 業務三組"}, "鄧瑋婷": {"f": 0, "q": 331121, "p": 124462, "grp": "業務二課 - 業務四組"}, "張淑瑜": {"f": 0, "q": 0, "p": 281245, "grp": "業務一課"}, "許孟瑋": {"f": 0, "q": 0, "p": 21600, "grp": "業務二課"}, "吳子敬": {"f": 0, "q": 0, "p": 187500, "grp": "業務一課 - 業務二組"}, "程湣傑": {"f": 0, "q": 0, "p": 1912493, "grp": "媒體產品課 - 站台產品組"}, "李抒姮": {"f": 0, "q": 0, "p": 156952, "grp": "設計課 - 設計組"}, "仲綨柱": {"f": 0, "q": 0, "p": 314402, "grp": "業務一課 - 業務一組"}, "陳文昕": {"f": 0, "q": 0, "p": 943237, "grp": "行銷策略課 - 行銷一組"}, "趙斯蓓": {"f": 0, "q": 0, "p": 314342, "grp": "設計課 - 設計組"}}, "weekly": {"2026-W32": {"date": "2026/08/04", "cls": {"業務二課": {"signed": 29652313, "wpipe": 2998292}, "媒體產品課": {"signed": 0, "wpipe": 1338745}, "業務一課": {"signed": 49660573, "wpipe": 4085136}, "設計課": {"signed": 1427191, "wpipe": 329906}, "行銷策略課": {"signed": 0, "wpipe": 660266}}}}};
 const fmtN=n=>Math.round(n).toLocaleString("en-US");
 const fmtWan=n=>{const x=Math.round(n);if(Math.abs(x)>=1e8)return (x/1e8).toLocaleString("en-US",{maximumFractionDigits:2})+"億";if(Math.abs(x)>=1e4)return (x/1e4).toLocaleString("en-US",{maximumFractionDigits:1})+"萬";return x.toLocaleString("en-US");};
 const fmtBoth=n=>`${fmtWan(n)}<span style="display:block;font-size:10px;color:#9aa3ad;font-weight:400">${fmtN(n)}</span>`;
@@ -377,7 +380,30 @@ function dlProj(){const h=fHouse(),o=fOnline(),key=projDim,hb={},ob={};h.forEach
 // ---------- 課組戰情 ----------
 const ORDER=["業務一課 - 業務一組","業務一課 - 業務二組","業務二課 - 業務三組","業務二課 - 業務四組","設計課 - 設計組"];
 function tKey(g){return "dm_target_2026_"+g;} function getTarget(g){const v=localStorage.getItem(tKey(g));return v?+v:null;}
+// ── 各季目標（新制）──
+function qKey(g,q){return "dm_qtgt_2026_"+g+"_q"+q;}
+function getQ(g,q){const v=localStorage.getItem(qKey(g,q));return v?+v:null;}
+function hasQ(g){return [1,2,3,4].some(q=>getQ(g,q)!=null);}
+function yearQ(g){return [1,2,3,4].reduce((s,q)=>s+(getQ(g,q)||0),0);}
+// 依目前篩選期間算目標：逐月累加（該月所屬季目標÷3）；無季目標則回退舊全年目標按月比例
+function periodTarget(g){
+  const ms=curMonths()||[1,2,3,4,5,6,7,8,9,10,11,12];
+  if(hasQ(g)){let s=0;ms.forEach(m=>{const q=Math.ceil(m/3);s+=(getQ(g,q)||0)/3;});return Math.round(s);}
+  const old=getTarget(g); if(old==null)return null; return Math.round(old*ms.length/12);
+}
+function renderQtgt(){
+  const tb=document.querySelector("#qtgt-tbl tbody"); if(!tb)return; tb.innerHTML="";
+  ORDER.forEach(g=>{
+    const nm=g.replace("業務","").replace(" - ","-");
+    const inp=q=>`<input type="number" data-g="${g}" data-q="${q}" value="${getQ(g,q)!=null?getQ(g,q):''}" placeholder="—" style="width:104px;text-align:right;padding:4px 6px;border:1px solid #d1d5db;border-radius:6px;font:inherit;font-size:12.5px">`;
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${nm}</td><td>${inp(1)}</td><td>${inp(2)}</td><td>${inp(3)}</td><td>${inp(4)}</td><td style="font-weight:700;color:#263E44">${fmtN(yearQ(g))}</td>`;
+    tb.appendChild(tr);
+  });
+  tb.querySelectorAll("input").forEach(i=>i.addEventListener("input",()=>{const v=i.value?+i.value:null;if(v)localStorage.setItem(qKey(i.dataset.g,i.dataset.q),v);else localStorage.removeItem(qKey(i.dataset.g,i.dataset.q));renderQtgt();renderTeam();}));
+}
 function renderTeam(){
+  renderQtgt();
   const rows=fRows(); const byg={};
   rows.forEach(r=>{(byg[r.grp]=byg[r.grp]||[]).push(r);});
   // 房產（滲透率）依篩選
@@ -390,16 +416,15 @@ function renderTeam(){
     const st=projStats(hb[full]||[],ob[full]||[]);
     const gr=(PDATA.growth[full]||{}).growth, arpuFy=(PDATA.growth[full]||{}).arpu2026;
     const name=full.replace("業務","").replace(" - ","-");
-    const tgt=getTarget(full), rate=tgt?(a.sale/tgt*100).toFixed(1)+"%":"—", rc=tgt?(a.sale>=tgt?"#1f7a4d":"#b53b65"):"";
+    const tgt=periodTarget(full), rate=tgt?(a.sale/tgt*100).toFixed(1)+"%":"—", rc=tgt?(a.sale>=tgt?"#1f7a4d":"#b53b65"):"";
     const grTxt=gr!=null?(gr>0?"+":"")+gr+"%":"—", gc=gr!=null?(gr>=0?"#1f7a4d":"#b53b65"):"";
     const tr=document.createElement("tr");
-    tr.innerHTML=`<td>${name}</td><td>${fmtN(a.sale)}</td><td><input type="number" data-g="${full}" value="${tgt!=null?tgt:''}" placeholder="輸入" style="width:96px;text-align:right;padding:4px 6px;border:1px solid #d1d5db;border-radius:6px;font:inherit;font-size:12.5px"></td><td class="rate" style="font-weight:700;color:${rc}">${rate}</td><td>${fmtN(arpuFy!=null?arpuFy:a.arpu)}</td><td style="font-weight:700;color:${gc}">${grTxt}</td><td>${st.pen!=null?st.pen.toFixed(1)+"%":"—"}</td><td>${fmtN(st.coopv)}</td><td>${fmtN(st.coopn)}</td><td>${a.sale?(onsite/a.sale*100).toFixed(1):0}%</td><td>${a.sale?(remkt/a.sale*100).toFixed(1):0}%</td>`;
+    tr.innerHTML=`<td>${name}</td><td>${fmtN(a.sale)}</td><td style="text-align:right">${tgt!=null?fmtN(tgt):"<span style='color:#98a2b3'>未設</span>"}</td><td class="rate" style="font-weight:700;color:${rc}">${rate}</td><td>${fmtN(arpuFy!=null?arpuFy:a.arpu)}</td><td style="font-weight:700;color:${gc}">${grTxt}</td><td>${st.pen!=null?st.pen.toFixed(1)+"%":"—"}</td><td>${fmtN(st.coopv)}</td><td>${fmtN(st.coopn)}</td><td>${a.sale?(onsite/a.sale*100).toFixed(1):0}%</td><td>${a.sale?(remkt/a.sale*100).toFixed(1):0}%</td>`;
     tb.appendChild(tr);
   });
-  tb.querySelectorAll("input").forEach(inp=>inp.addEventListener("input",()=>{const g=inp.dataset.g,v=inp.value?+inp.value:null;if(v)localStorage.setItem(tKey(g),v);else localStorage.removeItem(tKey(g));renderTeam();}));
 }
 function dlTeam(){const rows=fRows(),byg={};rows.forEach(r=>{(byg[r.grp]=byg[r.grp]||[]).push(r);});const h=fHouse(),o=fOnline(),hb={},ob={};h.forEach(r=>{(hb[r.grp]=hb[r.grp]||[]).push(r);});o.forEach(r=>{(ob[r.grp]=ob[r.grp]||[]).push(r);});
-  const out=ORDER.map(full=>{const a=agg(byg[full]||[]);let on=0,re=0;(byg[full]||[]).forEach(r=>{if(r.ad==="on-site")on+=r.sale;else if(r.ad==="remarketing"||r.ad==="agent")re+=r.sale;});const st=projStats(hb[full]||[],ob[full]||[]);const g=(PDATA.growth[full]||{});const t=getTarget(full);return [full.replace("業務","").replace(" - ","-"),a.sale,(t||""),(t?(a.sale/t*100).toFixed(1)+"%":""),(g.arpu2026!=null?g.arpu2026:a.arpu),(g.growth!=null?g.growth+"%":""),(st.pen!=null?st.pen.toFixed(1)+"%":""),st.coopv,st.coopn,(a.sale?(on/a.sale*100).toFixed(1):0)+"%",(a.sale?(re/a.sale*100).toFixed(1):0)+"%"];});
+  const out=ORDER.map(full=>{const a=agg(byg[full]||[]);let on=0,re=0;(byg[full]||[]).forEach(r=>{if(r.ad==="on-site")on+=r.sale;else if(r.ad==="remarketing"||r.ad==="agent")re+=r.sale;});const st=projStats(hb[full]||[],ob[full]||[]);const g=(PDATA.growth[full]||{});const t=periodTarget(full);return [full.replace("業務","").replace(" - ","-"),a.sale,(t||""),(t?(a.sale/t*100).toFixed(1)+"%":""),(g.arpu2026!=null?g.arpu2026:a.arpu),(g.growth!=null?g.growth+"%":""),(st.pen!=null?st.pen.toFixed(1)+"%":""),st.coopv,st.coopn,(a.sale?(on/a.sale*100).toFixed(1):0)+"%",(a.sale?(re/a.sale*100).toFixed(1):0)+"%"];});
   dl("課組戰情.csv",[["課組","業績總額","目標","達成率","客單價全年","客單價成長率","滲透率","有價值合作","無價值合作","站內占比","再行銷占比"],...out]);}
 
 // ---------- OKR 考核 ----------
