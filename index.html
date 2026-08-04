@@ -598,8 +598,11 @@ function dlRegion(){const rows=rgRows();if(rgYear==="yoy"){dl("區域戰情_"+(r
 
 // ---------- 業務戰報 ----------
 const GRP_TARGETS={
+ "業務一課 - 業務一組":{q3:3546},
+ "業務一課 - 業務二組":{q3:3496},
  "業務二課 - 業務三組":{q3:2248,q4:2129,h2:4377,remkt_q3:274,remkt_q4:259,remkt_h2:533,coop_q3:195,coop_q4:185,coop_h2:380},
- "業務二課 - 業務四組":{q3:2400,q4:2222,h2:4622,remkt_q3:227,remkt_q4:210,remkt_h2:437,coop_q3:241,coop_q4:223,coop_h2:464}
+ "業務二課 - 業務四組":{q3:2400,q4:2222,h2:4622,remkt_q3:227,remkt_q4:210,remkt_h2:437,coop_q3:241,coop_q4:223,coop_h2:464},
+ "設計課 - 設計組":{q3:1110}
 };
 const wanT=w=>Math.round(w).toLocaleString("en-US")+"萬";
 function buildWar(){const s=document.getElementById("war-cls");s.innerHTML="";[...new Set(ROWS.map(r=>r.cls))].filter(x=>x&&x!=="(其他)").sort().forEach(c=>{const o=document.createElement("option");o.value=c;o.textContent=c;if(c==="業務二課")o.selected=true;s.appendChild(o);});s.addEventListener("change",renderWar);}
