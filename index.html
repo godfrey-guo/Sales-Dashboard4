@@ -105,7 +105,7 @@ tbody tr:hover { background: #f8fafc; }
       <div class="ctrl" style="position:relative"><button class="treebtn" id="btn-sales">業務：全部 ▾</button><div class="pop" id="pop-sales"></div></div>
       <div class="ctrl" style="position:relative"><button class="treebtn" id="btn-region">建案地區：全部 ▾</button><div class="pop" id="pop-region"></div></div>
       <div class="ctrl"><label>站台</label><select id="f-ch"><option value="">全部</option></select></div>
-      <div class="ctrl"><label>廣告類型</label><select id="f-ad"><option value="">全部</option><option value="on-site">站內廣告</option><option value="remarketing">再行銷</option><option value="digitm">數媒-站內</option><option value="agent">數媒-再行銷</option></select></div>
+      <div class="ctrl" style="position:relative"><button class="treebtn" id="btn-ad">廣告類型：全部 ▾</button><div class="pop" id="pop-ad"></div></div>
       <span id="status" class="note"></span>
     </div>
 
@@ -170,7 +170,7 @@ tbody tr:hover { background: #f8fafc; }
   </div>
 </div>
 <script>
-const PDATA = {"snapshot": "2026/08/03", "growth": {"業務一課 - 業務一組": {"growth": -3.2, "arpu2026": 444408}, "業務一課 - 業務二組": {"growth": -7.5, "arpu2026": 441757}, "業務二課 - 業務三組": {"growth": -18.7, "arpu2026": 250060}, "業務二課 - 業務四組": {"growth": -17.7, "arpu2026": 331974}, "設計課 - 設計組": {"growth": 5.9, "arpu2026": 180463}}};
+const PDATA = {"snapshot": "2026/08/04", "growth": {"業務一課 - 業務一組": {"growth": -3.2, "arpu2026": 444408}, "業務一課 - 業務二組": {"growth": -7.5, "arpu2026": 441757}, "業務二課 - 業務三組": {"growth": -18.7, "arpu2026": 250060}, "業務二課 - 業務四組": {"growth": -17.7, "arpu2026": 331974}, "設計課 - 設計組": {"growth": 5.9, "arpu2026": 180463}}};
 const fmtN=n=>Math.round(n).toLocaleString("en-US");
 const fmtWan=n=>{const x=Math.round(n);if(Math.abs(x)>=1e8)return (x/1e8).toLocaleString("en-US",{maximumFractionDigits:2})+"億";if(Math.abs(x)>=1e4)return (x/1e4).toLocaleString("en-US",{maximumFractionDigits:1})+"萬";return x.toLocaleString("en-US");};
 const fmtBoth=n=>`${fmtWan(n)}<span style="display:block;font-size:10px;color:#9aa3ad;font-weight:400">${fmtN(n)}</span>`;
@@ -180,7 +180,7 @@ document.getElementById("snap").textContent="資料快照："+PDATA.snapshot;
 const wanLabel={id:"wanLabel",afterDatasetsDraw(c){const t=c.config.type,x=c.ctx;c.data.datasets.forEach((ds,di)=>{c.getDatasetMeta(di).data.forEach((el,i)=>{const v=ds.data[i];if(!v)return;x.save();x.font="bold 11px sans-serif";x.textAlign="center";x.textBaseline="middle";if(t==="bar"){x.fillStyle="#263E44";x.fillText(fmtWan(v),el.x,el.y-8);}else{const p=el.tooltipPosition();x.lineWidth=3;x.strokeStyle="rgba(0,0,0,.4)";x.strokeText(fmtWan(v),p.x,p.y);x.fillStyle="#fff";x.fillText(fmtWan(v),p.x,p.y);}x.restore();});});}};
 
 let ROWS=[], HOUSE=[], ONLINE=[], YOY=[], curDim="cls", projDim="grp", rgLevel="city", rgYear="yoy", YTD=7, trendChart, chChart, rgChart;
-const selSales=new Set(), selRegion=new Set(), selOkr=new Set(); // 空=全部
+const selSales=new Set(), selRegion=new Set(), selOkr=new Set(), selAd=new Set(); // 空=全部
 
 Promise.all([fetch("./data.json").then(r=>r.json()), fetch("./proj_rows.json").then(r=>r.json()), fetch("./yoy.json").then(r=>r.json()).catch(()=>({cols:[],dicts:{},rows:[]}))]).then(([d,pr,yy])=>{
   if(yy&&yy.rows&&yy.rows.length){const c=yy.cols,gy=n=>c.indexOf(n),FF=['region','section','cls','grp','sales','ch','ad'];YOY=yy.rows.map(r=>{const o={y:r[gy('y')],m:r[gy('m')],sale:r[gy('sale')]};FF.forEach(f=>o[f]=yy.dicts[f][r[gy(f)]]);return o;});}
@@ -192,11 +192,11 @@ Promise.all([fetch("./data.json").then(r=>r.json()), fetch("./proj_rows.json").t
   // 下拉
   fill("f-month",[...Array(12)].map((_,i)=>[String(i+1),(i+1)+"月"]));
   fill("f-ch",[...new Set(ROWS.map(r=>r.ch))].filter(x=>x).sort().map(v=>[v,v]));
-  buildSalesTree(); buildRegionTree(); buildOkrScope(); buildRegion();
+  buildSalesTree(); buildRegionTree(); buildOkrScope(); buildAdTree(); buildRegion();
   document.getElementById("loading").classList.add("hide"); document.getElementById("app").classList.remove("hide");
   document.getElementById("f-month").addEventListener("change",()=>{if(val("f-month"))document.getElementById("f-quarter").value="";renderAll();});
   document.getElementById("f-quarter").addEventListener("change",()=>{if(val("f-quarter"))document.getElementById("f-month").value="";renderAll();});
-  ["f-ch","f-ad"].forEach(id=>document.getElementById(id).addEventListener("change",renderAll));
+  document.getElementById("f-ch").addEventListener("change",renderAll);
   document.querySelectorAll("#dimtabs .tab").forEach(t=>t.addEventListener("click",()=>{sw("#dimtabs",t);curDim=t.dataset.dim;renderPerf();}));
   document.querySelectorAll("#proj-tabs .tab").forEach(t=>t.addEventListener("click",()=>{sw("#proj-tabs",t);projDim=t.dataset.dim;renderProj();}));
   renderAll();
@@ -254,13 +254,14 @@ function buildRegionTree(){
   const tree=Object.keys(h).sort().map(city=>({label:city,children:[...h[city]].sort().map(sec=>({label:sec||"（未分行政區）",key:city+"|"+sec}))}));
   makeTree("pop-region","btn-region",tree,selRegion,"建案地區");
 }
+function buildAdTree(){ makeTree("pop-ad","btn-ad",[{label:"站內廣告",key:"on-site"},{label:"再行銷",key:"remarketing"},{label:"數媒-站內",key:"digitm"},{label:"數媒-再行銷",key:"agent"}],selAd,"廣告類型",renderAll); }
 
 // ---------- 篩選 ----------
 function curMonths(){const mo=val("f-month"),qt=val("f-quarter");if(mo)return[+mo];if(qt)return PERIODS[qt];return null;}
 function curLabel(){const mo=val("f-month"),qt=val("f-quarter");if(mo)return mo+"月";if(qt)return qt;return "全年";}
 function matchSales(r){return selSales.size===0||selSales.has(r.sales);}
 function matchRegion(r){return selRegion.size===0||selRegion.has((r.region||"")+"|"+(r.section||""));}
-function fRows(){const ms=curMonths(),ch=val("f-ch"),ad=val("f-ad");return ROWS.filter(r=>(!ms||ms.includes(r.m))&&(!ch||r.ch===ch)&&(!ad||r.ad===ad)&&matchSales(r)&&matchRegion(r));}
+function fRows(){const ms=curMonths(),ch=val("f-ch");return ROWS.filter(r=>(!ms||ms.includes(r.m))&&(!ch||r.ch===ch)&&(!selAd.size||selAd.has(r.ad))&&matchSales(r)&&matchRegion(r));}
 function fHouse(){const ms=curMonths();return HOUSE.filter(r=>(!ms||ms.includes(r.m))&&matchSales(r)&&matchRegion(r));}
 function fOnline(){return ONLINE.filter(r=>matchSales(r)&&matchRegion(r));}
 
@@ -525,7 +526,7 @@ function buildRegion(){
   document.getElementById("rg-search").addEventListener("input",renderRegion);
   document.getElementById("rg-pick").addEventListener("change",renderRgChart);
 }
-function fYoy(){const ch=val("f-ch"),ad=val("f-ad");return YOY.filter(r=>(!ch||r.ch===ch)&&(!ad||r.ad===ad)&&matchSales(r)&&matchRegion(r));}
+function fYoy(){const ch=val("f-ch");return YOY.filter(r=>(!ch||r.ch===ch)&&(!selAd.size||selAd.has(r.ad))&&matchSales(r)&&matchRegion(r));}
 function rgPeriod(){return curMonths()||[...Array(YTD)].map((_,i)=>i+1);}
 function rgAgg(){
   const rows=fYoy(),per=rgPeriod(),acc={};
