@@ -56,6 +56,8 @@ tbody tr:hover { background: #f8fafc; }
 .tab { padding: 5px 12px; border: 1px solid #d1d5db; border-radius: 8px; background: #fff; font-size: 12.5px; cursor: pointer; }
 .tab.active { background: #eef3f4; border-color: #263E44; color: #263E44; font-weight: 700; }
 .note { font-size: 12px; color: #9aa3ad; margin-top: 8px; }
+.cap { font-size: 12px; color: #5a6675; background:#f3f6f7; border-left:3px solid #263E44; border-radius:0 6px 6px 0; padding:7px 10px; margin:0 0 12px; line-height:1.55; }
+.cap b { color:#263E44; }
 .hide { display: none; }
 .pagetitle { font-size: 16px; font-weight: 700; color: #263E44; margin: 4px 0 14px; }
 #loading { padding: 40px; text-align: center; color: #5a6271; }
@@ -124,12 +126,14 @@ tbody tr:hover { background: #f8fafc; }
     </div>
 
     <section id="page-perf">
+      <div class="cap" id="cap-kpi"></div>
       <div class="kpis" id="perf-kpis"></div>
       <div class="grid2">
-        <div class="card"><div class="card-head"><h2>📈 每月業績趨勢</h2></div><div class="chart-box"><canvas id="trend"></canvas></div></div>
-        <div class="card"><div class="card-head"><h2>🏢 各站台業績</h2></div><div class="chart-box"><canvas id="chCh"></canvas></div></div>
+        <div class="card"><div class="card-head"><h2>📈 每月業績趨勢</h2></div><div class="cap" id="cap-trend"></div><div class="chart-box"><canvas id="trend"></canvas></div></div>
+        <div class="card"><div class="card-head"><h2>🏢 各站台業績</h2></div><div class="cap" id="cap-ch"></div><div class="chart-box"><canvas id="chCh"></canvas></div></div>
       </div>
       <div class="card"><div class="card-head"><h2>📋 維度明細</h2><button onclick="dlDim()">⬇ 下載 CSV</button></div>
+        <div class="cap" id="cap-dim"></div>
         <div class="tabs" id="dimtabs">
           <div class="tab active" data-dim="cls">業務課</div><div class="tab" data-dim="grp">業務組</div><div class="tab" data-dim="sales">個別業務</div>
           <div class="tab" data-dim="region">縣市</div><div class="tab" data-dim="customer">客戶</div><div class="tab" data-dim="industry">產業</div><div class="tab" data-dim="slot">版位群組</div>
@@ -196,7 +200,7 @@ tbody tr:hover { background: #f8fafc; }
   </div>
 </div>
 <script>
-const PDATA = {"snapshot": "2026/08/04", "growth": {"業務一課 - 業務一組": {"growth": -3.2, "arpu2026": 444408}, "業務一課 - 業務二組": {"growth": -7.5, "arpu2026": 441757}, "業務二課 - 業務三組": {"growth": -18.7, "arpu2026": 250060}, "業務二課 - 業務四組": {"growth": -17.7, "arpu2026": 331974}, "設計課 - 設計組": {"growth": 5.9, "arpu2026": 180463}}, "pipe": {"曾方音": {"f": 99553, "q": 1131692, "p": 622493, "grp": "業務一課 - 業務二組"}, "呂佩宜": {"f": 114333, "q": 2145783, "p": 25662, "grp": "業務二課 - 業務三組"}, "簡艷華": {"f": 20000, "q": 621867, "p": 76087, "grp": "業務二課 - 業務四組"}, "黃淑萍": {"f": 309012, "q": 827996, "p": 597158, "grp": "業務一課 - 業務一組"}, "趙紹亨": {"f": 58310, "q": 345429, "p": 481116, "grp": "業務一課 - 業務一組"}, "楊儀菲": {"f": 339263, "q": 0, "p": 75000, "grp": "業務一課 - 業務二組"}, "陳怡雯": {"f": 731799, "q": 0, "p": 67470, "grp": "業務一課 - 業務二組"}, "曾家羚": {"f": 0, "q": 2778837, "p": 460979, "grp": "業務二課 - 業務三組"}, "簡順隆": {"f": 0, "q": 1904803, "p": 133946, "grp": "業務一課 - 業務二組"}, "姚蘋芸": {"f": 0, "q": 449486, "p": 127784, "grp": "業務二課 - 業務四組"}, "彭莉芳": {"f": 0, "q": 98982, "p": 306527, "grp": "業務一課 - 業務一組"}, "陳琬臻": {"f": 0, "q": 4951486, "p": 89916, "grp": "業務二課 - 業務三組"}, "鄧瑋婷": {"f": 0, "q": 331121, "p": 124462, "grp": "業務二課 - 業務四組"}, "張淑瑜": {"f": 0, "q": 0, "p": 281245, "grp": "業務一課"}, "許孟瑋": {"f": 0, "q": 0, "p": 21600, "grp": "業務二課"}, "吳子敬": {"f": 0, "q": 0, "p": 187500, "grp": "業務一課 - 業務二組"}, "程湣傑": {"f": 0, "q": 0, "p": 1912493, "grp": "媒體產品課 - 站台產品組"}, "李抒姮": {"f": 0, "q": 0, "p": 156952, "grp": "設計課 - 設計組"}, "仲綨柱": {"f": 0, "q": 0, "p": 314402, "grp": "業務一課 - 業務一組"}, "陳文昕": {"f": 0, "q": 0, "p": 943237, "grp": "行銷策略課 - 行銷一組"}, "趙斯蓓": {"f": 0, "q": 0, "p": 314342, "grp": "設計課 - 設計組"}}, "weekly": {"2026-W32": {"date": "2026/08/04", "cls": {"設計課": {"signed": 1427191, "wpipe": 329906}, "業務二課": {"signed": 29652313, "wpipe": 2998292}, "業務一課": {"signed": 49660573, "wpipe": 4085136}, "媒體產品課": {"signed": 0, "wpipe": 1338745}, "行銷策略課": {"signed": 0, "wpipe": 660266}}}}};
+const PDATA = {"snapshot": "2026/08/04", "growth": {"業務一課 - 業務一組": {"growth": -3.2, "arpu2026": 444408}, "業務一課 - 業務二組": {"growth": -7.5, "arpu2026": 441757}, "業務二課 - 業務三組": {"growth": -18.7, "arpu2026": 250060}, "業務二課 - 業務四組": {"growth": -17.7, "arpu2026": 331974}, "設計課 - 設計組": {"growth": 5.9, "arpu2026": 180463}}, "pipe": {"曾方音": {"f": 99553, "q": 1131692, "p": 622493, "grp": "業務一課 - 業務二組"}, "呂佩宜": {"f": 114333, "q": 2145783, "p": 25662, "grp": "業務二課 - 業務三組"}, "簡艷華": {"f": 20000, "q": 621867, "p": 76087, "grp": "業務二課 - 業務四組"}, "黃淑萍": {"f": 309012, "q": 827996, "p": 597158, "grp": "業務一課 - 業務一組"}, "趙紹亨": {"f": 58310, "q": 345429, "p": 481116, "grp": "業務一課 - 業務一組"}, "楊儀菲": {"f": 339263, "q": 0, "p": 75000, "grp": "業務一課 - 業務二組"}, "陳怡雯": {"f": 731799, "q": 0, "p": 67470, "grp": "業務一課 - 業務二組"}, "曾家羚": {"f": 0, "q": 2778837, "p": 460979, "grp": "業務二課 - 業務三組"}, "簡順隆": {"f": 0, "q": 1904803, "p": 133946, "grp": "業務一課 - 業務二組"}, "姚蘋芸": {"f": 0, "q": 449486, "p": 127784, "grp": "業務二課 - 業務四組"}, "彭莉芳": {"f": 0, "q": 98982, "p": 306527, "grp": "業務一課 - 業務一組"}, "陳琬臻": {"f": 0, "q": 4951486, "p": 89916, "grp": "業務二課 - 業務三組"}, "鄧瑋婷": {"f": 0, "q": 331121, "p": 124462, "grp": "業務二課 - 業務四組"}, "張淑瑜": {"f": 0, "q": 0, "p": 281245, "grp": "業務一課"}, "許孟瑋": {"f": 0, "q": 0, "p": 21600, "grp": "業務二課"}, "吳子敬": {"f": 0, "q": 0, "p": 187500, "grp": "業務一課 - 業務二組"}, "程湣傑": {"f": 0, "q": 0, "p": 1912493, "grp": "媒體產品課 - 站台產品組"}, "李抒姮": {"f": 0, "q": 0, "p": 156952, "grp": "設計課 - 設計組"}, "仲綨柱": {"f": 0, "q": 0, "p": 314402, "grp": "業務一課 - 業務一組"}, "陳文昕": {"f": 0, "q": 0, "p": 943237, "grp": "行銷策略課 - 行銷一組"}, "趙斯蓓": {"f": 0, "q": 0, "p": 314342, "grp": "設計課 - 設計組"}}, "weekly": {"2026-W32": {"date": "2026/08/04", "cls": {"媒體產品課": {"signed": 0, "wpipe": 1338745}, "業務一課": {"signed": 49660573, "wpipe": 4085136}, "業務二課": {"signed": 29652313, "wpipe": 2998292}, "行銷策略課": {"signed": 0, "wpipe": 660266}, "設計課": {"signed": 1427191, "wpipe": 329906}}}}};
 const fmtN=n=>Math.round(n).toLocaleString("en-US");
 const fmtWan=n=>{const x=Math.round(n);if(Math.abs(x)>=1e8)return (x/1e8).toLocaleString("en-US",{maximumFractionDigits:2})+"億";if(Math.abs(x)>=1e4)return (x/1e4).toLocaleString("en-US",{maximumFractionDigits:1})+"萬";return x.toLocaleString("en-US");};
 const fmtBoth=n=>`${fmtWan(n)}<span style="display:block;font-size:10px;color:#9aa3ad;font-weight:400">${fmtN(n)}</span>`;
@@ -285,6 +289,14 @@ function buildAdTree(){ makeTree("pop-ad","btn-ad",[{label:"站內廣告",key:"o
 // ---------- 篩選 ----------
 function curMonths(){const mo=val("f-month"),qt=val("f-quarter");if(mo)return[+mo];if(qt)return PERIODS[qt];return null;}
 function curLabel(){const mo=val("f-month"),qt=val("f-quarter");if(mo)return mo+"月";if(qt)return qt;return "全年";}
+const AD_NAME={"on-site":"站內廣告","remarketing":"再行銷","digitm":"數媒-站內","agent":"數媒-再行銷"};
+function ctxText(){const p=["期間 <b>"+curLabel()+"</b>"];
+  if(selSales.size)p.push("業務 <b>"+[...selSales].slice(0,3).join("、")+(selSales.size>3?" 等"+selSales.size+"人":"")+"</b>");
+  if(selRegion.size)p.push("地區 <b>"+selRegion.size+" 區</b>");
+  const ch=val("f-ch"); if(ch)p.push("站台 <b>"+ch+"</b>");
+  if(selAd.size)p.push("廣告 <b>"+[...selAd].map(a=>AD_NAME[a]||a).join("、")+"</b>");
+  if(p.length===1)p.push("<b>全公司・全站台・全類型</b>");
+  return p.join("　·　");}
 function matchSales(r){return selSales.size===0||selSales.has(r.sales);}
 function matchRegion(r){return selRegion.size===0||selRegion.has((r.region||"")+"|"+(r.section||""));}
 function fRows(){const ms=curMonths(),ch=val("f-ch");return ROWS.filter(r=>(!ms||ms.includes(r.m))&&(!ch||r.ch===ch)&&(!selAd.size||selAd.has(r.ad))&&matchSales(r)&&matchRegion(r));}
@@ -334,7 +346,17 @@ function renderPerf(){
     const arr=groupBy(rows,curDim);
     tbD.innerHTML=arr.map(x=>`<tr><td>${x.name}</td>${pc(x)}</tr>`).join("");
   }
+  // ── 說明列（隨篩選即時變）──
+  const ctx=ctxText();
+  let bestM=0,bestV=-1;for(const k in mon){if(mon[k]>bestV){bestV=mon[k];bestM=k;}}
+  const topCh=cg[0], dimNm=(document.querySelector("#dimtabs .tab.active")||{}).textContent||"";
+  const dimN=(curDim==="cls")?"":groupBy(rows,curDim).length;
+  setCap("cap-kpi",`目前範圍：${ctx}。<b>總業績</b>＝已簽約 sale_price 加總；<b>客戶數・委刊單</b>為 distinct 去重（跨月同一客戶只算一次）；<b>客單價</b>＝業績÷客戶數。共 ${fmtN(rows.length)} 筆明細。`);
+  setCap("cap-trend",`每根柱＝該月<b>已簽約業績</b>（${ctx}）。目前最高：<b>${bestM}月</b>（${fmtWan(bestV||0)}元）。切月/季會只留該區間。`);
+  setCap("cap-ch",topCh?`各站台業績占比（${ctx}）。最大站台：<b>${topCh.name}</b>，占 <b>${(topCh.sale/(a.sale||1)*100).toFixed(1)}%</b>（${fmtWan(topCh.sale)}元）。`:`各站台業績占比（${ctx}）。`);
+  setCap("cap-dim",`依<b>【${dimNm}】</b>拆解（${ctx}）：<b>占比</b>＝該列業績÷篩選後總業績；<b>客單價</b>＝業績÷客戶數${curDim==="cls"?"。點列可展開 課→組→員":"，共 "+dimN+" 列"}。`);
 }
+function setCap(id,html){const e=document.getElementById(id);if(e)e.innerHTML=html;}
 function dlDim(){const rows=fRows(),arr=groupBy(rows,curDim),tot=arr.reduce((s,x)=>s+x.sale,0)||1,nm=document.querySelector("#dimtabs .tab.active").textContent;dl(`業績明細_${curLabel()}_${nm}.csv`,[[nm,"業績","占比","客戶數","客單價","委刊單"],...arr.map(x=>[x.name,x.sale,(x.sale/tot*100).toFixed(2)+"%",x.cust,x.arpu,x.ins])]);}
 
 // ---------- 建案分析 ----------
