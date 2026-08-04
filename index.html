@@ -144,10 +144,12 @@ tbody tr:hover { background: #f8fafc; }
 
     <section id="page-proj" class="hide">
       <div class="pagetitle">建案分析（合作建案隨月份/季度即時算；在線建案為 7/29 預測系統快照，不隨月份變）</div>
+      <div class="cap" id="cap-proj-kpi"></div>
       <div class="kpis" id="proj-kpis"></div>
       <div class="card"><div class="card-head"><h2>💎 有無價值貢獻</h2></div><div class="kpis" id="proj-value" style="margin:0"></div>
         <div class="note">合作建案：已簽約房產且有縣市＋行政區。有價值滲透率＝有價值合作 ÷ 有價值在線。</div></div>
       <div class="card"><div class="card-head"><h2>📋 維度明細</h2><button onclick="dlProj()">⬇ 下載 CSV</button></div>
+        <div class="cap" id="cap-proj-dim"></div>
         <div class="tabs" id="proj-tabs"><div class="tab active" data-dim="grp">業務組</div><div class="tab" data-dim="cls">業務課</div><div class="tab" data-dim="region">縣市</div></div>
         <div class="tbl-wrap"><table id="proj-tbl"><thead><tr><th>名稱</th><th>合作建案</th><th>在線建案</th><th>滲透率</th><th>有價值合作</th><th>房產業績</th><th>客單價</th></tr></thead><tbody></tbody></table></div>
       </div>
@@ -160,6 +162,7 @@ tbody tr:hover { background: #f8fafc; }
         <div class="card" style="margin-top:8px"><div class="tbl-wrap"><table id="qtgt-tbl"><thead><tr><th>組別</th><th>Q1</th><th>Q2</th><th>Q3</th><th>Q4</th><th>全年合計</th></tr></thead><tbody></tbody></table></div></div>
       </details>
       <div class="card"><div class="card-head"><h2>🎯 各課組達成戰情</h2><button onclick="dlTeam()">⬇ 下載 CSV</button></div>
+        <div class="cap" id="cap-team"></div>
         <div class="tbl-wrap"><table id="team-tbl"><thead><tr><th>課組</th><th>業績總額</th><th>目標</th><th>達成率</th><th>客單價(全年)</th><th>客單價成長率</th><th>滲透率</th><th>有價值合作</th><th>無價值合作</th><th>站內占比</th><th>再行銷占比</th></tr></thead><tbody></tbody></table></div>
       </div>
     </section>
@@ -179,6 +182,7 @@ tbody tr:hover { background: #f8fafc; }
         <div class="ctrl" style="position:relative"><label>檢視對象</label><button class="treebtn" id="btn-okr">全部 ▾</button><div class="pop" id="pop-okr"></div></div>
         <span class="note">實績自動接 DOS（H2＝7–12月）；灰底 KR 需手動輸入。門檻為範例個人基準，可日後改。</span>
       </div>
+      <div class="cap" id="cap-okr"></div>
       <div id="okr-body"></div>
     </section>
 
@@ -192,15 +196,16 @@ tbody tr:hover { background: #f8fafc; }
         <span class="note" id="rg-note"></span>
       </div>
       <div class="card" id="rg-summary" style="background:#f4f7f2;border-color:#dfe8d8"></div>
-      <div class="card"><div class="card-head"><h2>📊 逐月同期比較（2025 vs 2026）</h2><select id="rg-pick" style="font:inherit;font-size:13px;padding:6px 10px;border:1px solid #d1d5db;border-radius:8px"></select></div><div class="chart-box"><canvas id="rgChart"></canvas></div></div>
+      <div class="card"><div class="card-head"><h2>📊 逐月同期比較（2025 vs 2026）</h2><select id="rg-pick" style="font:inherit;font-size:13px;padding:6px 10px;border:1px solid #d1d5db;border-radius:8px"></select></div><div class="cap" id="cap-rg-chart"></div><div class="chart-box"><canvas id="rgChart"></canvas></div></div>
       <div class="card"><div class="card-head"><h2>📋 各區同期戰情（依今年業績排序）</h2></div>
+        <div class="cap" id="cap-rg-tbl"></div>
         <div class="tbl-wrap"><table id="rg-tbl"><thead><tr><th>區域</th><th>2026 至今</th><th>2025 同期</th><th>YoY 超前/落後</th><th>2025 全年</th><th>今年進度</th></tr></thead><tbody></tbody></table></div>
       </div>
     </section>
   </div>
 </div>
 <script>
-const PDATA = {"snapshot": "2026/08/04", "growth": {"業務一課 - 業務一組": {"growth": -3.2, "arpu2026": 444408}, "業務一課 - 業務二組": {"growth": -7.5, "arpu2026": 441757}, "業務二課 - 業務三組": {"growth": -18.7, "arpu2026": 250060}, "業務二課 - 業務四組": {"growth": -17.7, "arpu2026": 331974}, "設計課 - 設計組": {"growth": 5.9, "arpu2026": 180463}}, "pipe": {"曾方音": {"f": 99553, "q": 1131692, "p": 622493, "grp": "業務一課 - 業務二組"}, "呂佩宜": {"f": 114333, "q": 2145783, "p": 25662, "grp": "業務二課 - 業務三組"}, "簡艷華": {"f": 20000, "q": 621867, "p": 76087, "grp": "業務二課 - 業務四組"}, "黃淑萍": {"f": 309012, "q": 827996, "p": 597158, "grp": "業務一課 - 業務一組"}, "趙紹亨": {"f": 58310, "q": 345429, "p": 481116, "grp": "業務一課 - 業務一組"}, "楊儀菲": {"f": 339263, "q": 0, "p": 75000, "grp": "業務一課 - 業務二組"}, "陳怡雯": {"f": 731799, "q": 0, "p": 67470, "grp": "業務一課 - 業務二組"}, "曾家羚": {"f": 0, "q": 2778837, "p": 460979, "grp": "業務二課 - 業務三組"}, "簡順隆": {"f": 0, "q": 1904803, "p": 133946, "grp": "業務一課 - 業務二組"}, "姚蘋芸": {"f": 0, "q": 449486, "p": 127784, "grp": "業務二課 - 業務四組"}, "彭莉芳": {"f": 0, "q": 98982, "p": 306527, "grp": "業務一課 - 業務一組"}, "陳琬臻": {"f": 0, "q": 4951486, "p": 89916, "grp": "業務二課 - 業務三組"}, "鄧瑋婷": {"f": 0, "q": 331121, "p": 124462, "grp": "業務二課 - 業務四組"}, "張淑瑜": {"f": 0, "q": 0, "p": 281245, "grp": "業務一課"}, "許孟瑋": {"f": 0, "q": 0, "p": 21600, "grp": "業務二課"}, "吳子敬": {"f": 0, "q": 0, "p": 187500, "grp": "業務一課 - 業務二組"}, "程湣傑": {"f": 0, "q": 0, "p": 1912493, "grp": "媒體產品課 - 站台產品組"}, "李抒姮": {"f": 0, "q": 0, "p": 156952, "grp": "設計課 - 設計組"}, "仲綨柱": {"f": 0, "q": 0, "p": 314402, "grp": "業務一課 - 業務一組"}, "陳文昕": {"f": 0, "q": 0, "p": 943237, "grp": "行銷策略課 - 行銷一組"}, "趙斯蓓": {"f": 0, "q": 0, "p": 314342, "grp": "設計課 - 設計組"}}, "weekly": {"2026-W32": {"date": "2026/08/04", "cls": {"媒體產品課": {"signed": 0, "wpipe": 1338745}, "業務一課": {"signed": 49660573, "wpipe": 4085136}, "業務二課": {"signed": 29652313, "wpipe": 2998292}, "行銷策略課": {"signed": 0, "wpipe": 660266}, "設計課": {"signed": 1427191, "wpipe": 329906}}}}};
+const PDATA = {"snapshot": "2026/08/04", "growth": {"業務一課 - 業務一組": {"growth": -3.2, "arpu2026": 444408}, "業務一課 - 業務二組": {"growth": -7.5, "arpu2026": 441757}, "業務二課 - 業務三組": {"growth": -18.7, "arpu2026": 250060}, "業務二課 - 業務四組": {"growth": -17.7, "arpu2026": 331974}, "設計課 - 設計組": {"growth": 5.9, "arpu2026": 180463}}, "pipe": {"曾方音": {"f": 99553, "q": 1131692, "p": 622493, "grp": "業務一課 - 業務二組"}, "呂佩宜": {"f": 114333, "q": 2145783, "p": 25662, "grp": "業務二課 - 業務三組"}, "簡艷華": {"f": 20000, "q": 621867, "p": 76087, "grp": "業務二課 - 業務四組"}, "黃淑萍": {"f": 309012, "q": 827996, "p": 597158, "grp": "業務一課 - 業務一組"}, "趙紹亨": {"f": 58310, "q": 345429, "p": 481116, "grp": "業務一課 - 業務一組"}, "楊儀菲": {"f": 339263, "q": 0, "p": 75000, "grp": "業務一課 - 業務二組"}, "陳怡雯": {"f": 731799, "q": 0, "p": 67470, "grp": "業務一課 - 業務二組"}, "曾家羚": {"f": 0, "q": 2778837, "p": 460979, "grp": "業務二課 - 業務三組"}, "簡順隆": {"f": 0, "q": 1904803, "p": 133946, "grp": "業務一課 - 業務二組"}, "姚蘋芸": {"f": 0, "q": 449486, "p": 127784, "grp": "業務二課 - 業務四組"}, "彭莉芳": {"f": 0, "q": 98982, "p": 306527, "grp": "業務一課 - 業務一組"}, "陳琬臻": {"f": 0, "q": 4951486, "p": 89916, "grp": "業務二課 - 業務三組"}, "鄧瑋婷": {"f": 0, "q": 331121, "p": 124462, "grp": "業務二課 - 業務四組"}, "張淑瑜": {"f": 0, "q": 0, "p": 281245, "grp": "業務一課"}, "許孟瑋": {"f": 0, "q": 0, "p": 21600, "grp": "業務二課"}, "吳子敬": {"f": 0, "q": 0, "p": 187500, "grp": "業務一課 - 業務二組"}, "程湣傑": {"f": 0, "q": 0, "p": 1912493, "grp": "媒體產品課 - 站台產品組"}, "李抒姮": {"f": 0, "q": 0, "p": 156952, "grp": "設計課 - 設計組"}, "仲綨柱": {"f": 0, "q": 0, "p": 314402, "grp": "業務一課 - 業務一組"}, "陳文昕": {"f": 0, "q": 0, "p": 943237, "grp": "行銷策略課 - 行銷一組"}, "趙斯蓓": {"f": 0, "q": 0, "p": 314342, "grp": "設計課 - 設計組"}}, "weekly": {"2026-W32": {"date": "2026/08/04", "cls": {"行銷策略課": {"signed": 0, "wpipe": 660266}, "業務二課": {"signed": 29652313, "wpipe": 2998292}, "媒體產品課": {"signed": 0, "wpipe": 1338745}, "業務一課": {"signed": 49660573, "wpipe": 4085136}, "設計課": {"signed": 1427191, "wpipe": 329906}}}}};
 const fmtN=n=>Math.round(n).toLocaleString("en-US");
 const fmtWan=n=>{const x=Math.round(n);if(Math.abs(x)>=1e8)return (x/1e8).toLocaleString("en-US",{maximumFractionDigits:2})+"億";if(Math.abs(x)>=1e4)return (x/1e4).toLocaleString("en-US",{maximumFractionDigits:1})+"萬";return x.toLocaleString("en-US");};
 const fmtBoth=n=>`${fmtWan(n)}<span style="display:block;font-size:10px;color:#9aa3ad;font-weight:400">${fmtN(n)}</span>`;
@@ -296,6 +301,11 @@ function ctxText(){const p=["期間 <b>"+curLabel()+"</b>"];
   const ch=val("f-ch"); if(ch)p.push("站台 <b>"+ch+"</b>");
   if(selAd.size)p.push("廣告 <b>"+[...selAd].map(a=>AD_NAME[a]||a).join("、")+"</b>");
   if(p.length===1)p.push("<b>全公司・全站台・全類型</b>");
+  return p.join("　·　");}
+function ctxHouse(){const p=["期間 <b>"+curLabel()+"</b>"];
+  if(selSales.size)p.push("業務 <b>"+[...selSales].slice(0,3).join("、")+(selSales.size>3?" 等"+selSales.size+"人":"")+"</b>");
+  if(selRegion.size)p.push("地區 <b>"+selRegion.size+" 區</b>");
+  if(p.length===1)p.push("<b>全公司</b>");
   return p.join("　·　");}
 function matchSales(r){return selSales.size===0||selSales.has(r.sales);}
 function matchRegion(r){return selRegion.size===0||selRegion.has((r.region||"")+"|"+(r.section||""));}
@@ -396,6 +406,9 @@ function renderProj(){
     const rowsOut=names.map(nm=>({name:nm||"（未填）",...projStats(hb[nm]||[],ob[nm]||[])})).sort((a,b)=>b.coop-a.coop);
     tb.innerHTML=rowsOut.map(x=>`<tr><td>${x.name}</td>${cell(x)}</tr>`).join("");
   }
+  const ctx=ctxHouse(), pdNm=(document.querySelector("#proj-tabs .tab.active")||{}).textContent||"";
+  setCap("cap-proj-kpi",`房產類建案指標（${ctx}）。<b>合作建案</b>＝已簽約房產且有縣市+行政區、去重；<b>在線建案</b>為 7/29 預測系統快照（不隨月份變）；<b>滲透率</b>＝合作÷在線；<b>客單價</b>＝房產業績÷客戶數。`);
+  setCap("cap-proj-dim",`依<b>【${pdNm}】</b>拆解（${ctx}）：各列為該分類的合作/在線/滲透率/有價值合作/房產業績/客單價${projDim==="cls"||projDim==="region"?"。點列可展開下一層":""}。`);
 }
 function dlProj(){const h=fHouse(),o=fOnline(),key=projDim,hb={},ob={};h.forEach(r=>{(hb[r[key]]=hb[r[key]]||[]).push(r);});o.forEach(r=>{(ob[r[key]]=ob[r[key]]||[]).push(r);});const names=[...new Set([...Object.keys(hb),...Object.keys(ob)])];const rowsOut=names.map(nm=>{const st=projStats(hb[nm]||[],ob[nm]||[]);return[nm,st.coop,st.online,(st.pen!=null?st.pen.toFixed(1)+"%":""),st.coopv,st.sale,st.arpu];});dl(`建案分析_${key}.csv`,[["名稱","合作建案","在線建案","滲透率","有價值合作","房產業績","客單價"],...rowsOut]);}
 
@@ -444,6 +457,7 @@ function renderTeam(){
     tr.innerHTML=`<td>${name}</td><td>${fmtN(a.sale)}</td><td style="text-align:right">${tgt!=null?fmtN(tgt):"<span style='color:#98a2b3'>未設</span>"}</td><td class="rate" style="font-weight:700;color:${rc}">${rate}</td><td>${fmtN(arpuFy!=null?arpuFy:a.arpu)}</td><td style="font-weight:700;color:${gc}">${grTxt}</td><td>${st.pen!=null?st.pen.toFixed(1)+"%":"—"}</td><td>${fmtN(st.coopv)}</td><td>${fmtN(st.coopn)}</td><td>${a.sale?(onsite/a.sale*100).toFixed(1):0}%</td><td>${a.sale?(remkt/a.sale*100).toFixed(1):0}%</td>`;
     tb.appendChild(tr);
   });
+  setCap("cap-team",`各課組於【${ctxText()}】的表現。<b>目標</b>依所選期間自動累加（H1=Q1+Q2、全年=四季、單月=該季÷3），在上方面板設定；<b>達成率</b>＝該期間業績÷該期間目標。客單價(全年)、成長率為全年 2025vs2026；滲透率、有無價值為房產7月，屬課組層級不隨月變。`);
 }
 function dlTeam(){const rows=fRows(),byg={};rows.forEach(r=>{(byg[r.grp]=byg[r.grp]||[]).push(r);});const h=fHouse(),o=fOnline(),hb={},ob={};h.forEach(r=>{(hb[r.grp]=hb[r.grp]||[]).push(r);});o.forEach(r=>{(ob[r.grp]=ob[r.grp]||[]).push(r);});
   const out=ORDER.map(full=>{const a=agg(byg[full]||[]);let on=0,re=0;(byg[full]||[]).forEach(r=>{if(r.ad==="on-site")on+=r.sale;else if(r.ad==="remarketing"||r.ad==="agent")re+=r.sale;});const st=projStats(hb[full]||[],ob[full]||[]);const g=(PDATA.growth[full]||{});const t=periodTarget(full);return [full.replace("業務","").replace(" - ","-"),a.sale,(t||""),(t?(a.sale/t*100).toFixed(1)+"%":""),(g.arpu2026!=null?g.arpu2026:a.arpu),(g.growth!=null?g.growth+"%":""),(st.pen!=null?st.pen.toFixed(1)+"%":""),st.coopv,st.coopn,(a.sale?(on/a.sale*100).toFixed(1):0)+"%",(a.sale?(re/a.sale*100).toFixed(1):0)+"%"];});
@@ -502,6 +516,7 @@ function okrAchievements(people,rows){
 }
 function renderOKR(){
   const people=okrPeople(), rows=okrRows(), withT=people.filter(p=>OKR_TARGETS[p]).length;
+  setCap("cap-okr",`檢視對象：<b>${selOkr.size?[...selOkr].slice(0,3).join("、")+(selOkr.size>3?" 等"+selOkr.size+"人":""):"二課全體"}</b>（${people.length} 人合計）。<b>實績</b>為 H2（7–12月）自動接 DOS；<b>目標</b>＝所選對象個人目標加總；<b>達成率</b>＝實績÷目標，門檻 可/佳/優。灰底 KR（如包套組數）需手動輸入、存本機。`);
   document.getElementById("okr-snap").textContent="· 對象："+(selOkr.size?[...selOkr].slice(0,3).join("、")+(selOkr.size>3?" 等"+selOkr.size+"人":""):"二課全體")+(withT?"":"（此範圍尚無考核目標，目前僅二課已建）");
   const ach=okrAchievements(people,rows);
   const mood=ach.length>=2?"優":ach.length===1?"佳":"可";
@@ -627,6 +642,11 @@ function renderRegion(){
     body.innerHTML=rows.map(x=>`<tr><td>${x.name.replace('｜','-')}</td><td>${x.lead||'—'}</td><td>${fmtBoth(x[key])}</td><td>${(x[key]/tot*100).toFixed(1)}%</td></tr>`).join("")||`<tr><td colspan="4" class="note">查無資料</td></tr>`;
   }
   renderRgSummary(rows);
+  const lvl=rgLevel==="city"?"縣市":"行政區", per=curMonths()?curLabel():"1–"+YTD+"月", scp=selSales.size?selSales.size+" 位業務":"全業務";
+  setCap("cap-rg-chart",`選定<b>${lvl}</b>的逐月業績：<b>深色＝2026</b>、<b>淺色＝2025</b>，比同一個月今年 vs 去年，看哪幾個月領先或落後。範圍：${scp}。`);
+  setCap("cap-rg-tbl",rgYear==="yoy"
+    ?`各${lvl}於<b>期間 ${per}</b>今年 vs 去年同期（${scp}）：<b>YoY</b>＝(今年−去年同期)÷去年同期；<b>今年進度</b>＝今年期間÷2025全年；主力業務＝該區今年業績最高者。依今年業績排序。`
+    :`各${lvl}於 <b>${rgYear==="25"?"2025":"2026"}</b> 期間 ${per} 的業績與占比（${scp}）。占比＝該區÷全部區合計。`);
   const pick=document.getElementById("rg-pick");
   if(pick.dataset.lv!==rgLevel){pick.innerHTML="";rows.forEach(x=>{const o=document.createElement("option");o.value=x.name;o.textContent=x.name.replace('｜','-');pick.appendChild(o);});pick.dataset.lv=rgLevel;}
   renderRgChart();
@@ -696,6 +716,8 @@ function renderWar(){
   const moData=Q3.map(m=>H.filter(r=>r.m===m).reduce((s,r)=>s+r.sale,0));
   const perData=[...new Set(H.map(r=>r.sales))].filter(x=>x).map(p=>{const hp=H.filter(r=>r.sales===p);const q=wHouse(hp,Q3);const x=PIPE[p]||{f:0,q:0,p:0};return{name:p,signed:q.sale,short:x.f+x.q,pot:x.p};}).filter(x=>x.signed>0).sort((a,b)=>(b.signed+b.short+b.pot)-(a.signed+a.short+a.pot));
   const kc=(k,v,n,col)=>`<div class="kpi"><div class="k">${k}</div><div class="v"${col?` style="color:${col}"`:""}>${v}</div><div class="n">${n}</div></div>`;
+  const cap=t=>`<div class="cap">${t}</div>`;
+  const wrng=grps.map(g=>g.split(" - ")[1]||g).join("＋");
   // OKR
   const h2s=wSum(R,H2)/1e4,tH2=T("h2"),h2r=wSum(R,H2,r=>r.ad==="remarketing"||r.ad==="agent")/1e4,tRe=T("remkt_h2"),h2c=wHouse(H,H2).coop,tCo=T("coop_h2");
   const okrCard=(nm,val,unit,tgt)=>{const rate=tgt?val/tgt*100:null;const col=rate==null?"#5a6271":rate>=100?"#1f7a4d":"#263E44";return `<div class="kpi" style="border-top-color:#263E44"><div class="k">${nm}</div><div class="v">${unit==="家"?fmtN(val)+"家":wanT(val)}</div><div class="n">目標 ${unit==="家"?fmtN(tgt)+"家":wanT(tgt)}｜達成 <b style="color:${col}">${rate!=null?rate.toFixed(1)+"%":"—"}</b>｜缺口 ${tgt?(unit==="家"?fmtN(Math.max(0,tgt-val))+"家":wanT(Math.max(0,tgt-val))):"—"}</div></div>`;};
@@ -729,17 +751,18 @@ function renderWar(){
   const sumTxt=`Q3 房產已簽約 ${fmtWan(q3h.sale)}，以${grps.map(g=>g.split(" - ")[1]).join("＋")}目標 ${wanT(tgtQ3)} 計，達成 ${rateQ3!=null?rateQ3.toFixed(1)+"%":"—"}（Q3 進行中、屬期中快照）。合作建案 ${q3h.coop} 件、客單價 ${fmtWan(q3h.arpu)}。H2 OKR：業績達 ${(tH2?h2s/tH2*100:0).toFixed(1)}%、再行銷 ${(tRe?h2r/tRe*100:0).toFixed(1)}%、合作建案 ${(tCo?h2c/tCo*100:0).toFixed(1)}%。`;
   document.getElementById("war-body").innerHTML=
     `<div class="pagetitle">📋 ${cls} 業務戰報 ${hasT?"":'<span style="font-size:12px;color:#b53b65;font-weight:400">（此課尚無組目標，達成率待補）</span>'}</div>`+
+    cap(`本報表範圍：<b>${cls}（${wrng}）</b>，房產類、Q3 進行中快照（${PDATA.snapshot||""}）。<b>加權預估</b>＝已簽約＋加權Pipeline（將實現×70%＋有效報價×20%＋潛力×70%）；<b>達成率</b>＝業績÷Q3目標；<b>YoY</b>為與去年同期比。`)+
     `<div class="kpis">${kc("Q3 目標業績",wanT(tgtQ3),grps.map(g=>(g.split(" - ")[1]||g)+" "+(gtVal(g,"q3")||"—")+"萬").join(" / "))}
       ${kc("Q3 已簽約業績",fmtWan(q3h.sale)+"元",`達成率 ${rateQ3!=null?rateQ3.toFixed(1)+"%":"—"} ｜ YoY ${yoy!=null?(yoy>=0?"+":"")+yoy.toFixed(1)+"%":"—"}`,rateQ3!=null&&rateQ3>=60?"#1f7a4d":"#263E44")}
       ${kc("加權預估業績",fmtWan(wEst)+"元",`加權達成 ${tgtQ3?(wEst/(tgtQ3*1e4)*100).toFixed(1):"—"}% ｜ 缺口 ${wanT(Math.max(0,tgtQ3-Math.round(wEst/1e4)))}`)}
       ${kc("Q3 合作建案／客單價",fmtN(q3h.coop)+" 件",`去重合作建案 ｜ 客單價 ${fmtWan(q3h.arpu)}`)}</div>`+
-    `<div class="card"><div class="card-head"><h2>📈 下半季展望 · 每週領先指標</h2></div><div class="kpis" style="margin:0">${kc("本週業績進帳",(curW&&prevW)?fmtWan(curW.signed-prevW.signed)+"元":"累積中",(curW&&prevW)?"本週 vs 上週":"下週起可比")}${kc("達標所需週均",fmtWan(needWk)+"元","已簽缺口 "+wanT(Math.round(gapS/1e4))+" / 剩 "+wkLeft+" 週")}${kc("Pipeline 週變化",(curW&&prevW)?fmtWan(curW.wpipe-prevW.wpipe)+"元":"累積中",(curW&&prevW)?"加權 pipeline 週變化":"下週起可比")}</div></div>`+
-    `<div class="card"><div class="card-head"><h2>🎯 Pipeline 子彈（Q3 房產）</h2></div><div class="kpis" style="margin:0">${kc("加權 Pipeline 合計",fmtWan(wpipe)+"元","覆蓋已簽缺口 "+cover.toFixed(1)+"%")}${kc("將實現 (70%)",fmtWan(pf)+"元","forecast")}${kc("有效報價 (20%)",fmtWan(pq)+"元","quotation_valid")}${kc("潛力 (70%)",fmtWan(pp)+"元","potential")}</div><div class="note">加權 Pipeline = 將實現×70% + 有效報價×20% + 潛力×70%；加權預估 = 已簽約 + 加權 Pipeline。</div></div>`+
-    `<div class="card"><div class="card-head"><h2>🎯 2026 H2 業務OKR 追蹤（全產業）</h2></div><div class="kpis" style="margin:0">${okrCard("O-1 H2 業績",h2s,"萬",tH2)}${okrCard("O-2 H2 再行銷",h2r,"萬",tRe)}${okrCard("O-3 H2 合作建案",h2c,"家",tCo)}</div></div>`+
-    `<div class="card"><div class="card-head"><h2>📊 組別 OKR 拆解（H2）</h2></div><div class="tbl-wrap"><table><thead><tr><th>組別</th><th>業績目前</th><th>業績目標</th><th>達成</th><th>再行銷目前</th><th>再行銷目標</th><th>達成</th><th>建案目前</th><th>建案目標</th><th>達成</th></tr></thead><tbody>${grps.map(grpRow).join("")}</tbody></table></div></div>`+
+    `<div class="card"><div class="card-head"><h2>📈 下半季展望 · 每週領先指標</h2></div>${cap(`<b>本週業績進帳</b>＝最新快照的Q3累積已簽約 −上一筆快照，即這週淨新增（需2週快照才顯示）；<b>達標所需週均</b>＝已簽缺口÷剩餘週數；<b>Pipeline週變化</b>＝加權Pipeline本週−上週。`)}<div class="kpis" style="margin:0">${kc("本週業績進帳",(curW&&prevW)?fmtWan(curW.signed-prevW.signed)+"元":"累積中",(curW&&prevW)?"本週 vs 上週":"下週起可比")}${kc("達標所需週均",fmtWan(needWk)+"元","已簽缺口 "+wanT(Math.round(gapS/1e4))+" / 剩 "+wkLeft+" 週")}${kc("Pipeline 週變化",(curW&&prevW)?fmtWan(curW.wpipe-prevW.wpipe)+"元":"累積中",(curW&&prevW)?"加權 pipeline 週變化":"下週起可比")}</div></div>`+
+    `<div class="card"><div class="card-head"><h2>🎯 Pipeline 子彈（Q3 房產）</h2></div>${cap(`Q3 房產尚未簽約但在追的商機，依機率加權：<b>將實現</b>(forecast) 70%、<b>有效報價</b>(quotation_valid，14天內) 20%、<b>潛力</b>(potential) 70%。<b>覆蓋率</b>＝加權Pipeline÷已簽缺口，看子彈夠不夠補洞。`)}<div class="kpis" style="margin:0">${kc("加權 Pipeline 合計",fmtWan(wpipe)+"元","覆蓋已簽缺口 "+cover.toFixed(1)+"%")}${kc("將實現 (70%)",fmtWan(pf)+"元","forecast")}${kc("有效報價 (20%)",fmtWan(pq)+"元","quotation_valid")}${kc("潛力 (70%)",fmtWan(pp)+"元","potential")}</div><div class="note">加權 Pipeline = 將實現×70% + 有效報價×20% + 潛力×70%；加權預估 = 已簽約 + 加權 Pipeline。</div></div>`+
+    `<div class="card"><div class="card-head"><h2>🎯 2026 H2 業務OKR 追蹤（全產業）</h2></div>${cap(`H2（7–12月）三大目標的課合計 目前 vs 目標：業績、再行銷為<b>全產業</b>，合作建案為<b>房產去重</b>。達成＝實績÷目標，缺口＝目標−實績。業績目標吃課組戰情頁的季目標（Q3+Q4）。`)}<div class="kpis" style="margin:0">${okrCard("O-1 H2 業績",h2s,"萬",tH2)}${okrCard("O-2 H2 再行銷",h2r,"萬",tRe)}${okrCard("O-3 H2 合作建案",h2c,"家",tCo)}</div></div>`+
+    `<div class="card"><div class="card-head"><h2>📊 組別 OKR 拆解（H2）</h2></div>${cap(`把 H2 三大 OKR 拆到各組：每組的<b>業績／再行銷（萬）、合作建案（家）</b>目前 vs 目標與達成率。看哪一組落後、缺口在誰身上。`)}<div class="tbl-wrap"><table><thead><tr><th>組別</th><th>業績目前</th><th>業績目標</th><th>達成</th><th>再行銷目前</th><th>再行銷目標</th><th>達成</th><th>建案目前</th><th>建案目標</th><th>達成</th></tr></thead><tbody>${grps.map(grpRow).join("")}</tbody></table></div></div>`+
     `<div class="card"><div class="card-head"><h2>🌀 季度節奏拆解</h2></div><div style="font-weight:700;color:#263E44;margin-bottom:6px">Q3 進行中（即時概況）</div>${qtr(Q3,"q3")}<div style="font-weight:700;color:#263E44;margin:14px 0 6px">Q4 預先認列（下季基本盤）</div>${qtr(Q4,"q4")}<div class="note">業績、再行銷為全產業；合作建案為房產去重。Q4 為預先認列，不代表完整季度成績。</div></div>`+
-    `<div class="card"><div class="card-head"><h2>👥 個人責任拆解（Q3 房產）</h2></div><div class="chart-box" style="height:${Math.max(160,perData.length*30)}px;margin-bottom:12px"><canvas id="warPer"></canvas></div><div class="tbl-wrap"><table><thead><tr><th>業務</th><th>已簽約</th><th>短期可追</th><th>潛力</th><th>加權預估</th><th>合作建案</th><th>客單價</th></tr></thead><tbody>${people.map(persRow).join("")}</tbody></table></div><div class="note">短期可追＝將實現+有效報價；加權預估＝已簽約+加權 Pipeline。</div></div>`+
-    `<div class="grid2"><div class="card"><div class="card-head"><h2>🧩 Q3 房產產品線分佈</h2></div>${adRows}</div><div class="card"><div class="card-head"><h2>📅 Q3 月度已簽約（房產）</h2></div><div class="chart-box" style="height:150px;margin-bottom:8px"><canvas id="warMo"></canvas></div>${moRows}</div></div>`+
+    `<div class="card"><div class="card-head"><h2>👥 個人責任拆解（Q3 房產）</h2></div>${cap(`每位業務的 Q3 房產：<b>已簽約</b>（實績）＋<b>短期可追</b>（將實現＋有效報價）＋<b>潛力</b>，長條堆疊看每人手上總量與結構；<b>加權預估</b>＝已簽約＋加權Pipeline。依總量排序，找誰能補缺口。`)}<div class="chart-box" style="height:${Math.max(160,perData.length*30)}px;margin-bottom:12px"><canvas id="warPer"></canvas></div><div class="tbl-wrap"><table><thead><tr><th>業務</th><th>已簽約</th><th>短期可追</th><th>潛力</th><th>加權預估</th><th>合作建案</th><th>客單價</th></tr></thead><tbody>${people.map(persRow).join("")}</tbody></table></div><div class="note">短期可追＝將實現+有效報價；加權預估＝已簽約+加權 Pipeline。</div></div>`+
+    `<div class="grid2"><div class="card"><div class="card-head"><h2>🧩 Q3 房產產品線分佈</h2></div>${cap(`Q3 房產已簽約業績依廣告類型（站內／再行銷／數媒）拆分與占比，看業績結構偏哪種產品。`)}${adRows}</div><div class="card"><div class="card-head"><h2>📅 Q3 月度已簽約（房產）</h2></div>${cap(`Q3 房產已簽約逐月（7/8/9月）金額，括號為占Q3目標%，看單月進度與節奏。`)}<div class="chart-box" style="height:150px;margin-bottom:8px"><canvas id="warMo"></canvas></div>${moRows}</div></div>`+
     `<div class="card"><div class="card-head"><h2>⏰ 走期結束與續約提醒（房產）</h2></div><div class="kpis" style="margin:0">${kc("Q3 結束走期建案",fmtN(es[7].size+es[8].size+es[9].size)+" 件","7月 "+es[7].size+" / 8月 "+es[8].size+" / 9月 "+es[9].size)}${kc("Q3 後結束（續約池）",fmtN(ea.size)+" 件","走期在 Q3 之後結束，續約追蹤")}</div><div class="note">依房產已簽約案件的走期結束月份（去重建案）統計，用於續約追蹤。</div></div>`+
     `<div class="card" style="background:#f6faf2;border-color:#dbe8cf"><div class="card-head"><h2>🧭 主管摘要</h2></div><div style="font-size:13.5px;line-height:1.9;color:#1a1d23">${sumTxt}</div></div>`+
     `<div class="card" style="background:#f6faf2;border-color:#dbe8cf"><div class="note" style="color:#5a6271"><b>ℹ️ 說明：</b>週變化需累積 2 週才顯示（本週已開始存快照，下週起可比）。Pipeline 為每次同步的房產 Q3 快照。走期結束／續約提醒依 DOS 走期日；也可另接你的「到期追蹤表」。</div></div>`;
