@@ -58,6 +58,8 @@ tbody tr:hover { background: #f8fafc; }
 .note { font-size: 12px; color: #9aa3ad; margin-top: 8px; }
 .cap { font-size: 12px; color: #5a6675; background:#f3f6f7; border-left:3px solid #263E44; border-radius:0 6px 6px 0; padding:7px 10px; margin:0 0 12px; line-height:1.55; }
 .cap b { color:#263E44; }
+.ce,.wp,#wk-targets input { padding:3px 6px; border:1px solid #d1d5db; border-radius:5px; font:inherit; font-size:12px; }
+#wk-combo td,#wk-pipe td,#wk-action td { vertical-align:middle; }
 .hide { display: none; }
 .pagetitle { font-size: 16px; font-weight: 700; color: #263E44; margin: 4px 0 14px; }
 #loading { padding: 40px; text-align: center; color: #5a6271; }
@@ -187,24 +189,38 @@ tbody tr:hover { background: #f8fafc; }
     </section>
 
     <section id="page-week" class="hide">
-      <div class="pagetitle">🗓️ 週會追蹤 <span style="font-size:12px;color:#9aa3ad;font-weight:400">全台適用 · 隨上方篩選(業務/課/組/員/站台)變 · 固定看 H2 26 週進度（不受期間下拉影響）</span></div>
-      <div class="card"><div class="card-head"><h2>🎯 週目標進度（H2· 26 週）</h2>
-        <span class="note" style="margin:0">半年目標(萬)可改：業績 <input id="wk-tperf" type="number" style="width:80px;padding:4px 6px;border:1px solid #d1d5db;border-radius:6px;font:inherit;font-size:12.5px"> · 再行銷 <input id="wk-trem" type="number" style="width:70px;padding:4px 6px;border:1px solid #d1d5db;border-radius:6px;font:inherit;font-size:12.5px"></span></div>
-        <div class="cap" id="cap-week"></div>
-        <div class="kpis" id="week-kpi"></div>
-        <div class="tbl-wrap"><table id="week-prog"><thead><tr><th>指標</th><th>半年目標</th><th>週目標</th><th>目前應達</th><th>實際累積</th><th>達成率</th><th>進度落後/超前</th></tr></thead><tbody></tbody></table></div>
+      <div class="pagetitle">🔥 週會戰情室 <span style="font-size:12px;color:#9aa3ad;font-weight:400">做決策·看未來·一起看 · 先篩到要看的組/人 · H2 26 週（不受期間下拉影響）</span></div>
+      <div class="card"><div class="card-head"><h2>⚙️ 半年目標設定（÷26＝週目標，對目前篩選範圍設）</h2></div>
+        <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;font-size:13px" id="wk-targets">
+          業績 <input id="wk-tperf" type="number" style="width:82px;padding:4px 6px;border:1px solid #d1d5db;border-radius:6px;font:inherit">萬
+          · 再行銷 <input id="wk-trem" type="number" style="width:70px;padding:4px 6px;border:1px solid #d1d5db;border-radius:6px;font:inherit">萬
+          · 包套 <input id="wk-tcombo" type="number" style="width:70px;padding:4px 6px;border:1px solid #d1d5db;border-radius:6px;font:inherit">萬
+          · 客戶數 <input id="wk-tcust" type="number" style="width:60px;padding:4px 6px;border:1px solid #d1d5db;border-radius:6px;font:inherit">
+        </div>
+        <div class="cap" id="cap-week" style="margin-top:10px"></div>
       </div>
-      <div class="card"><div class="card-head"><h2>🧩 個人產品結構（業績＋占比）</h2><button onclick="dlWeekProd()">⬇ 下載 CSV</button></div>
-        <div class="cap" id="cap-weekprod"></div>
-        <div class="tbl-wrap"><table id="week-prod"><thead><tr><th>業務</th><th>站內</th><th>再行銷</th><th>數媒站內</th><th>數媒再行銷</th><th>總計</th></tr></thead><tbody></tbody></table></div>
-      </div>
-      <div class="card"><div class="card-head"><h2>📦 包套售賣達成（業務自填）</h2></div>
-        <div class="note" style="margin-bottom:10px">填「包套方案、已售組數、目標組數」，達成率自動算（存本機，不隨同步覆蓋）。</div>
-        <div class="tbl-wrap"><table id="week-combo"><thead><tr><th>業務</th><th>包套方案</th><th>已售組數</th><th>目標組數</th><th>達成率</th></tr></thead><tbody></tbody></table></div>
-      </div>
-      <div class="card" style="background:#f6faf2;border-color:#dbe8cf"><div class="card-head"><h2>💬 週會必談清單</h2></div>
-        <div id="week-agenda" style="font-size:13px;line-height:1.9;color:#1a1d23"></div>
-      </div>
+      <div class="card"><div class="card-head"><h2>① 本週總戰情</h2></div><div class="kpis" id="wk-kpi"></div>
+        <div class="note">達成率＝累計實際÷累計應達(週目標×週次)。🟢≥100% 🟡85–100% 🔴<85%。本週淨增靠每週快照，會逐週長出來。</div></div>
+      <div class="card"><div class="card-head"><h2>② 業績跑速（累計 理論 vs 實際）</h2></div>
+        <div class="kpis" id="wk-pace" style="margin-bottom:10px"></div>
+        <div class="chart-box" style="height:240px"><canvas id="wk-chart"></canvas></div></div>
+      <div class="card"><div class="card-head"><h2>③ 再行銷戰情 — 誰有賣？誰沒賣？</h2></div>
+        <div class="cap" id="cap-wkrem"></div>
+        <div class="tbl-wrap"><table id="wk-rem"><thead><tr><th>業務</th><th>再行銷業績</th><th>占再行銷</th><th>占個人業績</th><th>週目標</th><th>累計達成</th></tr></thead><tbody></tbody></table></div></div>
+      <div class="card"><div class="card-head"><h2>④ 本週包套銷售登錄（業務自填）</h2><button onclick="wkAddCombo()">＋ 新增一筆</button></div>
+        <div class="kpis" id="wk-combo-kpi" style="margin-bottom:8px"></div>
+        <div class="tbl-wrap"><table id="wk-combo"><thead><tr><th>業務</th><th>客戶</th><th>建案</th><th>方案</th><th>金額</th><th>狀態</th><th></th></tr></thead><tbody></tbody></table></div>
+        <div class="note">方案用選單、金額填數字；自動算包套業績/占比/件數/均價（存本機）。</div></div>
+      <div class="card"><div class="card-head"><h2>⑤ 個人業績結構 ＋ 健康度</h2><button onclick="dlWeekProd()">⬇ 下載 CSV</button></div>
+        <div class="cap" id="cap-wkprod"></div>
+        <div class="tbl-wrap"><table id="wk-prod"><thead><tr><th>業務</th><th>總業績</th><th>站內</th><th>再行銷</th><th>數媒站內</th><th>數媒再行銷</th><th>結構健康度</th></tr></thead><tbody></tbody></table></div></div>
+      <div class="card"><div class="card-head"><h2>⑥ Pipeline 戰情 — 下週業績在哪？</h2></div>
+        <div class="cap" id="cap-wkpipe"></div>
+        <div class="tbl-wrap"><table id="wk-pipe"><thead><tr><th>業務</th><th>下週預估(可填)</th><th>已確定<br>將實現</th><th>高機率<br>有效報價</th><th>風險<br>潛力</th><th>對週目標缺口</th></tr></thead><tbody></tbody></table></div></div>
+      <div class="card" style="background:#fff4f4;border-color:#f2c7c7"><div class="card-head"><h2>🚨 紅燈預警 ＋ 產品缺口</h2></div>
+        <div id="wk-alert" style="font-size:13px;line-height:1.9;color:#1a1d23"></div></div>
+      <div class="card" style="background:#f6faf2;border-color:#dbe8cf"><div class="card-head"><h2>✅ 本週行動事項（誰·做什麼·何時）</h2><button onclick="wkAddAction()">＋ 新增</button></div>
+        <div class="tbl-wrap"><table id="wk-action"><thead><tr><th>負責</th><th>事項</th><th>期限</th><th>狀態</th><th></th></tr></thead><tbody></tbody></table></div></div>
     </section>
 
     <section id="page-region" class="hide">
@@ -226,7 +242,7 @@ tbody tr:hover { background: #f8fafc; }
   </div>
 </div>
 <script>
-const PDATA = {"snapshot": "2026/08/21", "growth": {"業務一課 - 業務一組": {"growth": -1.2, "arpu2026": 225671}, "業務一課 - 業務二組": {"growth": -10.6, "arpu2026": 223539}, "業務二課 - 業務三組": {"growth": -18.8, "arpu2026": 148632}, "業務二課 - 業務四組": {"growth": -12.6, "arpu2026": 124484}, "設計課 - 設計組": {"growth": 5.9, "arpu2026": 180463}}, "pipe": {"曾方音": {"f": 80267, "q": 685908, "p": 731430, "grp": "業務一課 - 業務二組"}, "呂佩宜": {"f": 96933, "q": 2210161, "p": 22876, "grp": "業務二課 - 業務三組"}, "簡艷華": {"f": 39500, "q": 649307, "p": 63465, "grp": "業務二課 - 業務四組"}, "黃淑萍": {"f": 250732, "q": 2166179, "p": 915376, "grp": "業務一課 - 業務一組"}, "趙紹亨": {"f": 58310, "q": 22286, "p": 380838, "grp": "業務一課 - 業務一組"}, "楊儀菲": {"f": 254622, "q": 24886, "p": 47143, "grp": "業務一課 - 業務二組"}, "陳怡雯": {"f": 896416, "q": 0, "p": 74137, "grp": "業務一課 - 業務二組"}, "曾家羚": {"f": 65529, "q": 2162221, "p": 477253, "grp": "業務二課 - 業務三組"}, "簡順隆": {"f": 0, "q": 2199915, "p": 257096, "grp": "業務一課 - 業務二組"}, "姚蘋芸": {"f": 0, "q": 406791, "p": 165841, "grp": "業務二課 - 業務四組"}, "彭莉芳": {"f": 45006, "q": 778011, "p": 288568, "grp": "業務一課 - 業務一組"}, "陳琬臻": {"f": 0, "q": 3114718, "p": 308921, "grp": "業務二課 - 業務三組"}, "鄧瑋婷": {"f": 39817, "q": 667282, "p": 146973, "grp": "業務二課 - 業務四組"}, "張淑瑜": {"f": 0, "q": 0, "p": 298537, "grp": "業務一課"}, "許孟瑋": {"f": 0, "q": 0, "p": 21600, "grp": "業務二課"}, "吳子敬": {"f": 0, "q": 0, "p": 187500, "grp": "業務一課 - 業務二組"}, "程湣傑": {"f": 0, "q": 0, "p": 653728, "grp": "媒體產品課 - 站台產品組"}, "李抒姮": {"f": 0, "q": 0, "p": 151238, "grp": "設計課 - 設計組"}, "仲綨柱": {"f": 0, "q": 0, "p": 168364, "grp": "業務一課 - 業務一組"}, "陳文昕": {"f": 0, "q": 0, "p": 842219, "grp": "行銷策略課 - 行銷一組"}, "趙斯蓓": {"f": 0, "q": 0, "p": 314342, "grp": "設計課 - 設計組"}}, "weekly": {"2026-W32": {"date": "2026/08/07", "cls": {"行銷策略課": {"signed": 0, "wpipe": 660266}, "業務二課": {"signed": 29652313, "wpipe": 2998292}, "媒體產品課": {"signed": 0, "wpipe": 1338745}, "設計課": {"signed": 1427191, "wpipe": 329906}, "業務一課": {"signed": 49660573, "wpipe": 4085136}}}, "2026-W33": {"date": "2026/08/13", "cls": {"行銷策略課": {"signed": 0, "wpipe": 589553}, "設計課": {"signed": 1427191, "wpipe": 325906}, "業務二課": {"signed": 29652313, "wpipe": 2856192}, "業務一課": {"signed": 49660573, "wpipe": 4629476}, "媒體產品課": {"signed": 0, "wpipe": 457610}}}, "2026-W34": {"date": "2026/08/21", "cls": {"業務一課": {"signed": 49660573, "wpipe": 4629476}, "業務二課": {"signed": 29652313, "wpipe": 2856192}, "媒體產品課": {"signed": 0, "wpipe": 457610}, "設計課": {"signed": 1427191, "wpipe": 325906}, "行銷策略課": {"signed": 0, "wpipe": 589553}}}}};
+const PDATA = {"snapshot": "2026/08/21", "growth": {"業務一課 - 業務一組": {"growth": -1.2, "arpu2026": 225671}, "業務一課 - 業務二組": {"growth": -10.6, "arpu2026": 223539}, "業務二課 - 業務三組": {"growth": -18.8, "arpu2026": 148632}, "業務二課 - 業務四組": {"growth": -12.6, "arpu2026": 124484}, "設計課 - 設計組": {"growth": 5.9, "arpu2026": 180463}}, "pipe": {"曾方音": {"f": 80267, "q": 685908, "p": 731430, "grp": "業務一課 - 業務二組"}, "呂佩宜": {"f": 96933, "q": 2210161, "p": 22876, "grp": "業務二課 - 業務三組"}, "簡艷華": {"f": 39500, "q": 649307, "p": 63465, "grp": "業務二課 - 業務四組"}, "黃淑萍": {"f": 250732, "q": 2166179, "p": 915376, "grp": "業務一課 - 業務一組"}, "趙紹亨": {"f": 58310, "q": 22286, "p": 380838, "grp": "業務一課 - 業務一組"}, "楊儀菲": {"f": 254622, "q": 24886, "p": 47143, "grp": "業務一課 - 業務二組"}, "陳怡雯": {"f": 896416, "q": 0, "p": 74137, "grp": "業務一課 - 業務二組"}, "曾家羚": {"f": 65529, "q": 2162221, "p": 477253, "grp": "業務二課 - 業務三組"}, "簡順隆": {"f": 0, "q": 2199915, "p": 257096, "grp": "業務一課 - 業務二組"}, "姚蘋芸": {"f": 0, "q": 406791, "p": 165841, "grp": "業務二課 - 業務四組"}, "彭莉芳": {"f": 45006, "q": 778011, "p": 288568, "grp": "業務一課 - 業務一組"}, "陳琬臻": {"f": 0, "q": 3114718, "p": 308921, "grp": "業務二課 - 業務三組"}, "鄧瑋婷": {"f": 39817, "q": 667282, "p": 146973, "grp": "業務二課 - 業務四組"}, "張淑瑜": {"f": 0, "q": 0, "p": 298537, "grp": "業務一課"}, "許孟瑋": {"f": 0, "q": 0, "p": 21600, "grp": "業務二課"}, "吳子敬": {"f": 0, "q": 0, "p": 187500, "grp": "業務一課 - 業務二組"}, "程湣傑": {"f": 0, "q": 0, "p": 653728, "grp": "媒體產品課 - 站台產品組"}, "李抒姮": {"f": 0, "q": 0, "p": 151238, "grp": "設計課 - 設計組"}, "仲綨柱": {"f": 0, "q": 0, "p": 168364, "grp": "業務一課 - 業務一組"}, "陳文昕": {"f": 0, "q": 0, "p": 842219, "grp": "行銷策略課 - 行銷一組"}, "趙斯蓓": {"f": 0, "q": 0, "p": 314342, "grp": "設計課 - 設計組"}}, "weekly": {"2026-W32": {"date": "2026/08/07", "cls": {"行銷策略課": {"signed": 0, "wpipe": 660266}, "業務二課": {"signed": 29652313, "wpipe": 2998292}, "媒體產品課": {"signed": 0, "wpipe": 1338745}, "設計課": {"signed": 1427191, "wpipe": 329906}, "業務一課": {"signed": 49660573, "wpipe": 4085136}}}, "2026-W33": {"date": "2026/08/13", "cls": {"行銷策略課": {"signed": 0, "wpipe": 589553}, "設計課": {"signed": 1427191, "wpipe": 325906}, "業務二課": {"signed": 29652313, "wpipe": 2856192}, "業務一課": {"signed": 49660573, "wpipe": 4629476}, "媒體產品課": {"signed": 0, "wpipe": 457610}}}, "2026-W34": {"date": "2026/08/21", "cls": {"媒體產品課": {"signed": 0, "wpipe": 457610, "perf": 0, "rem": 0}, "行銷策略課": {"signed": 0, "wpipe": 589553, "perf": 0, "rem": 0}, "業務二課": {"signed": 29652313, "wpipe": 2856192, "perf": 32150758, "rem": 3543194}, "業務一課": {"signed": 49660573, "wpipe": 4629476, "perf": 51955607, "rem": 4918454}, "設計課": {"signed": 1427191, "wpipe": 325906, "perf": 14916356, "rem": 976224}}}}};
 const fmtN=n=>Math.round(n).toLocaleString("en-US");
 const fmtWan=n=>{const x=Math.round(n);if(Math.abs(x)>=1e8)return (x/1e8).toLocaleString("en-US",{maximumFractionDigits:2})+"億";if(Math.abs(x)>=1e4)return (x/1e4).toLocaleString("en-US",{maximumFractionDigits:1})+"萬";return x.toLocaleString("en-US");};
 const fmtBoth=n=>`${fmtWan(n)}<span style="display:block;font-size:10px;color:#9aa3ad;font-weight:400">${fmtN(n)}</span>`;
@@ -501,61 +517,103 @@ function dlTeam(){const rows=fRows(),byg={};rows.forEach(r=>{(byg[r.grp]=byg[r.g
   dl("課組戰情.csv",[["課組","業績總額","目標","達成率","客單價(房產÷建案,設計÷客戶)","客單價成長率","滲透率","有價值合作","無價值合作","站內占比","再行銷占比"],...out]);}
 
 // ---------- 週會追蹤 ----------
-const H2M=[7,8,9,10,11,12];
-const WINP='width:64px;padding:3px 5px;border:1px solid #d1d5db;border-radius:5px;font:inherit;font-size:12px';
+const H2M=[7,8,9,10,11,12], NWK=26;
+const PLANS=["591站內＋再行銷","591站內＋數媒","站內＋再行銷＋數媒","影音＋站內","影音＋再行銷","年度包套","客製整合方案","其他"];
+const STATUS=["提案","洽談","成交"];
+let wkChart=null;
+const wSt=k=>{try{return JSON.parse(localStorage.getItem(k)||"[]");}catch(e){return [];}};
+const wSet=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 function wkT(k,def){const v=localStorage.getItem("dm_wk_"+k);return v!==null&&v!==""?+v:def;}
-function ckKey(p){return "dm_combo_"+p;}
-function getCombo(p){try{return JSON.parse(localStorage.getItem(ckKey(p))||"{}");}catch(e){return {};}}
-function weekNo(){const s=PDATA.snapshot?new Date(PDATA.snapshot):new Date();const jul1=new Date(s.getFullYear(),6,1);return Math.max(1,Math.min(26,Math.ceil((s-jul1)/(7*864e5))));}
+function weekNo(){const s=PDATA.snapshot?new Date(PDATA.snapshot):new Date();const jul1=new Date(s.getFullYear(),6,1);return Math.max(1,Math.min(NWK,Math.ceil((s-jul1)/(7*864e5))));}
 function ctxWk(){const p=[];if(selSales.size)p.push(selSales.size+" 業務");if(selRegion.size)p.push(selRegion.size+" 區");const ch=val("f-ch");if(ch)p.push("站台 "+ch);return p.length?p.join("・"):"全台全業務";}
 function weekRows(){const ch=val("f-ch");return ROWS.filter(r=>H2M.includes(r.m)&&(!ch||r.ch===ch)&&(!selAd.size||selAd.has(r.ad))&&matchSales(r)&&matchRegion(r));}
+function lamp(r){return r>=100?"🟢":r>=85?"🟡":"🔴";}
 function renderWeek(){
-  const tp=document.getElementById("wk-tperf"),tr=document.getElementById("wk-trem");
-  if(tp&&!tp.value)tp.value=wkT("tperf",1400);
-  if(tr&&!tr.value)tr.value=wkT("trem",150);
-  const tPerf=tp&&tp.value?+tp.value:1400, tRem=tr&&tr.value?+tr.value:150, N=weekNo(), R=weekRows();
-  const perf=R.reduce((s,r)=>s+r.sale,0)/1e4, rem=R.filter(r=>r.ad==="remarketing"||r.ad==="agent").reduce((s,r)=>s+r.sale,0)/1e4;
-  const due=N/26;
-  const P=(name,tot,act)=>{const wk=tot/26,dueV=tot*due;return {name,tot,wk,dueV,act,rate:dueV?act/dueV*100:0,behind:wk?(dueV-act)/wk:0};};
-  const pP=P("總業績",tPerf,perf), pR=P("再行銷(站台+數媒)",tRem,rem);
-  const gc=v=>v>=100?"#1f7a4d":"#b53b65";
-  const card=p=>`<div class="kpi" style="border-top-color:${gc(p.rate)}"><div class="k">${p.name}</div><div class="v">${p.act.toFixed(0)}萬</div><div class="n">應達 ${p.dueV.toFixed(0)}萬 · 達成 <b style="color:${gc(p.rate)}">${p.rate.toFixed(0)}%</b> · ${p.behind>0?"落後":"超前"} ${Math.abs(p.behind).toFixed(1)} 週</div></div>`;
-  document.getElementById("week-kpi").innerHTML=card(pP)+card(pR);
-  setCap("cap-week",`目前 H2 <b>第 ${N} 週 / 26 週</b>（快照 ${PDATA.snapshot||""}）。範圍：${ctxWk()}。週目標＝半年目標÷26；應達＝週目標×${N}。因 DOS 無逐週實績，用「累積實際 vs 累積應達」看有沒有跟上進度。`);
-  const row=p=>`<tr><td>${p.name}</td><td>${fmtN(p.tot)}萬</td><td>${p.wk.toFixed(1)}萬</td><td>${p.dueV.toFixed(0)}萬</td><td>${p.act.toFixed(0)}萬</td><td style="font-weight:700;color:${gc(p.rate)}">${p.rate.toFixed(1)}%</td><td style="color:${p.behind>0?'#b53b65':'#1f7a4d'}">${p.behind>0?"落後":"超前"} ${Math.abs(p.behind).toFixed(1)} 週</td></tr>`;
-  document.querySelector("#week-prog tbody").innerHTML=row(pP)+row(pR);
-  if(tp)tp.oninput=()=>{localStorage.setItem("dm_wk_tperf",tp.value);renderWeek();};
-  if(tr)tr.oninput=()=>{localStorage.setItem("dm_wk_trem",tr.value);renderWeek();};
-  // 個人產品結構
+  const N=weekNo(), due=N/NWK, R=weekRows();
+  ["tperf","trem","tcombo","tcust"].forEach(k=>{const el=document.getElementById("wk-"+k);if(!el)return;if(!el.value)el.value=wkT(k,{tperf:1400,trem:150,tcombo:100,tcust:40}[k]);el.onchange=()=>{localStorage.setItem("dm_wk_"+k,el.value);renderWeek();};});
+  const tPerf=wkT("tperf",1400),tRem=wkT("trem",150),tCombo=wkT("tcombo",100),tCust=wkT("tcust",40);
   const byS={};R.forEach(r=>{const s=r.sales||"(未填)";const d=byS[s]=byS[s]||{on:0,re:0,dm:0,da:0};if(r.ad==="on-site")d.on+=r.sale;else if(r.ad==="remarketing")d.re+=r.sale;else if(r.ad==="digitm")d.dm+=r.sale;else if(r.ad==="agent")d.da+=r.sale;});
-  const arr=Object.entries(byS).map(([s,d])=>({s,...d,tot:d.on+d.re+d.dm+d.da})).sort((a,b)=>b.tot-a.tot);
+  const ppl=Object.entries(byS).map(([s,d])=>({s,...d,tot:d.on+d.re+d.dm+d.da,rem:d.re+d.da})).sort((a,b)=>b.tot-a.tot);
+  const perf=ppl.reduce((s,x)=>s+x.tot,0)/1e4, rem=ppl.reduce((s,x)=>s+x.rem,0)/1e4, nCust=new Set(R.filter(r=>r.cust!=-1).map(r=>r.cust)).size;
+  const combo=wSt("dm_wkcombo"), done=combo.filter(c=>c.status==="成交"), comboAmt=done.reduce((s,c)=>s+(+c.amt||0),0)/1e4;
+  // ① KPI
+  const kpi=(name,tot,act,u)=>{const dv=tot*due,rt=dv?act/dv*100:0;return `<div class="kpi" style="border-top-color:${rt>=100?'#1f7a4d':rt>=85?'#caa500':'#b53b65'}"><div class="k">${lamp(rt)} ${name}</div><div class="v">${fmtN(act)}${u}</div><div class="n">應達 ${fmtN(dv)}${u} · 達成 <b>${rt.toFixed(0)}%</b></div></div>`;};
+  document.getElementById("wk-kpi").innerHTML=kpi("總業績",tPerf,perf,"萬")+kpi("再行銷",tRem,rem,"萬")+kpi("包套(成交)",tCombo,comboAmt,"萬")+kpi("客戶數",tCust,nCust,"家");
+  setCap("cap-week",`目前 H2 <b>第 ${N} / ${NWK} 週</b>（快照 ${PDATA.snapshot||""}）｜範圍：${ctxWk()}。週目標＝半年目標÷26；應達＝週目標×${N}。🟢≥100% 🟡85–100% 🔴<85%。`);
+  // ② 跑速
+  const wPerf=tPerf/NWK, dueV=tPerf*due, lg=dueV-perf;
+  document.getElementById("wk-pace").innerHTML=
+    `<div class="kpi"><div class="k">半年目標</div><div class="v">${fmtN(tPerf)}萬</div><div class="n">週目標 ${wPerf.toFixed(1)}萬</div></div>`+
+    `<div class="kpi"><div class="k">理論進度</div><div class="v">${(due*100).toFixed(1)}%</div><div class="n">第 ${N}/26 週</div></div>`+
+    `<div class="kpi"><div class="k">實際進度</div><div class="v">${(perf/tPerf*100).toFixed(1)}%</div><div class="n">累計 ${fmtN(perf)}萬</div></div>`+
+    `<div class="kpi" style="border-top-color:${lg>0?'#b53b65':'#1f7a4d'}"><div class="k">${lg>0?'落後':'超前'}</div><div class="v" style="color:${lg>0?'#b53b65':'#1f7a4d'}">${fmtN(Math.abs(lg))}萬</div><div class="n">≈ ${wPerf?(Math.abs(lg)/wPerf).toFixed(1):0} 週</div></div>`;
+  const mEndWk={7:4,8:9,9:13,10:17,11:22,12:26}, byM={};R.forEach(r=>{byM[r.m]=(byM[r.m]||0)+r.sale;});
+  const snM=+((PDATA.snapshot||"").split("/")[1])||new Date().getMonth()+1;
+  const labels=[],theo=[];for(let w=1;w<=NWK;w++){labels.push("W"+w);theo.push(+(wPerf*w).toFixed(1));}
+  let cum=0;const act=Array(NWK).fill(null);for(let m=7;m<=12;m++){if(m<=snM){cum+=(byM[m]||0)/1e4;act[mEndWk[m]-1]=+cum.toFixed(1);}}
+  if(wkChart)wkChart.destroy();
+  wkChart=new Chart(document.getElementById("wk-chart"),{type:"line",data:{labels,datasets:[
+    {label:"應有累計",data:theo,borderColor:"#b5c400",borderDash:[6,4],pointRadius:0},
+    {label:"實際累計",data:act,borderColor:"#263E44",backgroundColor:"#263E44",pointRadius:4,spanGaps:true,tension:.2}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"top"},tooltip:{callbacks:{label:c=>c.dataset.label+"："+fmtN(c.raw)+"萬"}}},scales:{y:{ticks:{callback:v=>v+"萬"}}}}});
+  // ③ 再行銷
+  const remTot=rem||1, remWkP=tRem/NWK/(ppl.length||1);
+  document.querySelector("#wk-rem tbody").innerHTML=ppl.map(x=>{const rm=x.rem/1e4,rt=remWkP*N?rm/(remWkP*N)*100:0;
+    return `<tr><td>${x.s}</td><td>${fmtN(rm)}萬</td><td>${(rm/remTot*100).toFixed(0)}%</td><td>${x.tot?(x.rem/x.tot*100).toFixed(0):0}%</td><td>${remWkP.toFixed(2)}萬/週</td><td style="font-weight:700">${lamp(rt)} ${rt.toFixed(0)}%</td></tr>`;}).join("")||`<tr><td colspan="6" class="note">查無資料</td></tr>`;
+  setCap("cap-wkrem",`再行銷＝站台再行銷＋數媒再行銷。週目標＝半年再行銷目標÷26÷人數(平均攤)。占再行銷＝該人÷團隊；占個人＝該人再行銷÷該人總業績。`);
+  // ⑤ 個人結構 + 健康度
   const cel=(v,t)=>`${fmtN(v)}<span style="font-size:10px;color:#9aa3ad"> ${t?(v/t*100).toFixed(0):0}%</span>`;
-  const ptb=document.querySelector("#week-prod tbody");
-  ptb.innerHTML=arr.map(x=>`<tr><td>${x.s}</td><td>${cel(x.on,x.tot)}</td><td>${cel(x.re,x.tot)}</td><td>${cel(x.dm,x.tot)}</td><td>${cel(x.da,x.tot)}</td><td><b>${fmtN(x.tot)}</b></td></tr>`).join("")||`<tr><td colspan="6" class="note">查無資料</td></tr>`;
-  if(arr.length){const T=arr.reduce((a,x)=>({on:a.on+x.on,re:a.re+x.re,dm:a.dm+x.dm,da:a.da+x.da,tot:a.tot+x.tot}),{on:0,re:0,dm:0,da:0,tot:0});
-    ptb.innerHTML+=`<tr style="font-weight:700;background:#f6f8f9"><td>合計</td><td>${cel(T.on,T.tot)}</td><td>${cel(T.re,T.tot)}</td><td>${cel(T.dm,T.tot)}</td><td>${cel(T.da,T.tot)}</td><td>${fmtN(T.tot)}</td></tr>`;}
-  setCap("cap-weekprod",`各業務 H2 四類產品業績＋占比（占該業務總業績）。範圍：${ctxWk()}。站內=on-site、再行銷=站台再行銷、數媒站內=digitm、數媒再行銷=agent。`);
-  // 包套自填
-  const ctb=document.querySelector("#week-combo tbody");
-  ctb.innerHTML=arr.map(x=>{const c=getCombo(x.s),rate=(c.sold&&c.tgt)?(+c.sold/+c.tgt*100).toFixed(0)+"%":"—";
-    return `<tr data-p="${x.s}"><td>${x.s}</td><td><input class="cb" data-f="plan" value="${c.plan||''}" placeholder="方案名稱" style="width:150px;padding:3px 5px;border:1px solid #d1d5db;border-radius:5px;font:inherit;font-size:12px"></td><td><input class="cb" data-f="sold" type="number" value="${c.sold||''}" style="${WINP}"></td><td><input class="cb" data-f="tgt" type="number" value="${c.tgt||''}" style="${WINP}"></td><td class="crate" style="font-weight:700;color:#263E44">${rate}</td></tr>`;}).join("")||`<tr><td colspan="5" class="note">查無業務</td></tr>`;
-  ctb.querySelectorAll("input.cb").forEach(inp=>inp.addEventListener("input",()=>{const t=inp.closest("tr"),p=t.dataset.p,c=getCombo(p);c[inp.dataset.f]=inp.value;localStorage.setItem(ckKey(p),JSON.stringify(c));t.querySelector(".crate").textContent=(c.sold&&c.tgt)?(+c.sold/+c.tgt*100).toFixed(0)+"%":"—";}));
-  // 週會清單
-  const fl=[];
-  if(pP.rate<100)fl.push(`業績落後：達成 ${pP.rate.toFixed(0)}%，需補 ${(pP.dueV-pP.act).toFixed(0)}萬追上第${N}週。`);
-  if(pR.rate<100)fl.push(`再行銷落後：達成 ${pR.rate.toFixed(0)}%、落後 ${pR.behind.toFixed(1)} 週。`);
-  const lag=arr.filter(x=>x.tot>0&&(x.re+x.da)/x.tot<0.05).slice(0,4).map(x=>x.s);
-  document.getElementById("week-agenda").innerHTML=
-    (fl.length?"<b>⚠ 本週警訊</b><br>"+fl.map(f=>"· "+f).join("<br>")+"<br><br>":"")+
-    "<b>📋 週會固定議程</b><br>"+
-    "1. <b>進度追蹤</b>：業績、再行銷 vs 週目標（上表），落後者提補救。<br>"+
-    "2. <b>Pipeline／商機</b>：本週新增商機、將實現與有效報價轉化、加權預估缺口（見業務戰報頁）。<br>"+
-    "3. <b>包套售賣</b>：各人包套組數進度（下表自填）。<br>"+
-    "4. <b>走期到期／續約</b>：本週到期建案、續約池追蹤（戰報頁）。<br>"+
-    "5. <b>機會池推進</b>：分層未合作·有意願·有價值建案、重點單。<br>"+
-    "6. <b>產品結構補強</b>：再行銷／數媒占比偏低者拉高毛利產品"+(lag.length?`（偏低：${lag.join("、")}）`:"")+"。<br>"+
-    "7. <b>求援</b>：需跨部門(企劃／成效／站台)支援事項。";
+  const health=x=>{const o=x.on/(x.tot||1),re=x.rem/(x.tot||1),dm=(x.dm+x.da)/(x.tot||1);
+    return `站內${o>.7?"🔴":o>.55?"🟡":"🟢"} 再行銷${re<.10?"🔴":re<.18?"🟡":"🟢"} 數媒${dm<.10?"🔴":dm<.20?"🟡":"🟢"}`;};
+  document.querySelector("#wk-prod tbody").innerHTML=ppl.map(x=>`<tr><td>${x.s}</td><td><b>${fmtN(x.tot)}</b></td><td>${cel(x.on,x.tot)}</td><td>${cel(x.re,x.tot)}</td><td>${cel(x.dm,x.tot)}</td><td>${cel(x.da,x.tot)}</td><td style="font-size:11px">${health(x)}</td></tr>`).join("")||`<tr><td colspan="7" class="note">查無資料</td></tr>`;
+  setCap("cap-wkprod",`各業務 H2 四類產品業績＋占比。健康度：站內>70%🔴過度依賴、再行銷<10%🔴弱、數媒<10%🔴弱。範圍：${ctxWk()}。`);
+  // ④ 包套
+  renderCombo(ppl, perf*1e4);
+  // ⑥ Pipeline
+  renderWkPipe(ppl, tPerf);
+  // 🚨 紅燈 + 產品缺口
+  const al=[]; const r1=dueV?perf/dueV*100:0, r2=tRem*due?rem/(tRem*due)*100:0;
+  if(r1<85)al.push(`🔴 業績落後：累計達成 ${r1.toFixed(0)}%（<85%），落後 ${fmtN(lg)}萬。`);
+  if(r2<85)al.push(`🔴 再行銷落後：累計達成 ${r2.toFixed(0)}%。`);
+  if(done.length===0)al.push("🔴 本週包套：0 件成交，須推整合方案。");
+  const gaps=ppl.map(x=>{const o=x.on/(x.tot||1),re=x.rem/(x.tot||1),dm=(x.dm+x.da)/(x.tot||1),w=[];if(o>.7)w.push("站內過重");if(re<.10)w.push("再行銷弱");if(dm<.10)w.push("數媒弱");return w.length?`${x.s}：${w.join("、")}`:null;}).filter(Boolean);
+  document.getElementById("wk-alert").innerHTML=(al.length?al.join("<br>"):"🟢 目前無紅燈")+(gaps.length?"<br><br><b>🧩 產品缺口（下週該教他賣什麼）</b><br>"+gaps.map(g=>"· "+g).join("<br>"):"");
+  renderWkAction();
 }
+function renderCombo(ppl,perfEl){
+  const combo=wSt("dm_wkcombo"),done=combo.filter(c=>c.status==="成交"),amt=done.reduce((s,c)=>s+(+c.amt||0),0);
+  document.getElementById("wk-combo-kpi").innerHTML=
+    `<div class="kpi"><div class="k">包套件數</div><div class="v">${combo.length}</div><div class="n">成交 ${done.length}</div></div>`+
+    `<div class="kpi"><div class="k">包套業績(成交)</div><div class="v">${fmtN(amt/1e4)}萬</div><div class="n">占總業績 ${perfEl?(amt/perfEl*100).toFixed(1):0}%</div></div>`+
+    `<div class="kpi"><div class="k">平均包套金額</div><div class="v">${fmtN(done.length?amt/done.length:0)}</div><div class="n">元/件</div></div>`;
+  const opt=(a,v)=>a.map(o=>`<option${o===v?" selected":""}>${o}</option>`).join("");
+  const so=["",...ppl.map(x=>x.s)];
+  document.querySelector("#wk-combo tbody").innerHTML=combo.map((c,i)=>
+    `<tr data-i="${i}"><td><select class="ce" data-f="sales" style="width:82px">${opt(so,c.sales)}</select></td><td><input class="ce" data-f="cust" value="${c.cust||''}" placeholder="客戶" style="width:88px"></td><td><input class="ce" data-f="proj" value="${c.proj||''}" placeholder="建案" style="width:88px"></td><td><select class="ce" data-f="plan" style="width:150px">${opt(["",...PLANS],c.plan)}</select></td><td><input class="ce" data-f="amt" type="number" value="${c.amt||''}" placeholder="金額" style="width:80px"></td><td><select class="ce" data-f="status" style="width:66px">${opt(["",...STATUS],c.status)}</select></td><td><button onclick="wkDelCombo(${i})" style="border:none;background:none;color:#b53b65;cursor:pointer;font-size:14px">✕</button></td></tr>`).join("")||`<tr><td colspan="7" class="note">尚無登錄，按「＋新增一筆」</td></tr>`;
+  document.querySelectorAll("#wk-combo .ce").forEach(el=>el.addEventListener("change",()=>{const i=+el.closest("tr").dataset.i,a=wSt("dm_wkcombo");a[i][el.dataset.f]=el.value;wSet("dm_wkcombo",a);renderWeek();}));
+}
+function wkAddCombo(){const a=wSt("dm_wkcombo");a.push({sales:"",cust:"",proj:"",plan:"",amt:"",status:"提案"});wSet("dm_wkcombo",a);renderWeek();}
+function wkDelCombo(i){const a=wSt("dm_wkcombo");a.splice(i,1);wSet("dm_wkcombo",a);renderWeek();}
+function renderWkPipe(ppl,tPerf){
+  const PIPE=PDATA.pipe||{}, wkGoal=tPerf/NWK/(ppl.length||1), goalT=tPerf/NWK;
+  const pred={};wSt("dm_wkpred").forEach(x=>pred[x.s]=x.v);
+  let tf=0,tq=0,tp=0,tpr=0;
+  const body=ppl.map(x=>{const v=PIPE[x.s]||{f:0,q:0,p:0},f=v.f/1e4,q=v.q/1e4,p=v.p/1e4;tf+=f;tq+=q;tp+=p;
+    const dv=(pred[x.s]!==undefined&&pred[x.s]!=="")?+pred[x.s]:+(f+q*0.5).toFixed(1);tpr+=dv;const gap=wkGoal-dv;
+    return `<tr data-p="${x.s}"><td>${x.s}</td><td><input class="wp" value="${pred[x.s]!==undefined?pred[x.s]:''}" placeholder="${(f+q*0.5).toFixed(1)}" style="width:60px"> 萬</td><td>${fmtN(f)}萬</td><td>${fmtN(q)}萬</td><td>${fmtN(p)}萬</td><td style="color:${gap>0?'#b53b65':'#1f7a4d'};font-weight:600">${gap>0?'缺 '+fmtN(gap):'足'}萬</td></tr>`;}).join("");
+  document.querySelector("#wk-pipe tbody").innerHTML=(body||`<tr><td colspan="6" class="note">查無資料</td></tr>`)+
+    (ppl.length?`<tr style="font-weight:700;background:#f6f8f9"><td>課合計</td><td>${fmtN(tpr)}萬</td><td>${fmtN(tf)}萬</td><td>${fmtN(tq)}萬</td><td>${fmtN(tp)}萬</td><td style="color:${goalT-tpr>0?'#b53b65':'#1f7a4d'}">目標 ${fmtN(goalT)}萬 · ${goalT-tpr>0?'缺 '+fmtN(goalT-tpr):'足'}萬</td></tr>`:"");
+  document.querySelectorAll("#wk-pipe .wp").forEach(el=>el.addEventListener("change",()=>{const p=el.closest("tr").dataset.p,a=wSt("dm_wkpred").filter(x=>x.s!==p);a.push({s:p,v:el.value});wSet("dm_wkpred",a);renderWeek();}));
+  setCap("cap-wkpipe",`已確定/高機率/風險＝DOS 的將實現/有效報價/潛力(per person 自動帶)。下週預估可手填覆蓋(留空＝將實現+有效報價×50%)。缺口＝下週業績目標(週目標÷人數)−下週預估。`);
+}
+function renderWkAction(){
+  const a=wSt("dm_wkaction"),opt=v=>["待辦","進行中","完成"].map(o=>`<option${o===v?" selected":""}>${o}</option>`).join("");
+  document.querySelector("#wk-action tbody").innerHTML=a.map((x,i)=>
+    `<tr data-i="${i}"><td><input class="ce" data-f="who" value="${x.who||''}" placeholder="負責人" style="width:82px"></td><td><input class="ce" data-f="what" value="${x.what||''}" placeholder="事項" style="width:300px"></td><td><input class="ce" data-f="due" value="${x.due||''}" placeholder="期限" style="width:88px"></td><td><select class="ce" data-f="status" style="width:72px">${opt(x.status)}</select></td><td><button onclick="wkDelAction(${i})" style="border:none;background:none;color:#b53b65;cursor:pointer;font-size:14px">✕</button></td></tr>`).join("")||`<tr><td colspan="5" class="note">尚無行動事項，按「＋新增」</td></tr>`;
+  document.querySelectorAll("#wk-action .ce").forEach(el=>el.addEventListener("change",()=>{const i=+el.closest("tr").dataset.i,arr=wSt("dm_wkaction");arr[i][el.dataset.f]=el.value;wSet("dm_wkaction",arr);}));
+}
+function wkAddAction(){const a=wSt("dm_wkaction");a.push({who:"",what:"",due:"",status:"待辦"});wSet("dm_wkaction",a);renderWkAction();}
+function wkDelAction(i){const a=wSt("dm_wkaction");a.splice(i,1);wSet("dm_wkaction",a);renderWkAction();}
 function dlWeekProd(){const R=weekRows(),byS={};R.forEach(r=>{const s=r.sales||"(未填)";const d=byS[s]=byS[s]||{on:0,re:0,dm:0,da:0};if(r.ad==="on-site")d.on+=r.sale;else if(r.ad==="remarketing")d.re+=r.sale;else if(r.ad==="digitm")d.dm+=r.sale;else if(r.ad==="agent")d.da+=r.sale;});
   const out=Object.entries(byS).map(([s,d])=>[s,d.on,d.re,d.dm,d.da,d.on+d.re+d.dm+d.da]).sort((a,b)=>b[5]-a[5]);
   dl("個人產品結構_H2.csv",[["業務","站內","再行銷","數媒站內","數媒再行銷","總計"],...out]);}
