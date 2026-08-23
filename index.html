@@ -6,6 +6,7 @@
 <title>數字廣告業績儀表板</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 :root { color-scheme: light; }
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -136,13 +137,18 @@ tbody tr:hover { background: #f8fafc; }
 <div id="login">
   <div class="box">
     <div class="brand"><div class="lg">Digit<b>M</b> 數字廣告</div><div class="sb">業務經營戰情系統</div></div>
-    <label>帳號</label>
-    <input id="lg-acc" type="text" placeholder="請輸入公司帳號" autocomplete="username" onkeydown="if(event.key==='Enter')doLogin()">
-    <label>密碼</label>
-    <input id="lg-pw" type="password" placeholder="請輸入密碼" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
-    <button class="btn" onclick="doLogin()">登 入 系 統</button>
+    <div id="gwrap"><div id="gbtn" style="display:flex;justify-content:center;min-height:44px"></div></div>
+    <div class="note" style="text-align:center;margin-top:8px">請用公司 Google 帳號（@digitm.com.tw）登入</div>
     <div class="err" id="lg-err"></div>
-    <div class="demo" id="lg-demo"></div>
+    <details style="margin-top:18px">
+      <summary style="cursor:pointer;font-size:12px;color:#8a97a0;text-align:center">▸ 用示範帳號登入（測試用）</summary>
+      <label>帳號</label>
+      <input id="lg-acc" type="text" placeholder="請輸入公司帳號" autocomplete="username" onkeydown="if(event.key==='Enter')doLogin()">
+      <label>密碼</label>
+      <input id="lg-pw" type="password" placeholder="請輸入密碼" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+      <button class="btn" onclick="doLogin()">登 入 系 統</button>
+      <div class="demo" id="lg-demo"></div>
+    </details>
   </div>
 </div>
 <div class="top">
@@ -313,7 +319,7 @@ tbody tr:hover { background: #f8fafc; }
   </div>
 </div>
 <script>
-const PDATA = {"snapshot": "2026/08/22", "growth": {"業務一課 - 業務一組": {"growth": -1.2, "arpu2026": 225671}, "業務一課 - 業務二組": {"growth": -10.6, "arpu2026": 223539}, "業務二課 - 業務三組": {"growth": -18.8, "arpu2026": 148632}, "業務二課 - 業務四組": {"growth": -12.6, "arpu2026": 124484}, "設計課 - 設計組": {"growth": 5.9, "arpu2026": 180463}}, "pipe": {"曾方音": {"f": 80267, "q": 685908, "p": 731430, "grp": "業務一課 - 業務二組"}, "呂佩宜": {"f": 96933, "q": 2210161, "p": 22876, "grp": "業務二課 - 業務三組"}, "簡艷華": {"f": 39500, "q": 649307, "p": 63465, "grp": "業務二課 - 業務四組"}, "黃淑萍": {"f": 250732, "q": 2166179, "p": 915376, "grp": "業務一課 - 業務一組"}, "趙紹亨": {"f": 58310, "q": 22286, "p": 380838, "grp": "業務一課 - 業務一組"}, "楊儀菲": {"f": 254622, "q": 24886, "p": 47143, "grp": "業務一課 - 業務二組"}, "陳怡雯": {"f": 896416, "q": 0, "p": 74137, "grp": "業務一課 - 業務二組"}, "曾家羚": {"f": 65529, "q": 2162221, "p": 477253, "grp": "業務二課 - 業務三組"}, "簡順隆": {"f": 0, "q": 2199915, "p": 257096, "grp": "業務一課 - 業務二組"}, "姚蘋芸": {"f": 0, "q": 406791, "p": 165841, "grp": "業務二課 - 業務四組"}, "彭莉芳": {"f": 45006, "q": 778011, "p": 288568, "grp": "業務一課 - 業務一組"}, "陳琬臻": {"f": 0, "q": 3114718, "p": 308921, "grp": "業務二課 - 業務三組"}, "鄧瑋婷": {"f": 39817, "q": 667282, "p": 146973, "grp": "業務二課 - 業務四組"}, "張淑瑜": {"f": 0, "q": 0, "p": 298537, "grp": "業務一課"}, "許孟瑋": {"f": 0, "q": 0, "p": 21600, "grp": "業務二課"}, "吳子敬": {"f": 0, "q": 0, "p": 187500, "grp": "業務一課 - 業務二組"}, "程湣傑": {"f": 0, "q": 0, "p": 653728, "grp": "媒體產品課 - 站台產品組"}, "李抒姮": {"f": 0, "q": 0, "p": 151238, "grp": "設計課 - 設計組"}, "仲綨柱": {"f": 0, "q": 0, "p": 168364, "grp": "業務一課 - 業務一組"}, "陳文昕": {"f": 0, "q": 0, "p": 842219, "grp": "行銷策略課 - 行銷一組"}, "趙斯蓓": {"f": 0, "q": 0, "p": 314342, "grp": "設計課 - 設計組"}}, "weekly": {"2026-W32": {"date": "2026/08/07", "cls": {"行銷策略課": {"signed": 0, "wpipe": 660266}, "業務二課": {"signed": 29652313, "wpipe": 2998292}, "媒體產品課": {"signed": 0, "wpipe": 1338745}, "設計課": {"signed": 1427191, "wpipe": 329906}, "業務一課": {"signed": 49660573, "wpipe": 4085136}}}, "2026-W33": {"date": "2026/08/13", "cls": {"行銷策略課": {"signed": 0, "wpipe": 589553}, "設計課": {"signed": 1427191, "wpipe": 325906}, "業務二課": {"signed": 29652313, "wpipe": 2856192}, "業務一課": {"signed": 49660573, "wpipe": 4629476}, "媒體產品課": {"signed": 0, "wpipe": 457610}}}, "2026-W34": {"date": "2026/08/22", "cls": {"業務一課": {"signed": 49660573, "wpipe": 4629476, "perf": 51955607, "rem": 4918454}, "媒體產品課": {"signed": 0, "wpipe": 457610, "perf": 0, "rem": 0}, "業務二課": {"signed": 29652313, "wpipe": 2856192, "perf": 32150758, "rem": 3543194}, "行銷策略課": {"signed": 0, "wpipe": 589553, "perf": 0, "rem": 0}, "設計課": {"signed": 1427191, "wpipe": 325906, "perf": 14916356, "rem": 976224}}}}};
+const PDATA = {"snapshot": "2026/08/23", "growth": {"業務一課 - 業務一組": {"growth": -1.2, "arpu2026": 225671}, "業務一課 - 業務二組": {"growth": -10.6, "arpu2026": 223539}, "業務二課 - 業務三組": {"growth": -18.8, "arpu2026": 148632}, "業務二課 - 業務四組": {"growth": -12.6, "arpu2026": 124484}, "設計課 - 設計組": {"growth": 5.9, "arpu2026": 180463}}, "pipe": {"曾方音": {"f": 80267, "q": 685908, "p": 731430, "grp": "業務一課 - 業務二組"}, "呂佩宜": {"f": 96933, "q": 2210161, "p": 22876, "grp": "業務二課 - 業務三組"}, "簡艷華": {"f": 39500, "q": 649307, "p": 63465, "grp": "業務二課 - 業務四組"}, "黃淑萍": {"f": 250732, "q": 2166179, "p": 915376, "grp": "業務一課 - 業務一組"}, "趙紹亨": {"f": 58310, "q": 22286, "p": 380838, "grp": "業務一課 - 業務一組"}, "楊儀菲": {"f": 254622, "q": 24886, "p": 47143, "grp": "業務一課 - 業務二組"}, "陳怡雯": {"f": 896416, "q": 0, "p": 74137, "grp": "業務一課 - 業務二組"}, "曾家羚": {"f": 65529, "q": 2162221, "p": 477253, "grp": "業務二課 - 業務三組"}, "簡順隆": {"f": 0, "q": 2199915, "p": 257096, "grp": "業務一課 - 業務二組"}, "姚蘋芸": {"f": 0, "q": 406791, "p": 165841, "grp": "業務二課 - 業務四組"}, "彭莉芳": {"f": 45006, "q": 778011, "p": 288568, "grp": "業務一課 - 業務一組"}, "陳琬臻": {"f": 0, "q": 3114718, "p": 308921, "grp": "業務二課 - 業務三組"}, "鄧瑋婷": {"f": 39817, "q": 667282, "p": 146973, "grp": "業務二課 - 業務四組"}, "張淑瑜": {"f": 0, "q": 0, "p": 298537, "grp": "業務一課"}, "許孟瑋": {"f": 0, "q": 0, "p": 21600, "grp": "業務二課"}, "吳子敬": {"f": 0, "q": 0, "p": 187500, "grp": "業務一課 - 業務二組"}, "程湣傑": {"f": 0, "q": 0, "p": 653728, "grp": "媒體產品課 - 站台產品組"}, "李抒姮": {"f": 0, "q": 0, "p": 151238, "grp": "設計課 - 設計組"}, "仲綨柱": {"f": 0, "q": 0, "p": 168364, "grp": "業務一課 - 業務一組"}, "陳文昕": {"f": 0, "q": 0, "p": 842219, "grp": "行銷策略課 - 行銷一組"}, "趙斯蓓": {"f": 0, "q": 0, "p": 314342, "grp": "設計課 - 設計組"}}, "weekly": {"2026-W32": {"date": "2026/08/07", "cls": {"行銷策略課": {"signed": 0, "wpipe": 660266}, "業務二課": {"signed": 29652313, "wpipe": 2998292}, "媒體產品課": {"signed": 0, "wpipe": 1338745}, "設計課": {"signed": 1427191, "wpipe": 329906}, "業務一課": {"signed": 49660573, "wpipe": 4085136}}}, "2026-W33": {"date": "2026/08/13", "cls": {"行銷策略課": {"signed": 0, "wpipe": 589553}, "設計課": {"signed": 1427191, "wpipe": 325906}, "業務二課": {"signed": 29652313, "wpipe": 2856192}, "業務一課": {"signed": 49660573, "wpipe": 4629476}, "媒體產品課": {"signed": 0, "wpipe": 457610}}}, "2026-W34": {"date": "2026/08/23", "cls": {"行銷策略課": {"signed": 0, "wpipe": 589553, "perf": 0, "rem": 0}, "業務二課": {"signed": 29652313, "wpipe": 2856192, "perf": 32150758, "rem": 3543194}, "媒體產品課": {"signed": 0, "wpipe": 457610, "perf": 0, "rem": 0}, "業務一課": {"signed": 49660573, "wpipe": 4629476, "perf": 51955607, "rem": 4918454}, "設計課": {"signed": 1427191, "wpipe": 325906, "perf": 14916356, "rem": 976224}}}}};
 const fmtN=n=>Math.round(n).toLocaleString("en-US");
 const fmtWan=n=>{const x=Math.round(n);if(Math.abs(x)>=1e8)return (x/1e8).toLocaleString("en-US",{maximumFractionDigits:2})+"億";if(Math.abs(x)>=1e4)return (x/1e4).toLocaleString("en-US",{maximumFractionDigits:1})+"萬";return x.toLocaleString("en-US");};
 const fmtBoth=n=>`${fmtWan(n)}<span style="display:block;font-size:10px;color:#9aa3ad;font-weight:400">${fmtN(n)}</span>`;
@@ -450,6 +456,34 @@ const DEMO_USERS=[
   {acc:"pennyhuang@digitm.com.tw", pw:"1234",name:"黃淑萍",role:"sales",     cls:"業務一課",grp:"業務一課 - 業務一組"}
 ];
 let SESSION=null;
+/* ── Google 登入（公司信箱→角色→資料範圍） ── */
+const DOMAIN="digitm.com.tw";
+let GOOGLE_CLIENT_ID=localStorage.getItem("dm_gid")||"";   // 管理者於登入頁設定一次（存本機）
+const ADMIN_EMAILS=(localStorage.getItem("dm_admins")||"").split(",").map(s=>s.trim().toLowerCase()).filter(Boolean); // 管理者信箱，逗號分隔存本機
+const EMAIL_USERS={"vivi@digitm.com.tw":{name:"彭莉芳",role:"sales",cls:"業務一課",grp:"業務一課 - 業務一組"},"pennyhuang@digitm.com.tw":{name:"黃淑萍",role:"sales",cls:"業務一課",grp:"業務一課 - 業務一組"},"miachao@digitm.com.tw":{name:"趙紹亨",role:"sales",cls:"業務一課",grp:"業務一課 - 業務一組"},"rebichung@digitm.com.tw":{name:"仲綨柱",role:"sales",cls:"業務一課",grp:"業務一課 - 業務一組"},"ivy.tseng@digitm.com.tw":{name:"曾方音",role:"sales",cls:"業務一課",grp:"業務一課 - 業務二組"},"dirochien@digitm.com.tw":{name:"簡順隆",role:"sales",cls:"業務一課",grp:"業務一課 - 業務二組"},"fifiyang@digitm.com.tw":{name:"楊儀菲",role:"sales",cls:"業務一課",grp:"業務一課 - 業務二組"},"vanessachen@digitm.com.tw":{name:"陳怡雯",role:"team_leader",cls:"業務一課",grp:"業務一課 - 業務一組"},"aviis_tseng@digitm.com.tw":{name:"曾家羚",role:"sales",cls:"業務二課",grp:"業務二課 - 業務三組"},"j77725@digitm.com.tw":{name:"陳琬臻",role:"sales",cls:"業務二課",grp:"業務二課 - 業務三組"},"unalu@digitm.com.tw":{name:"呂佩宜",role:"sales",cls:"業務二課",grp:"業務二課 - 業務三組"},"jennyjian@digitm.com.tw":{name:"簡艷華",role:"sales",cls:"業務二課",grp:"業務二課 - 業務四組"},"wendyteng@digitm.com.tw":{name:"鄧瑋婷",role:"sales",cls:"業務二課",grp:"業務二課 - 業務四組"},"appleyao@digitm.com.tw":{name:"姚蘋芸",role:"sales",cls:"業務二課",grp:"業務二課 - 業務四組"},"kellychao@digitm.com.tw":{name:"趙斯蓓",role:"sales",cls:"設計課",grp:"設計課 - 設計組"},"aprilchang@digitm.com.tw":{name:"張瑋秦",role:"sales",cls:"設計課",grp:"設計課 - 設計組"},"yuralee@digitm.com.tw":{name:"李抒姮",role:"sales",cls:"設計課",grp:"設計課 - 設計組"},"erinkuo@digitm.com.tw":{name:"郭宴菱",role:"sales",cls:"設計課",grp:"設計課 - 設計組"}};
+function initGoogle(){
+  const wrap=document.getElementById("gwrap");if(!wrap)return;
+  if(!GOOGLE_CLIENT_ID){wrap.innerHTML='<div class="note" style="text-align:center;line-height:1.7">尚未啟用 Google 登入。<br><a class="u" style="cursor:pointer;color:#263E44;text-decoration:underline" onclick="setGid()">管理者點此貼上 Client ID 啟用</a></div>';return;}
+  if(!(window.google&&google.accounts&&google.accounts.id)){setTimeout(initGoogle,300);return;}
+  if(!document.getElementById("gbtn")){wrap.innerHTML='<div id="gbtn" style="display:flex;justify-content:center;min-height:44px"></div>';}
+  try{google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:onGoogle,hosted_domain:DOMAIN,auto_select:false});
+    google.accounts.id.renderButton(document.getElementById("gbtn"),{theme:"filled_blue",size:"large",text:"signin_with",shape:"pill",locale:"zh_TW"});
+  }catch(e){wrap.innerHTML='<div class="note" style="text-align:center;color:#b53b65">Google 登入初始化失敗：'+e.message+'　<a class="u" style="cursor:pointer" onclick="setGid()">重設 Client ID</a></div>';}
+}
+function setGid(){const v=prompt("貼上 Google OAuth Client ID（結尾 .apps.googleusercontent.com）：",GOOGLE_CLIENT_ID||"");if(v!==null){localStorage.setItem("dm_gid",v.trim());const a=prompt("（選填）管理者信箱，多個用逗號分隔，例：boss@digitm.com.tw",localStorage.getItem("dm_admins")||"");if(a!==null)localStorage.setItem("dm_admins",a.trim());location.reload();}}
+function b64u(s){s=s.replace(/-/g,"+").replace(/_/g,"/");while(s.length%4)s+="=";return decodeURIComponent(escape(atob(s)));}
+function onGoogle(resp){
+  try{
+    const p=JSON.parse(b64u((resp.credential||"").split(".")[1]||""));
+    const email=(p.email||"").toLowerCase(),name=p.name||email;
+    if(!email.endsWith("@"+DOMAIN)){document.getElementById("lg-err").textContent="請用公司信箱（@"+DOMAIN+"）登入，此帳號為 "+email;return;}
+    let u=EMAIL_USERS[email];
+    if(ADMIN_EMAILS.includes(email))u={name:(u&&u.name)||name,role:"admin",cls:"",grp:""};
+    if(!u)u={name:name,role:"sales",cls:"",grp:""}; // 網域內但不在名單：暫給業務、以姓名對範圍
+    u=Object.assign({acc:email,gmail:true},u);
+    localStorage.setItem("dm_session",JSON.stringify(u));applySession(u);
+  }catch(e){document.getElementById("lg-err").textContent="Google 登入解析失敗："+e.message;}
+}
 // 由 ROWS 推每位業務所屬 課／組
 function orgMap(){const m={};ROWS.forEach(r=>{if(r.sales)m[r.sales]={cls:r.cls,grp:r.grp};});return m;}
 function scopeSales(u){const om=orgMap();const all=Object.keys(om);
@@ -465,7 +499,7 @@ function doLogin(){const a=val("lg-acc").trim(),p=val("lg-pw").trim();const u=DE
 function logout(){localStorage.removeItem("dm_session");SESSION=null;location.reload();}
 function gateAuth(){document.getElementById("lg-demo").innerHTML="<b>示範帳號</b>（密碼皆 1234）：<br>"+DEMO_USERS.map(u=>'<span class="u" onclick="fillLogin(\''+u.acc+'\')">'+u.acc+'</span> ＝ '+ROLE_LABEL[u.role]+(u.name.startsWith("（")?"":" "+u.name)).join("<br>");
   const s=localStorage.getItem("dm_session");if(s){try{applySession(JSON.parse(s));return;}catch(e){}}
-  document.getElementById("login").style.display="flex";}
+  document.getElementById("login").style.display="flex";initGoogle();}
 function fillLogin(a){document.getElementById("lg-acc").value=a;document.getElementById("lg-pw").value="1234";}
 // 依角色決定可見頁面：業務只留 我的業績／我的週會／我的目標；主管以上看完整管理視角
 function allowedPages(role){
