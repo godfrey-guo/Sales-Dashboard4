@@ -105,6 +105,15 @@ tbody tr:hover { background: #f8fafc; }
 .badge-sys { background:#dff3e6; color:#1f7a4d; } .badge-man { background:#fff3d6; color:#8a6300; }
 .matrix .bd { font-size:11px; font-weight:700; padding:1px 8px; border-radius:20px; }
 .utbl td .st-on { color:#1f7a4d; font-weight:700; } .utbl .rl2 { font-weight:700; color:#263E44; }
+/* ── 明細彈窗（點 KPI 下鑽） ── */
+#drill { position:fixed; inset:0; z-index:150; background:rgba(20,30,33,.55); display:flex; align-items:center; justify-content:center; padding:20px; }
+#drill .dbox { background:#fff; border-radius:14px; width:100%; max-width:920px; max-height:82vh; display:flex; flex-direction:column; box-shadow:0 20px 60px rgba(0,0,0,.4); }
+#drill .dhd { display:flex; justify-content:space-between; align-items:center; padding:14px 18px; border-bottom:1px solid #eceff1; gap:8px; flex-wrap:wrap; }
+#drill .dhd h2 { font-size:15px; color:#263E44; }
+#drill .dhd button { font:inherit; font-size:12px; font-weight:700; padding:6px 11px; border-radius:8px; border:1px solid #263E44; background:#fff; color:#263E44; cursor:pointer; margin-left:6px; }
+#drill .dhd button.x { background:#263E44; color:#fff; border:none; }
+#drill .dwrap { overflow:auto; padding:6px 14px 16px; }
+#drill table { font-size:12px; } #drill th { position:sticky; top:0; }
 .am-split { display:grid; grid-template-columns:340px 1fr; gap:16px; align-items:start; }
 @media (max-width: 820px){ .am-split { grid-template-columns:1fr; } }
 .ref { display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px solid #f0f1f3; font-size:13px; }
@@ -319,7 +328,7 @@ tbody tr:hover { background: #f8fafc; }
   </div>
 </div>
 <script>
-const PDATA = {"snapshot": "2026/08/23", "growth": {"業務一課 - 業務一組": {"growth": -1.2, "arpu2026": 225671}, "業務一課 - 業務二組": {"growth": -10.6, "arpu2026": 223539}, "業務二課 - 業務三組": {"growth": -18.8, "arpu2026": 148632}, "業務二課 - 業務四組": {"growth": -12.6, "arpu2026": 124484}, "設計課 - 設計組": {"growth": 5.9, "arpu2026": 180463}}, "pipe": {"曾方音": {"f": 80267, "q": 685908, "p": 731430, "grp": "業務一課 - 業務二組"}, "呂佩宜": {"f": 96933, "q": 2210161, "p": 22876, "grp": "業務二課 - 業務三組"}, "簡艷華": {"f": 39500, "q": 649307, "p": 63465, "grp": "業務二課 - 業務四組"}, "黃淑萍": {"f": 250732, "q": 2166179, "p": 915376, "grp": "業務一課 - 業務一組"}, "趙紹亨": {"f": 58310, "q": 22286, "p": 380838, "grp": "業務一課 - 業務一組"}, "楊儀菲": {"f": 254622, "q": 24886, "p": 47143, "grp": "業務一課 - 業務二組"}, "陳怡雯": {"f": 896416, "q": 0, "p": 74137, "grp": "業務一課 - 業務二組"}, "曾家羚": {"f": 65529, "q": 2162221, "p": 477253, "grp": "業務二課 - 業務三組"}, "簡順隆": {"f": 0, "q": 2199915, "p": 257096, "grp": "業務一課 - 業務二組"}, "姚蘋芸": {"f": 0, "q": 406791, "p": 165841, "grp": "業務二課 - 業務四組"}, "彭莉芳": {"f": 45006, "q": 778011, "p": 288568, "grp": "業務一課 - 業務一組"}, "陳琬臻": {"f": 0, "q": 3114718, "p": 308921, "grp": "業務二課 - 業務三組"}, "鄧瑋婷": {"f": 39817, "q": 667282, "p": 146973, "grp": "業務二課 - 業務四組"}, "張淑瑜": {"f": 0, "q": 0, "p": 298537, "grp": "業務一課"}, "許孟瑋": {"f": 0, "q": 0, "p": 21600, "grp": "業務二課"}, "吳子敬": {"f": 0, "q": 0, "p": 187500, "grp": "業務一課 - 業務二組"}, "程湣傑": {"f": 0, "q": 0, "p": 653728, "grp": "媒體產品課 - 站台產品組"}, "李抒姮": {"f": 0, "q": 0, "p": 151238, "grp": "設計課 - 設計組"}, "仲綨柱": {"f": 0, "q": 0, "p": 168364, "grp": "業務一課 - 業務一組"}, "陳文昕": {"f": 0, "q": 0, "p": 842219, "grp": "行銷策略課 - 行銷一組"}, "趙斯蓓": {"f": 0, "q": 0, "p": 314342, "grp": "設計課 - 設計組"}}, "weekly": {"2026-W32": {"date": "2026/08/07", "cls": {"行銷策略課": {"signed": 0, "wpipe": 660266}, "業務二課": {"signed": 29652313, "wpipe": 2998292}, "媒體產品課": {"signed": 0, "wpipe": 1338745}, "設計課": {"signed": 1427191, "wpipe": 329906}, "業務一課": {"signed": 49660573, "wpipe": 4085136}}}, "2026-W33": {"date": "2026/08/13", "cls": {"行銷策略課": {"signed": 0, "wpipe": 589553}, "設計課": {"signed": 1427191, "wpipe": 325906}, "業務二課": {"signed": 29652313, "wpipe": 2856192}, "業務一課": {"signed": 49660573, "wpipe": 4629476}, "媒體產品課": {"signed": 0, "wpipe": 457610}}}, "2026-W34": {"date": "2026/08/23", "cls": {"設計課": {"signed": 1427191, "wpipe": 325906, "perf": 14916356, "rem": 976224}, "業務一課": {"signed": 49660573, "wpipe": 4629476, "perf": 51955607, "rem": 4918454}, "媒體產品課": {"signed": 0, "wpipe": 457610, "perf": 0, "rem": 0}, "業務二課": {"signed": 29652313, "wpipe": 2856192, "perf": 32150758, "rem": 3543194}, "行銷策略課": {"signed": 0, "wpipe": 589553, "perf": 0, "rem": 0}}}}};
+const PDATA = {"snapshot": "2026/08/24", "growth": {"業務一課 - 業務一組": {"growth": -1.2, "arpu2026": 225671}, "業務一課 - 業務二組": {"growth": -10.6, "arpu2026": 223539}, "業務二課 - 業務三組": {"growth": -18.8, "arpu2026": 148632}, "業務二課 - 業務四組": {"growth": -12.6, "arpu2026": 124484}, "設計課 - 設計組": {"growth": 5.9, "arpu2026": 180463}}, "pipe": {"曾方音": {"f": 80267, "q": 685908, "p": 731430, "grp": "業務一課 - 業務二組"}, "呂佩宜": {"f": 96933, "q": 2210161, "p": 22876, "grp": "業務二課 - 業務三組"}, "簡艷華": {"f": 39500, "q": 649307, "p": 63465, "grp": "業務二課 - 業務四組"}, "黃淑萍": {"f": 250732, "q": 2166179, "p": 915376, "grp": "業務一課 - 業務一組"}, "趙紹亨": {"f": 58310, "q": 22286, "p": 380838, "grp": "業務一課 - 業務一組"}, "楊儀菲": {"f": 254622, "q": 24886, "p": 47143, "grp": "業務一課 - 業務二組"}, "陳怡雯": {"f": 896416, "q": 0, "p": 74137, "grp": "業務一課 - 業務二組"}, "曾家羚": {"f": 65529, "q": 2162221, "p": 477253, "grp": "業務二課 - 業務三組"}, "簡順隆": {"f": 0, "q": 2199915, "p": 257096, "grp": "業務一課 - 業務二組"}, "姚蘋芸": {"f": 0, "q": 406791, "p": 165841, "grp": "業務二課 - 業務四組"}, "彭莉芳": {"f": 45006, "q": 778011, "p": 288568, "grp": "業務一課 - 業務一組"}, "陳琬臻": {"f": 0, "q": 3114718, "p": 308921, "grp": "業務二課 - 業務三組"}, "鄧瑋婷": {"f": 39817, "q": 667282, "p": 146973, "grp": "業務二課 - 業務四組"}, "張淑瑜": {"f": 0, "q": 0, "p": 298537, "grp": "業務一課"}, "許孟瑋": {"f": 0, "q": 0, "p": 21600, "grp": "業務二課"}, "吳子敬": {"f": 0, "q": 0, "p": 187500, "grp": "業務一課 - 業務二組"}, "程湣傑": {"f": 0, "q": 0, "p": 653728, "grp": "媒體產品課 - 站台產品組"}, "李抒姮": {"f": 0, "q": 0, "p": 151238, "grp": "設計課 - 設計組"}, "仲綨柱": {"f": 0, "q": 0, "p": 168364, "grp": "業務一課 - 業務一組"}, "陳文昕": {"f": 0, "q": 0, "p": 842219, "grp": "行銷策略課 - 行銷一組"}, "趙斯蓓": {"f": 0, "q": 0, "p": 314342, "grp": "設計課 - 設計組"}}, "weekly": {"2026-W32": {"date": "2026/08/07", "cls": {"行銷策略課": {"signed": 0, "wpipe": 660266}, "業務二課": {"signed": 29652313, "wpipe": 2998292}, "媒體產品課": {"signed": 0, "wpipe": 1338745}, "設計課": {"signed": 1427191, "wpipe": 329906}, "業務一課": {"signed": 49660573, "wpipe": 4085136}}}, "2026-W33": {"date": "2026/08/13", "cls": {"行銷策略課": {"signed": 0, "wpipe": 589553}, "設計課": {"signed": 1427191, "wpipe": 325906}, "業務二課": {"signed": 29652313, "wpipe": 2856192}, "業務一課": {"signed": 49660573, "wpipe": 4629476}, "媒體產品課": {"signed": 0, "wpipe": 457610}}}, "2026-W34": {"date": "2026/08/23", "cls": {"設計課": {"signed": 1427191, "wpipe": 325906, "perf": 14916356, "rem": 976224}, "業務一課": {"signed": 49660573, "wpipe": 4629476, "perf": 51955607, "rem": 4918454}, "媒體產品課": {"signed": 0, "wpipe": 457610, "perf": 0, "rem": 0}, "業務二課": {"signed": 29652313, "wpipe": 2856192, "perf": 32150758, "rem": 3543194}, "行銷策略課": {"signed": 0, "wpipe": 589553, "perf": 0, "rem": 0}}}, "2026-W35": {"date": "2026/08/24", "cls": {"業務一課": {"signed": 49660573, "wpipe": 4629476, "perf": 51955607, "rem": 4918454}, "設計課": {"signed": 1427191, "wpipe": 325906, "perf": 14916356, "rem": 976224}, "媒體產品課": {"signed": 0, "wpipe": 457610, "perf": 0, "rem": 0}, "業務二課": {"signed": 29652313, "wpipe": 2856192, "perf": 32150758, "rem": 3543194}, "行銷策略課": {"signed": 0, "wpipe": 589553, "perf": 0, "rem": 0}}}}};
 const fmtN=n=>Math.round(n).toLocaleString("en-US");
 const fmtWan=n=>{const x=Math.round(n);if(Math.abs(x)>=1e8)return (x/1e8).toLocaleString("en-US",{maximumFractionDigits:2})+"億";if(Math.abs(x)>=1e4)return (x/1e4).toLocaleString("en-US",{maximumFractionDigits:1})+"萬";return x.toLocaleString("en-US");};
 const fmtBoth=n=>`${fmtWan(n)}<span style="display:block;font-size:10px;color:#9aa3ad;font-weight:400">${fmtN(n)}</span>`;
@@ -738,8 +747,8 @@ function renderWeek(){
   const perf=ppl.reduce((s,x)=>s+x.tot,0)/1e4, rem=ppl.reduce((s,x)=>s+x.rem,0)/1e4, nCust=new Set(R.filter(r=>r.cust!=-1).map(r=>r.cust)).size;
   const combo=wSt("dm_wkcombo"), done=combo.filter(c=>c.status==="成交"), comboAmt=done.reduce((s,c)=>s+(+c.amt||0),0)/1e4;
   // ① KPI
-  const kpi=(name,tot,act,u)=>{const dv=tot*due,rt=dv?act/dv*100:0;return `<div class="kpi" style="border-top-color:${rt>=100?'#1f7a4d':rt>=85?'#caa500':'#b53b65'}"><div class="k">${lamp(rt)} ${name} <span style="font-weight:400;color:#9aa3ad">· 累計</span></div><div class="v">${fmtN(act)}${u}</div><div class="n">應達 ${fmtN(dv)}${u}(第${N}週) · 達成 <b>${rt.toFixed(0)}%</b></div></div>`;};
-  document.getElementById("wk-kpi").innerHTML=kpi("總業績",tPerf,perf,"萬")+kpi("再行銷",tRem,rem,"萬")+kpi("包套(成交)",tCombo,comboAmt,"萬")+kpi("客戶數",tCust,nCust,"家");
+  const kpi=(name,tot,act,u,key)=>{const dv=tot*due,rt=dv?act/dv*100:0;return `<div class="kpi" style="border-top-color:${rt>=100?'#1f7a4d':rt>=85?'#caa500':'#b53b65'};cursor:pointer" onclick="drillKPI('${key}')" title="點看明細"><div class="k">${lamp(rt)} ${name} <span style="font-weight:400;color:#9aa3ad">· 累計 🔍</span></div><div class="v">${fmtN(act)}${u}</div><div class="n">應達 ${fmtN(dv)}${u}(第${N}週) · 達成 <b>${rt.toFixed(0)}%</b></div></div>`;};
+  document.getElementById("wk-kpi").innerHTML=kpi("總業績",tPerf,perf,"萬","perf")+kpi("再行銷",tRem,rem,"萬","rem")+kpi("包套(成交)",tCombo,comboAmt,"萬","combo")+kpi("客戶數",tCust,nCust,"家","cust");
   setCap("cap-week",`目前 H2 <b>第 ${N} / ${NWK} 週</b>（快照 ${PDATA.snapshot||""}）｜範圍：${ctxWk()}。週目標＝半年目標÷26；應達＝週目標×${N}。🟢≥100% 🟡85–100% 🔴<85%。`);
   // ② 跑速
   const wPerf=tPerf/NWK, dueV=tPerf*due, lg=dueV-perf;
@@ -809,6 +818,31 @@ function renderWkMe(N,tPerf,ppl){
   const p3=panel("✅ 本週三件必做",actInner,"#263E44");
   box.innerHTML=`<div class="card-head" style="margin-bottom:10px"><h2>👋 ${name}，這是你本週的戰情（第 ${N}/${NWK} 週）</h2></div><div style="display:flex;gap:12px;flex-wrap:wrap">${p1}${p2}${p3}</div>${est?`<div class="note" style="margin-top:9px">＊個人業績目標尚未在 Sheet「目標設定」設定，暫以上方「半年目標設定」欄的 ${fmtN(half)}萬 為本人半年目標。主管在目標中心設定個人目標後即以實際值計算。</div>`:""}`;
 }
+/* ── 明細下鑽（可重複用元件；點 KPI 彈出組成清單＋CSV） ── */
+const AD_LABEL={"on-site":"站內","remarketing":"站台再行銷","digitm":"數媒站內","agent":"數媒再行銷"};
+let DRILL={head:[],rows:[],name:"明細"};
+function openDrill(title,head,rows,name){DRILL={head,rows,name:name||title};
+  document.getElementById("drill-title").textContent=title+"（"+fmtN(rows.length)+" 筆）";
+  document.querySelector("#drill-tbl thead").innerHTML="<tr>"+head.map(h=>"<th>"+h+"</th>").join("")+"</tr>";
+  document.querySelector("#drill-tbl tbody").innerHTML=rows.length?rows.map(r=>"<tr>"+r.map(c=>"<td>"+(c==null?"":c)+"</td>").join("")+"</tr>").join(""):`<tr><td class="note" colspan="${head.length}">查無資料</td></tr>`;
+  document.getElementById("drill").classList.remove("hide");}
+function closeDrill(){document.getElementById("drill").classList.add("hide");}
+function dlDrill(){const esc=c=>'"'+String(c==null?"":c).replace(/"/g,'""')+'"';const csv=[DRILL.head.map(esc).join(",")].concat(DRILL.rows.map(r=>r.map(esc).join(","))).join("\n");const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["﻿"+csv],{type:"text/csv"}));a.download=DRILL.name+".csv";document.body.appendChild(a);a.click();a.remove();}
+function drillKPI(k){if(k==="perf")drillLines(null,"總業績");else if(k==="rem")drillLines(r=>r.ad==="remarketing"||r.ad==="agent","再行銷");else if(k==="combo")drillCombo();else if(k==="cust")drillCust();}
+function drillLines(filt,title){let R=weekRows();if(filt)R=R.filter(filt);R=R.sort((a,b)=>b.sale-a.sale);
+  const head=["月份","廣告類型","業務","客戶","產品(版位)","站台","地區","金額"];
+  const rows=R.map(r=>[r.m+"月",AD_LABEL[r.ad]||r.ad,r.sales||"",r.customer||"",r.slot||"",r.ch||"",r.region||"",fmtN(r.sale)]);
+  openDrill(title+" 累計明細（H2）",head,rows,title+"明細");}
+function drillCombo(){const pu=localStorage.getItem("dm_sheet_edit");let combo=[];
+  if(pu&&Array.isArray(SHEETDATA.pkg))combo=sheetRows(SHEETDATA.pkg,"業務",["業務","客戶","建案","方案","金額","進單時間","狀態"]).map(o=>({sales:o.業務,cust:o.客戶,proj:o.建案,plan:o.方案,amt:o.金額,time:o.進單時間,status:o.狀態}));
+  else combo=wSt("dm_wkcombo");
+  const done=combo.filter(c=>c.status==="成交");
+  const head=["業務","客戶","建案","方案","金額","進單時間","狀態"];
+  const rows=done.map(c=>[c.sales||"",c.cust||"",c.proj||"",c.plan||"",fmtN(numOf(c.amt)),c.time||"",c.status||""]);
+  openDrill("包套（成交）明細",head,rows,"包套明細");}
+function drillCust(){const R=weekRows(),by={};R.forEach(r=>{if(r.cust===-1)return;const c=r.customer||"(未填)";const o=by[c]=by[c]||{amt:0,n:0,s:new Set()};o.amt+=r.sale;o.n++;if(r.sales)o.s.add(r.sales);});
+  const rows=Object.entries(by).sort((a,b)=>b[1].amt-a[1].amt).map(([c,o])=>[c,[...o.s].slice(0,3).join("、")+(o.s.size>3?" 等":""),fmtN(o.n),fmtN(o.amt)]);
+  openDrill("客戶明細（H2）",["客戶","往來業務","投放筆數","金額"],rows,"客戶明細");}
 function renderCombo(ppl,perfEl){
   const pu=localStorage.getItem("dm_sheet_edit");let combo,ro=false;
   if(pu){if(SHEETDATA.pkg===null){wkFetchSheets(false);document.getElementById("wk-combo-kpi").innerHTML="";document.querySelector("#wk-combo tbody").innerHTML=`<tr><td colspan="8" class="note">讀取 Sheet 中…</td></tr>`;return;}
@@ -1197,5 +1231,11 @@ function renderWar(){
 
 function dl(fn,rows){const csv="﻿"+rows.map(r=>r.map(c=>'"'+String(c==null?"":c).replace(/"/g,'""')+'"').join(",")).join("\r\n");const b=new Blob([csv],{type:"text/csv;charset=utf-8"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=fn;document.body.appendChild(a);a.click();setTimeout(()=>a.remove(),200);}
 </script>
+<div id="drill" class="hide" onclick="if(event.target.id==='drill')closeDrill()">
+  <div class="dbox">
+    <div class="dhd"><h2 id="drill-title"></h2><span><button onclick="dlDrill()">⬇ 下載 CSV</button><button class="x" onclick="closeDrill()">✕ 關閉</button></span></div>
+    <div class="dwrap"><table id="drill-tbl"><thead></thead><tbody></tbody></table></div>
+  </div>
+</div>
 </body>
 </html>
