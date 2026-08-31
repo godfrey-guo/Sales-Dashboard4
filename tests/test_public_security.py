@@ -1,4 +1,5 @@
 import pathlib
+import subprocess
 import unittest
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -59,6 +60,16 @@ class PublicDashboardSecurityTests(unittest.TestCase):
         self.assertIn("Content-Security-Policy", html)
         self.assertIn("default-src 'self'", html)
         self.assertNotIn("'unsafe-inline'", html)
+
+    def test_python_cache_is_not_committed(self):
+        result = subprocess.run(
+            ["git", "ls-files", "*__pycache__*", "*.pyc"],
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual("", result.stdout.strip())
 
 
 if __name__ == "__main__":
