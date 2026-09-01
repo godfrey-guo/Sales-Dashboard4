@@ -8,14 +8,25 @@
 <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
-:root { color-scheme: light; }
+:root {
+  color-scheme: light;
+  --digitm-blue: #263E44;
+  --digitm-green: #E6F31E;
+  --godfrey-orange: #FF8A1F;
+  --godfrey-orange-text: #C2410C;
+  --godfrey-cocoa: #35150F;
+  --godfrey-cream: #FFF4E6;
+  --godfrey-terracotta: #B84A32;
+  --orange-foreground: #161616;
+}
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: "Noto Sans TC", -apple-system, "Segoe UI", "Microsoft JhengHei", sans-serif; background: #f7f8fa; color: #1a1d23; }
-.top { background: #263E44; color: #fff; padding: 14px 22px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+body { font-family: "Noto Sans TC", -apple-system, "Segoe UI", "Microsoft JhengHei", sans-serif; background: linear-gradient(180deg,#FFF9F3 0%,#FFF4E6 100%); color: #2B1B16; }
+button:focus-visible, a:focus-visible, select:focus-visible { outline: 3px solid var(--godfrey-orange); outline-offset: 2px; }
+.top { background: var(--godfrey-cocoa); color: var(--godfrey-cream); padding: 14px 22px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; border-bottom: 3px solid var(--godfrey-orange); }
 .top h1 { font-size: 18px; font-weight: 700; }
 .top .right { display: flex; align-items: center; gap: 12px; }
-.top .snap { font-size: 12px; color: #b9ccd0; }
-.top select { font: inherit; font-size: 14px; font-weight: 700; padding: 7px 12px; border-radius: 8px; border: 2px solid #E6F31E; background: #263E44; color: #E6F31E; cursor: pointer; }
+.top .snap { font-size: 12px; color: #E9D8CC; }
+.top select { font: inherit; font-size: 14px; font-weight: 700; padding: 7px 12px; border-radius: 8px; border: 2px solid var(--godfrey-orange); background: var(--godfrey-cocoa); color: var(--godfrey-cream); cursor: pointer; }
 .wrap { max-width: 1160px; margin: 0 auto; padding: 20px; }
 .bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 16px; background:#fff; border:1px solid #e4e7ec; border-radius:12px; padding:12px 14px; position: relative; z-index: 5; }
 #app > .bar { z-index: 40; }
@@ -23,12 +34,12 @@ body { font-family: "Noto Sans TC", -apple-system, "Segoe UI", "Microsoft JhengH
 .ctrl { display: flex; align-items: center; gap: 6px; font-size: 13px; }
 .ctrl label { color: #5a6271; font-weight: 600; }
 .bar select { font: inherit; font-size: 13px; padding: 6px 10px; border: 1px solid #d1d5db; border-radius: 8px; background: #fff; }
-.treebtn { font: inherit; font-size: 13px; padding: 6px 12px; border: 1px solid #263E44; border-radius: 8px; background: #fff; color:#263E44; cursor: pointer; font-weight:600; }
-.treebtn.on { background:#eef3f4; }
+.treebtn { font: inherit; font-size: 13px; padding: 6px 12px; border: 1px solid var(--godfrey-orange-text); border-radius: 8px; background: #fff; color: var(--godfrey-orange-text); cursor: pointer; font-weight:600; }
+.treebtn.on { background:#FFE4CC; }
 .pop { position: absolute; top: 100%; left: 0; margin-top: 6px; background:#fff; border:1px solid #cfd6da; border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,.14); padding:10px; width: 340px; max-height: 380px; overflow:auto; z-index: 50; display:none; }
 .pop.open { display:block; }
 .pop .act { display:flex; justify-content:space-between; margin-bottom:8px; font-size:12px; }
-.pop .act a { color:#263E44; cursor:pointer; text-decoration:underline; }
+.pop .act a { color: var(--godfrey-orange-text); cursor:pointer; text-decoration:underline; }
 .node { padding: 2px 0; }
 .node .row { display:flex; align-items:center; gap:6px; }
 .node .tg { width:16px; text-align:center; cursor:pointer; color:#8a97a0; user-select:none; font-size:11px; }
@@ -36,18 +47,18 @@ body { font-family: "Noto Sans TC", -apple-system, "Segoe UI", "Microsoft JhengH
 .node .kids { margin-left: 18px; display:none; }
 .node.open > .kids { display:block; }
 .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 16px; }
-.kpi { background: #fff; border: 1px solid #e4e7ec; border-top: 3px solid #E6F31E; border-radius: 12px; padding: 14px 16px; }
+.kpi { background: #fff; border: 1px solid #e4e7ec; border-top: 3px solid var(--godfrey-orange); border-radius: 12px; padding: 14px 16px; }
 .kpi .k { font-size: 12px; color: #5a6271; font-weight: 600; }
 .ii { cursor: help; color: #9aa3ad; font-size: 12px; }
-.ii:hover { color: #263E44; }
-.kpi .v { font-size: 23px; font-weight: 700; color: #263E44; margin-top: 4px; }
+.ii:hover { color: var(--godfrey-orange-text); }
+.kpi .v { font-size: 23px; font-weight: 700; color: #2B1B16; margin-top: 4px; }
 .kpi .n { font-size: 11px; color: #9aa3ad; margin-top: 2px; }
 .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 @media (max-width: 820px){ .grid2 { grid-template-columns: 1fr; } }
 .card { background: #fff; border: 1px solid #e4e7ec; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
 .card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px; flex-wrap: wrap; }
-.card h2 { font-size: 14px; font-weight: 700; color: #263E44; }
-.card-head button { padding: 5px 10px; font-size: 12px; border: 1px solid #263E44; color: #263E44; background: #fff; border-radius: 8px; cursor: pointer; }
+.card h2 { font-size: 14px; font-weight: 700; color: #2B1B16; }
+.card-head button { padding: 5px 10px; font-size: 12px; border: 1px solid var(--godfrey-orange-text); color: var(--godfrey-orange-text); background: #fff; border-radius: 8px; cursor: pointer; }
 .chart-box { position: relative; height: 270px; }
 table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
 th, td { padding: 7px 9px; text-align: right; border-bottom: 1px solid #f0f1f3; white-space: nowrap; }
@@ -57,60 +68,65 @@ tbody tr:hover { background: #f8fafc; }
 .tbl-wrap { max-height: 440px; overflow: auto; border: 1px solid #f0f1f3; border-radius: 8px; }
 .tabs { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
 .tab { padding: 5px 12px; border: 1px solid #d1d5db; border-radius: 8px; background: #fff; font-size: 12.5px; cursor: pointer; }
-.tab.active { background: #eef3f4; border-color: #263E44; color: #263E44; font-weight: 700; }
+.tab.active { background: #FFE4CC; border-color: var(--godfrey-orange); color: var(--godfrey-orange-text); font-weight: 700; }
 .note { font-size: 12px; color: #9aa3ad; margin-top: 8px; }
-.cap { font-size: 12px; color: #5a6675; background:#f3f6f7; border-left:3px solid #263E44; border-radius:0 6px 6px 0; padding:7px 10px; margin:0 0 12px; line-height:1.55; }
-.cap b { color:#263E44; }
+.cap { font-size: 12px; color: #5a6675; background:#FFF4E6; border-left:3px solid var(--godfrey-orange); border-radius:0 6px 6px 0; padding:7px 10px; margin:0 0 12px; line-height:1.55; }
+.cap b { color: var(--godfrey-orange-text); }
 .ce,.wp,#wk-targets input { padding:3px 6px; border:1px solid #d1d5db; border-radius:5px; font:inherit; font-size:12px; }
 #wk-combo td,#wk-pipe td,#wk-action td { vertical-align:middle; }
 .hide { display: none; }
-.pagetitle { font-size: 16px; font-weight: 700; color: #263E44; margin: 4px 0 14px; }
+.pagetitle { font-size: 16px; font-weight: 700; color: #2B1B16; margin: 4px 0 14px; }
 #loading { padding: 40px; text-align: center; color: #5a6271; }
 .okr-o { background:#fff; border:1px solid #e4e7ec; border-radius:12px; padding:16px; margin-bottom:16px; }
-.okr-o h3 { font-size:15px; color:#263E44; margin-bottom:2px; }
+.okr-o h3 { font-size:15px; color:#2B1B16; margin-bottom:2px; }
 .okr-o .w { font-size:12px; color:#9aa3ad; margin-bottom:12px; }
 .kr { border-top:1px solid #f0f1f3; padding:12px 0; }
 .kr:first-of-type { border-top:none; }
 .kr.manual { background:#fafbf3; margin:0 -8px; padding:12px 8px; border-radius:8px; }
 .kr .kh { display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap; }
 .kr .knm { font-size:13.5px; font-weight:600; color:#1a1d23; }
-.kr .kv { font-size:15px; font-weight:700; color:#263E44; }
+.kr .kv { font-size:15px; font-weight:700; color:#2B1B16; }
 .kr .lv { font-size:12px; font-weight:700; padding:1px 8px; border-radius:20px; margin-left:6px; }
 .lv.優 { background:#dff3e6; color:#1f7a4d; } .lv.佳 { background:#fff3d6; color:#8a6300; } .lv.可 { background:#eef3f4; color:#5a6271; } .lv.未達 { background:#fdeaea; color:#b53b65; }
 .bar2 { height:10px; background:#eef1f3; border-radius:6px; margin:8px 0 5px; overflow:hidden; }
-.bar2 > i { display:block; height:100%; background:#263E44; border-radius:6px; }
+.bar2 > i { display:block; height:100%; background: var(--godfrey-orange); border-radius:6px; }
 .kr .tiers { font-size:11px; color:#9aa3ad; }
 .kr input { width:90px; text-align:right; padding:4px 6px; border:1px solid #d1d5db; border-radius:6px; font:inherit; font-size:13px; }
 /* ── V0.1 登入／權限 ── */
-#login { position:fixed; inset:0; z-index:200; background:linear-gradient(150deg,#1c2e33 0%,#263E44 55%,#2f4d55 100%); display:flex; align-items:center; justify-content:center; padding:20px; }
+#login { position:fixed; inset:0; z-index:200; background:linear-gradient(150deg,#22100c 0%,#35150F 55%,#4a2018 100%); display:flex; align-items:center; justify-content:center; padding:20px; }
 #login .box { width:100%; max-width:380px; background:#fff; border-radius:16px; box-shadow:0 18px 50px rgba(0,0,0,.35); padding:30px 28px 26px; }
 #login .brand { text-align:center; margin-bottom:22px; }
-#login .brand .lg { font-size:26px; font-weight:800; color:#263E44; letter-spacing:1px; }
-#login .brand .lg b { color:#8a9a1e; }
+#login .brand .lg { font-size:26px; font-weight:800; color:#2B1B16; letter-spacing:1px; }
+#login .brand .lg b { color: var(--godfrey-orange-text); }
 #login .brand .sb { font-size:13px; color:#5a6271; margin-top:4px; font-weight:600; }
 #login label { display:block; font-size:12px; color:#5a6271; font-weight:700; margin:14px 0 5px; }
 #login input { width:100%; padding:11px 12px; border:1px solid #cfd6da; border-radius:9px; font:inherit; font-size:14px; }
-#login input:focus { outline:none; border-color:#263E44; box-shadow:0 0 0 3px rgba(38,62,68,.12); }
-#login .btn { width:100%; margin-top:20px; padding:12px; border:none; border-radius:9px; background:#263E44; color:#E6F31E; font-size:15px; font-weight:800; cursor:pointer; letter-spacing:2px; }
-#login .btn:hover { background:#1c2e33; }
+#login input:focus { outline:none; border-color: var(--godfrey-orange); box-shadow:0 0 0 3px rgba(255,138,31,.18); }
 #login .err { color:#b53b65; font-size:12.5px; margin-top:12px; min-height:16px; text-align:center; }
-#login .demo { margin-top:18px; border-top:1px dashed #dfe4e7; padding-top:12px; font-size:11.5px; color:#8a97a0; line-height:1.7; }
-#login .demo b { color:#5a6271; }
-#login .demo .u { cursor:pointer; color:#263E44; text-decoration:underline; }
 .top .right .who { font-size:12px; color:#dfe9eb; display:flex; align-items:center; gap:8px; }
 .top .right .who .rl { background:#E6F31E; color:#263E44; font-weight:800; font-size:11px; padding:2px 8px; border-radius:20px; }
-.top .right .who .sc { color:#b9ccd0; }
-.top .right .lo { font-size:12px; font-weight:700; color:#263E44; background:#E6F31E; border:none; padding:6px 11px; border-radius:8px; cursor:pointer; }
-.scope-b { background:#eef3f4; border:1px solid #d4e0e2; border-radius:10px; padding:9px 13px; font-size:12.5px; color:#33474d; margin-bottom:14px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
-.scope-b .ic { font-size:15px; } .scope-b b { color:#263E44; }
+.top .right .who .sc { color:#E9D8CC; }
+.top .right .lo { font-size:12px; font-weight:700; color: var(--godfrey-cream); background: transparent; border:1px solid rgb(255 244 230 / 35%); padding:6px 11px; border-radius:8px; cursor:pointer; }
+.top .right .lo:hover { background: rgb(255 255 255 / 12%); }
+.role-preview { font: inherit; font-size: 12px; font-weight: 700; padding: 5px 10px; border-radius: 8px; border: 1px solid rgb(255 244 230 / 40%); background: transparent; color: var(--godfrey-cream); cursor: pointer; }
+.role-preview option { color: #1a1d23; background: #fff; }
+.preview-flag { display:none; align-items:center; gap:6px; font-size:11px; font-weight:700; color: var(--godfrey-cocoa); background: var(--godfrey-orange); padding:3px 10px; border-radius:20px; }
+.preview-flag.on { display:inline-flex; }
+.scope-b { background:#FFF4E6; border:1px solid #E3D6C8; border-radius:10px; padding:9px 13px; font-size:12.5px; color:#4a3a30; margin-bottom:14px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.scope-b .ic { font-size:15px; } .scope-b b { color: var(--godfrey-orange-text); }
 .matrix td.sys { color:#1f7a4d; font-weight:700; } .matrix td.man { color:#8a6300; font-weight:700; }
 .badge-sys { background:#dff3e6; color:#1f7a4d; } .badge-man { background:#fff3d6; color:#8a6300; }
 .matrix .bd { font-size:11px; font-weight:700; padding:1px 8px; border-radius:20px; }
-.utbl td .st-on { color:#1f7a4d; font-weight:700; } .utbl .rl2 { font-weight:700; color:#263E44; }
+.utbl td .st-on { color:#1f7a4d; font-weight:700; } .utbl .rl2 { font-weight:700; color: var(--godfrey-orange-text); }
 .am-split { display:grid; grid-template-columns:340px 1fr; gap:16px; align-items:start; }
 @media (max-width: 820px){ .am-split { grid-template-columns:1fr; } }
 .ref { display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px solid #f0f1f3; font-size:13px; }
-.ref b { color:#263E44; }
+.ref b { color: var(--godfrey-orange-text); }
+.ov-links { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; margin-top:14px; }
+.ov-link { display:block; background:#fff; border:1px solid #e4e7ec; border-top:3px solid var(--godfrey-orange); border-radius:12px; padding:16px; text-decoration:none; color:#2B1B16; cursor:pointer; }
+.ov-link:hover { border-top-color: var(--godfrey-orange-text); background:#FFF9F3; }
+.ov-link .t { font-size:14px; font-weight:700; margin-bottom:4px; }
+.ov-link .d { font-size:12px; color:#6E554C; line-height:1.6; }
 @media print {
   @page { margin: 12mm; }
   body { background:#fff; }
@@ -123,7 +139,7 @@ tbody tr:hover { background: #f8fafc; }
   * { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
 }
 .am-f { margin-bottom:12px; }
-.am-f > label { display:block; font-size:13px; font-weight:700; color:#263E44; margin-bottom:5px; }
+.am-f > label { display:block; font-size:13px; font-weight:700; color:#2B1B16; margin-bottom:5px; }
 .am-f textarea { width:100%; border:1px solid #d1d5db; border-radius:8px; padding:8px 10px; font:inherit; font-size:13px; resize:vertical; }
 .stars { display:inline-block; margin-bottom:6px; }
 .stars span { font-size:20px; color:#d1d5db; cursor:pointer; }
@@ -142,22 +158,20 @@ tbody tr:hover { background: #f8fafc; }
     <div id="gwrap"><div id="gbtn" style="display:flex;justify-content:center;min-height:44px"></div></div>
     <div class="note" style="text-align:center;margin-top:8px">請用公司 Google 帳號（@digitm.com.tw）登入</div>
     <div class="err" id="lg-err"></div>
-    <details style="margin-top:18px">
-      <summary style="cursor:pointer;font-size:12px;color:#8a97a0;text-align:center">▸ 用示範帳號登入（測試用）</summary>
-      <label>帳號</label>
-      <input id="lg-acc" type="text" placeholder="請輸入公司帳號" autocomplete="username" onkeydown="if(event.key==='Enter')doLogin()">
-      <label>密碼</label>
-      <input id="lg-pw" type="password" placeholder="請輸入密碼" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
-      <button class="btn" onclick="doLogin()">登 入 系 統</button>
-      <div class="demo" id="lg-demo"></div>
-    </details>
+    <div id="local-preview" class="hide" style="margin-top:18px;border-top:1px dashed #E3D6C8;padding-top:12px">
+      <div class="note" style="text-align:center;margin-bottom:8px">🔧 本機預覽模式（僅 localhost／本機檔案顯示，正式站不會出現）</div>
+      <div id="local-preview-btns" style="display:flex;flex-direction:column;gap:6px"></div>
+    </div>
   </div>
 </div>
 <div class="top">
   <h1>📊 數字廣告業績儀表板</h1>
   <div class="right">
-    <select id="pageSel"><option value="perf">📈 業績總覽</option><option value="proj">🏗️ 建案分析</option><option value="team">🎯 課組戰情</option><option value="war">📋 業務戰報</option><option value="week">🗓️ 週會追蹤</option><option value="goal">🎯 目標中心</option><option value="region">🗺️ 區域歷年戰情</option><option value="okr">🏅 OKR 考核</option></select>
+    <select id="pageSel"><option value="overview">🧭 經營總覽</option><option value="perf">📈 業績總覽</option><option value="proj">🏗️ 建案分析</option><option value="team">🎯 課組戰情</option><option value="war">📋 業務戰報</option><option value="week">🗓️ 週會追蹤</option><option value="goal">🎯 目標中心</option><option value="region">🗺️ 區域歷年戰情</option><option value="okr">🏅 OKR 考核</option></select>
     <span class="who" id="whoami"></span>
+    <select class="role-preview" id="rolePreview" style="display:none" title="以角色預覽（僅供你自己檢視，不影響實際權限）"></select>
+    <select class="role-preview" id="personPreview" style="display:none" title="挑一位下屬業務，確認他登入後看到的畫面"></select>
+    <span class="preview-flag" id="previewFlag">🔎 預覽中</span>
     <button class="lo" id="logout" onclick="logout()" style="display:none">登出</button>
     <span class="snap" id="snap"></span>
   </div>
@@ -175,6 +189,15 @@ tbody tr:hover { background: #f8fafc; }
       <div class="ctrl" style="position:relative"><button class="treebtn" id="btn-ad">廣告類型：全部 ▾</button><div class="pop" id="pop-ad"></div></div>
       <span id="status" class="note"></span>
     </div>
+
+    <section id="page-overview" class="hide">
+      <div class="pagetitle">🧭 經營總覽 <span style="font-size:12px;color:#9aa3ad;font-weight:400">今天先處理什麼？</span></div>
+      <div class="cap" id="ov-scope"></div>
+      <div class="kpis" id="ov-kpis"></div>
+      <div id="ov-compare"></div>
+      <div class="card-head" style="margin-top:22px"><h2>快速前往其他分頁</h2></div>
+      <div class="ov-links" id="ov-links"></div>
+    </section>
 
     <section id="page-perf">
       <div class="cap" id="cap-kpi"></div>
@@ -331,7 +354,7 @@ tbody tr:hover { background: #f8fafc; }
   </div>
 </div>
 <script>
-const PDATA = {"snapshot": "2026/08/26", "growth": {"業務一課 - 業務一組": {"growth": -1.2, "arpu2026": 225671}, "業務一課 - 業務二組": {"growth": -10.6, "arpu2026": 223539}, "業務二課 - 業務三組": {"growth": -18.8, "arpu2026": 148632}, "業務二課 - 業務四組": {"growth": -12.6, "arpu2026": 124484}, "設計課 - 設計組": {"growth": 5.9, "arpu2026": 180463}}, "pipe": {"曾方音": {"f": 80267, "q": 685908, "p": 731430, "grp": "業務一課 - 業務二組"}, "呂佩宜": {"f": 96933, "q": 2210161, "p": 22876, "grp": "業務二課 - 業務三組"}, "簡艷華": {"f": 39500, "q": 649307, "p": 63465, "grp": "業務二課 - 業務四組"}, "黃淑萍": {"f": 250732, "q": 2166179, "p": 915376, "grp": "業務一課 - 業務一組"}, "趙紹亨": {"f": 58310, "q": 22286, "p": 380838, "grp": "業務一課 - 業務一組"}, "楊儀菲": {"f": 254622, "q": 24886, "p": 47143, "grp": "業務一課 - 業務二組"}, "陳怡雯": {"f": 896416, "q": 0, "p": 74137, "grp": "業務一課 - 業務二組"}, "曾家羚": {"f": 65529, "q": 2162221, "p": 477253, "grp": "業務二課 - 業務三組"}, "簡順隆": {"f": 0, "q": 2199915, "p": 257096, "grp": "業務一課 - 業務二組"}, "姚蘋芸": {"f": 0, "q": 406791, "p": 165841, "grp": "業務二課 - 業務四組"}, "彭莉芳": {"f": 45006, "q": 778011, "p": 288568, "grp": "業務一課 - 業務一組"}, "陳琬臻": {"f": 0, "q": 3114718, "p": 308921, "grp": "業務二課 - 業務三組"}, "鄧瑋婷": {"f": 39817, "q": 667282, "p": 146973, "grp": "業務二課 - 業務四組"}, "張淑瑜": {"f": 0, "q": 0, "p": 298537, "grp": "業務一課"}, "許孟瑋": {"f": 0, "q": 0, "p": 21600, "grp": "業務二課"}, "吳子敬": {"f": 0, "q": 0, "p": 187500, "grp": "業務一課 - 業務二組"}, "程湣傑": {"f": 0, "q": 0, "p": 653728, "grp": "媒體產品課 - 站台產品組"}, "李抒姮": {"f": 0, "q": 0, "p": 151238, "grp": "設計課 - 設計組"}, "仲綨柱": {"f": 0, "q": 0, "p": 168364, "grp": "業務一課 - 業務一組"}, "陳文昕": {"f": 0, "q": 0, "p": 842219, "grp": "行銷策略課 - 行銷一組"}, "趙斯蓓": {"f": 0, "q": 0, "p": 314342, "grp": "設計課 - 設計組"}}, "weekly": {"2026-W32": {"date": "2026/08/07", "cls": {"行銷策略課": {"signed": 0, "wpipe": 660266}, "業務二課": {"signed": 29652313, "wpipe": 2998292}, "媒體產品課": {"signed": 0, "wpipe": 1338745}, "設計課": {"signed": 1427191, "wpipe": 329906}, "業務一課": {"signed": 49660573, "wpipe": 4085136}}}, "2026-W33": {"date": "2026/08/13", "cls": {"行銷策略課": {"signed": 0, "wpipe": 589553}, "設計課": {"signed": 1427191, "wpipe": 325906}, "業務二課": {"signed": 29652313, "wpipe": 2856192}, "業務一課": {"signed": 49660573, "wpipe": 4629476}, "媒體產品課": {"signed": 0, "wpipe": 457610}}}, "2026-W34": {"date": "2026/08/23", "cls": {"設計課": {"signed": 1427191, "wpipe": 325906, "perf": 14916356, "rem": 976224}, "業務一課": {"signed": 49660573, "wpipe": 4629476, "perf": 51955607, "rem": 4918454}, "媒體產品課": {"signed": 0, "wpipe": 457610, "perf": 0, "rem": 0}, "業務二課": {"signed": 29652313, "wpipe": 2856192, "perf": 32150758, "rem": 3543194}, "行銷策略課": {"signed": 0, "wpipe": 589553, "perf": 0, "rem": 0}}}, "2026-W35": {"date": "2026/08/26", "cls": {"業務二課": {"signed": 36118329, "wpipe": 2856192, "perf": 44657809, "rem": 4864540}, "媒體產品課": {"signed": 0, "wpipe": 457610, "perf": 0, "rem": 0}, "業務一課": {"signed": 62641412, "wpipe": 4629476, "perf": 70352835, "rem": 6205417}, "行銷策略課": {"signed": 0, "wpipe": 589553, "perf": 0, "rem": 0}, "設計課": {"signed": 1434923, "wpipe": 325906, "perf": 17092215, "rem": 1105264}}}}};
+const PDATA = {"snapshot": "2026/09/01", "growth": {"業務一課 - 業務一組": {"growth": -1.2, "arpu2026": 225671}, "業務一課 - 業務二組": {"growth": -10.6, "arpu2026": 223539}, "業務二課 - 業務三組": {"growth": -18.8, "arpu2026": 148632}, "業務二課 - 業務四組": {"growth": -12.6, "arpu2026": 124484}, "設計課 - 設計組": {"growth": 5.9, "arpu2026": 180463}}, "pipe": {"張淑瑜": {"f": 0, "q": 60984, "p": 326362, "grp": "業務一課"}, "曾方音": {"f": 0, "q": 1019022, "p": 248405, "grp": "業務一課 - 業務二組"}, "曾家羚": {"f": 0, "q": 713933, "p": 92026, "grp": "業務二課 - 業務三組"}, "呂佩宜": {"f": 0, "q": 806919, "p": 157393, "grp": "業務二課 - 業務三組"}, "陳琬臻": {"f": 0, "q": 1646773, "p": 111521, "grp": "業務二課 - 業務三組"}, "簡順隆": {"f": 0, "q": 354482, "p": 242039, "grp": "業務一課 - 業務二組"}, "黃淑萍": {"f": 0, "q": 916181, "p": 650763, "grp": "業務一課 - 業務一組"}, "趙紹亨": {"f": 0, "q": 53882, "p": 170717, "grp": "業務一課 - 業務一組"}, "楊儀菲": {"f": 0, "q": 222198, "p": 52101, "grp": "業務一課 - 業務二組"}, "彭莉芳": {"f": 0, "q": 228780, "p": 89706, "grp": "業務一課 - 業務一組"}, "簡艷華": {"f": 0, "q": 44245, "p": 0, "grp": "業務二課 - 業務四組"}, "姚蘋芸": {"f": 0, "q": 164470, "p": 144146, "grp": "業務二課 - 業務四組"}, "鄧瑋婷": {"f": 0, "q": 68792, "p": 136338, "grp": "業務二課 - 業務四組"}, "許孟瑋": {"f": 0, "q": 0, "p": 70434, "grp": "業務二課"}, "吳子敬": {"f": 0, "q": 0, "p": 187500, "grp": "業務一課 - 業務二組"}, "程湣傑": {"f": 0, "q": 0, "p": 678414, "grp": "媒體產品課 - 站台產品組"}, "李抒姮": {"f": 0, "q": 0, "p": 151238, "grp": "設計課 - 設計組"}, "仲綨柱": {"f": 0, "q": 0, "p": 145059, "grp": "業務一課 - 業務一組"}, "陳文昕": {"f": 0, "q": 0, "p": 973871, "grp": "行銷策略課 - 行銷一組"}, "郭彥孝": {"f": 0, "q": 0, "p": 11, "grp": "業務二課"}, "劉美恩": {"f": 0, "q": 0, "p": 16343, "grp": "資訊技術中心"}, "陳怡雯 Mina": {"f": 0, "q": 0, "p": 87619, "grp": "業務一課 - 業務一組"}, "趙斯蓓": {"f": 0, "q": 0, "p": 314342, "grp": "設計課 - 設計組"}, "李佳隆": {"f": 0, "q": 0, "p": 42858, "grp": "資訊技術中心"}}, "weekly": {"2026-W32": {"date": "2026/08/07", "cls": {"行銷策略課": {"signed": 0, "wpipe": 660266}, "業務二課": {"signed": 29652313, "wpipe": 2998292}, "媒體產品課": {"signed": 0, "wpipe": 1338745}, "設計課": {"signed": 1427191, "wpipe": 329906}, "業務一課": {"signed": 49660573, "wpipe": 4085136}}}, "2026-W33": {"date": "2026/08/13", "cls": {"行銷策略課": {"signed": 0, "wpipe": 589553}, "設計課": {"signed": 1427191, "wpipe": 325906}, "業務二課": {"signed": 29652313, "wpipe": 2856192}, "業務一課": {"signed": 49660573, "wpipe": 4629476}, "媒體產品課": {"signed": 0, "wpipe": 457610}}}, "2026-W34": {"date": "2026/08/23", "cls": {"設計課": {"signed": 1427191, "wpipe": 325906, "perf": 14916356, "rem": 976224}, "業務一課": {"signed": 49660573, "wpipe": 4629476, "perf": 51955607, "rem": 4918454}, "媒體產品課": {"signed": 0, "wpipe": 457610, "perf": 0, "rem": 0}, "業務二課": {"signed": 29652313, "wpipe": 2856192, "perf": 32150758, "rem": 3543194}, "行銷策略課": {"signed": 0, "wpipe": 589553, "perf": 0, "rem": 0}}}, "2026-W35": {"date": "2026/08/26", "cls": {"業務二課": {"signed": 36118329, "wpipe": 2856192, "perf": 44657809, "rem": 4864540}, "媒體產品課": {"signed": 0, "wpipe": 457610, "perf": 0, "rem": 0}, "業務一課": {"signed": 62641412, "wpipe": 4629476, "perf": 70352835, "rem": 6205417}, "行銷策略課": {"signed": 0, "wpipe": 589553, "perf": 0, "rem": 0}, "設計課": {"signed": 1434923, "wpipe": 325906, "perf": 17092215, "rem": 1105264}}}, "2026-W36": {"date": "2026/09/01", "cls": {"設計課": {"signed": 1434923, "wpipe": 325906, "perf": 17092215, "rem": 1105264}, "媒體產品課": {"signed": 0, "wpipe": 474890, "perf": 0, "rem": 0}, "行銷策略課": {"signed": 0, "wpipe": 681710, "perf": 0, "rem": 0}, "業務一課": {"signed": 62641412, "wpipe": 2111296, "perf": 70352835, "rem": 6205417}, "資訊技術中心": {"signed": 0, "wpipe": 41441, "perf": 0, "rem": 0}, "業務二課": {"signed": 36118329, "wpipe": 1187335, "perf": 44657809, "rem": 4864540}}}}};
 const fmtN=n=>Math.round(n).toLocaleString("en-US");
 const fmtWan=n=>{const x=Math.round(n);if(Math.abs(x)>=1e8)return (x/1e8).toLocaleString("en-US",{maximumFractionDigits:2})+"億";if(Math.abs(x)>=1e4)return (x/1e4).toLocaleString("en-US",{maximumFractionDigits:1})+"萬";return x.toLocaleString("en-US");};
 const fmtBoth=n=>`${fmtWan(n)}<span style="display:block;font-size:10px;color:#9aa3ad;font-weight:400">${fmtN(n)}</span>`;
@@ -363,7 +386,7 @@ Promise.all([fetch("./data.json").then(r=>r.json()), fetch("./proj_rows.json").t
   document.querySelectorAll("#proj-tabs .tab").forEach(t=>t.addEventListener("click",()=>{sw("#proj-tabs",t);projDim=t.dataset.dim;renderProj();}));
   renderAll();
   gateAuth();
-}).catch(e=>{document.getElementById("loading").textContent="載入失敗："+e.message;});
+}).catch(e=>{document.getElementById("loading").classList.add("hide");gateAuth();});
 
 function fill(id,pairs){const s=document.getElementById(id);pairs.forEach(([v,t])=>{const o=document.createElement("option");o.value=v;o.textContent=t;s.appendChild(o);});}
 function val(id){return document.getElementById(id).value;}
@@ -459,16 +482,16 @@ function exToggle(tb,tr){const id=tr.dataset.id,exp=tr.querySelector(".exp");if(
 function exHide(tb,id){[...tb.querySelectorAll('.exrow[data-pid="'+id+'"]')].forEach(k=>{k.style.display="none";const e=k.querySelector(".exp");if(e)e.textContent="▸";exHide(tb,k.dataset.id);});}
 
 function renderAll(){ document.getElementById("status").textContent=curLabel()+" · "+fmtN(fRows().length)+" 筆"; renderPerf(); renderProj(); renderTeam(); renderWeek(); renderGoal(); if(YOY.length)renderRegion(); }
-document.getElementById("pageSel").addEventListener("change",e=>{const p=e.target.value;["perf","proj","team","okr","region","war","week","goal","admin"].forEach(x=>document.getElementById("page-"+x).classList.toggle("hide",x!==p));document.querySelector("#app > .bar").style.display=((p==="okr"||p==="war"||p==="admin")?"none":"");if(p==="okr")renderOKR();if(p==="region")renderRegion();if(p==="war")renderWar();if(p==="week")renderWeek();if(p==="goal")renderGoal();if(p==="admin")renderAdmin();});
+document.getElementById("pageSel").addEventListener("change",e=>{const p=e.target.value;["overview","perf","proj","team","okr","region","war","week","goal","admin"].forEach(x=>document.getElementById("page-"+x).classList.toggle("hide",x!==p));document.querySelector("#app > .bar").style.display=((p==="okr"||p==="war"||p==="admin"||p==="overview")?"none":"");if(p==="overview")renderOverview((PREVIEW_ROLE||SESSION.role),SESSION);if(p==="okr")renderOKR();if(p==="region")renderRegion();if(p==="war")renderWar();if(p==="week")renderWeek();if(p==="goal")renderGoal();if(p==="admin")renderAdmin();});
 
 /* ══════════ V0.1 登入／角色／資料範圍（前端示範，真驗證需後端） ══════════ */
 const ROLE_LABEL={sales:"業務",team_leader:"組長",manager:"課長",admin:"管理者"};
-// 示範帳號（密碼皆 1234）；姓名需對得上資料裡的業務名，資料範圍才會真的變
+// 內部角色／組織對照表（僅供前端示範用途；姓名需對得上資料裡的業務名，資料範圍才會真的變；登入一律走 Google 帳號驗證）
 const DEMO_USERS=[
-  {acc:"godfrey",                  pw:"1234",name:"郭彥孝",role:"admin",     cls:"",     grp:""},
-  {acc:"mgr1@digitm.com.tw",       pw:"1234",name:"（業務一課 課長）",role:"manager",cls:"業務一課",grp:""},
-  {acc:"vanessachen@digitm.com.tw",pw:"1234",name:"陳怡雯",role:"team_leader",cls:"業務一課",grp:"業務一課 - 業務一組"},
-  {acc:"pennyhuang@digitm.com.tw", pw:"1234",name:"黃淑萍",role:"sales",     cls:"業務一課",grp:"業務一課 - 業務一組"}
+  {acc:"godfrey",                  name:"郭彥孝",role:"admin",     cls:"",     grp:""},
+  {acc:"mgr1@digitm.com.tw",       name:"（業務一課 課長）",role:"manager",cls:"業務一課",grp:""},
+  {acc:"vanessachen@digitm.com.tw",name:"陳怡雯",role:"team_leader",cls:"業務一課",grp:"業務一課 - 業務一組"},
+  {acc:"pennyhuang@digitm.com.tw", name:"黃淑萍",role:"sales",     cls:"業務一課",grp:"業務一課 - 業務一組"}
 ];
 let SESSION=null;
 /* ── Google 登入（公司信箱→角色→資料範圍） ── */
@@ -508,32 +531,201 @@ function scopeSales(u){const om=orgMap();const all=Object.keys(om);
   return [u.name];                                                    // 業務：只有自己
 }
 function scopeText(u){if(u.role==="admin")return"全台所有業務";if(u.role==="manager")return u.cls+"（全部組別）";if(u.role==="team_leader")return u.grp.split(" - ").pop()+"（本組）";return"僅本人（"+u.name+"）";}
-function doLogin(){const a=val("lg-acc").trim(),p=val("lg-pw").trim();const u=DEMO_USERS.find(x=>x.acc===a&&x.pw===p);
-  if(!u){document.getElementById("lg-err").textContent="帳號或密碼錯誤（示範密碼：1234）";return;}
-  localStorage.setItem("dm_session",JSON.stringify(u));applySession(u);}
 function logout(){localStorage.removeItem("dm_session");SESSION=null;location.reload();}
-function gateAuth(){document.getElementById("lg-demo").innerHTML="<b>示範帳號</b>（密碼皆 1234）：<br>"+DEMO_USERS.map(u=>'<span class="u" onclick="fillLogin(\''+u.acc+'\')">'+u.acc+'</span> ＝ '+ROLE_LABEL[u.role]+(u.name.startsWith("（")?"":" "+u.name)).join("<br>");
+function localPreviewLogin(acc){const u=DEMO_USERS.find(x=>x.acc===acc);if(!u)return;localStorage.setItem("dm_session",JSON.stringify(u));applySession(u);}
+function isLocalOrigin(){return location.protocol==="file:"||["localhost","127.0.0.1"].includes(location.hostname);}
+function gateAuth(){
   const s=localStorage.getItem("dm_session");if(s){try{applySession(JSON.parse(s));return;}catch(e){}}
-  document.getElementById("login").style.display="flex";initGoogle();}
-function fillLogin(a){document.getElementById("lg-acc").value=a;document.getElementById("lg-pw").value="1234";}
+  document.getElementById("login").style.display="flex";initGoogle();
+  // 本機預覽：只在 localhost／file:// 顯示，正式網域（github.io）不會出現，避免公開頁面出現可跳過登入的按鈕
+  if(isLocalOrigin()){
+    const box=document.getElementById("local-preview");const btns=document.getElementById("local-preview-btns");
+    box.classList.remove("hide");
+    btns.innerHTML=DEMO_USERS.map(u=>'<button class="treebtn" onclick="localPreviewLogin(\''+u.acc+'\')" style="text-align:left">'+ROLE_LABEL[u.role]+' － '+(u.name.startsWith("（")?u.name:u.name+"（"+u.acc+"）")+'</button>').join("");
+  }
+}
 // 依角色決定可見頁面：業務只留 我的業績／我的週會／我的目標；主管以上看完整管理視角
 function allowedPages(role){
-  if(role==="sales")return[["perf","📈 我的業績"],["week","🗓️ 我的週會"],["goal","🎯 我的目標"],["okr","🏅 我的 OKR"]];
-  const base=[["perf","📈 業績總覽"],["proj","🏗️ 建案分析"],["team","🎯 課組戰情"],["war","📋 業務戰報"],["week","🗓️ 週會追蹤"],["goal","🎯 目標中心"],["region","🗺️ 區域歷年戰情"],["okr","🏅 OKR 考核"]];
+  if(role==="sales")return[["overview","🧭 經營總覽"],["perf","📈 我的業績"],["week","🗓️ 我的週會"],["goal","🎯 我的目標"],["okr","🏅 我的 OKR"]];
+  const base=[["overview","🧭 經營總覽"],["perf","📈 業績總覽"],["proj","🏗️ 建案分析"],["team","🎯 課組戰情"],["war","📋 業務戰報"],["week","🗓️ 週會追蹤"],["goal","🎯 目標中心"],["region","🗺️ 區域歷年戰情"],["okr","🏅 OKR 考核"]];
   if(role==="admin")base.push(["admin","🔐 使用者權限管理"]);
   return base;
 }
+function overviewTargetGroups(du){
+  if(!du)return [];
+  if(du.role==="admin")return ORDER;
+  if(du.role==="manager")return ORDER.filter(g=>g.startsWith(du.cls));
+  if(du.role==="team_leader")return du.grp?[du.grp]:[];
+  return []; // 業務：目前無個人群組目標可比對
+}
+function scopedRowsFor(du,allRows){
+  if(du.role==="manager")return allRows.filter(r=>r.cls===du.cls);
+  if(du.role==="team_leader")return allRows.filter(r=>r.grp===du.grp);
+  if(du.role==="sales")return allRows.filter(r=>r.sales===du.name);
+  return allRows; // admin
+}
+function peerRankOfIn(du,allRows){
+  const rows=allRows.filter(r=>r.grp===du.grp);
+  const by={};rows.forEach(r=>{by[r.sales]=(by[r.sales]||0)+r.sale;});
+  const arr=Object.entries(by).sort((a,b)=>b[1]-a[1]);
+  const idx=arr.findIndex(([n])=>n===du.name);
+  return {rank:idx>=0?idx+1:null,total:arr.length};
+}
+// 主管／管理者用「預覽」看其他身分的經營總覽版型：課長/組長選真實下屬業務逐一確認；沒有指定對象時（例如管理者選抽象角色）才抓示範對象
+function overviewDemoTarget(navRole,realU){
+  const baseRows=fRows(); // 一律以真實登入者的資料範圍為邊界，預覽只換角度、不擴大存取範圍
+  if(typeof PREVIEW_PERSON!=="undefined"&&PREVIEW_PERSON){
+    const om=orgMap(),info=om[PREVIEW_PERSON]||{};
+    return {role:"sales",cls:info.cls||realU.cls||"",grp:info.grp||realU.grp||"",name:PREVIEW_PERSON,demo:true};
+  }
+  if(navRole===realU.role)return realU;
+  if(navRole==="manager"){const cls=[...new Set(ORDER.map(g=>g.split(" - ")[0]))][0]||"業務一課";return {role:"manager",cls,grp:"",name:"（示範）"+cls+" 課長",demo:true};}
+  if(navRole==="team_leader"){const grp=ORDER[0];return {role:"team_leader",cls:grp.split(" - ")[0],grp,name:"（示範）"+grp.split(" - ").pop()+" 組長",demo:true};}
+  if(navRole==="sales"){
+    const by={};baseRows.forEach(r=>{by[r.sales]=(by[r.sales]||0)+r.sale;});
+    const top=Object.entries(by).sort((a,b)=>b[1]-a[1])[0];
+    const grp=(top&&(baseRows.find(r=>r.sales===top[0])||{}).grp)||ORDER[0];
+    return {role:"sales",cls:grp.split(" - ")[0],grp,name:top?top[0]:"（示範業務，目前無資料可抓）",demo:true};
+  }
+  return realU; // 預覽管理者：就是真實身分本人
+}
+function renderOverview(navRole,u){
+  const demoU=overviewDemoTarget(navRole,u);
+  const ov=document.getElementById("ov-scope");
+  if(ov){
+    ov.textContent=demoU.demo?("🔎 預覽示範中：以「"+ROLE_LABEL[demoU.role]+"」版型示範呈現（"+demoU.name+"），僅供你確認畫面，不影響你自己的真實登入身分"):("期間「"+curLabel()+"」・資料範圍：「"+scopeText(u)+"」");
+  }
+  const allRows=fRows(); // 一律先以真實登入者可存取的範圍為邊界
+  const rows=demoU.demo?scopedRowsFor(demoU,allRows):allRows;
+  const a=agg(rows);
+  const statColor={success:"#1f7a4d",warning:"#caa500",danger:"#b53b65"};
+  const groups=overviewTargetGroups(demoU);
+  const hasTgt=groups.length&&groups.some(g=>periodTarget(g)!=null);
+  const tgt=hasTgt?groups.reduce((s,g)=>s+(periodTarget(g)||0),0):null;
+  const rate=hasTgt&&tgt?a.sale/tgt*100:null;
+  let kpis;
+  if(demoU.role==="sales"){
+    // OKR 才有個人層級的目標（目前僅部分課組已建）；有就用 OKR 個人達成率，沒有才退回組內名次
+    const okrT=(typeof OKR_TARGETS!=="undefined")?OKR_TARGETS[demoU.name]:null;
+    if(okrT&&okrT.q3!=null){
+      const q3a=autoVal("q3",allRows.filter(r=>r.sales===demoU.name));
+      const q3r=okrT.q3?(q3a/okrT.q3*100):null;
+      kpis=[
+        {k:"我的業績",v:fmtWan(a.sale)+"元",n:curLabel(),status:"neutral"},
+        {k:"OKR 達成率（Q3）",v:q3r!=null?q3r.toFixed(0)+"%":"—",n:"個人目標 "+fmtKR(okrT.q3,"萬"),status:q3r!=null?(q3r>=100?"success":q3r>=60?"warning":"danger"):"neutral"},
+        {k:"客戶數",v:fmtN(a.cust),n:"本期範圍內、去重",status:"neutral"},
+        {k:"委刊單數",v:fmtN(a.ins),n:"本期範圍內、去重",status:"neutral"}
+      ];
+    }else{
+      const pr=peerRankOfIn(demoU,allRows);
+      kpis=[
+        {k:"我的業績",v:fmtWan(a.sale)+"元",n:curLabel(),status:"neutral"},
+        {k:"組內名次",v:pr.rank?("第 "+pr.rank+" 名"):"—",n:pr.total?("共 "+pr.total+" 人（僅顯示名次，不顯示他人金額；此人尚無 OKR 個人目標）"):"組內尚無其他業務資料",status:"neutral"},
+        {k:"客戶數",v:fmtN(a.cust),n:"本期範圍內、去重",status:"neutral"},
+        {k:"委刊單數",v:fmtN(a.ins),n:"本期範圍內、去重",status:"neutral"}
+      ];
+    }
+  }else{
+    kpis=[
+      {k:"本期業績",v:fmtWan(a.sale)+"元",n:curLabel(),status:"neutral"},
+      {k:"達成率",v:rate!=null?rate.toFixed(1)+"%":"—",n:hasTgt?"目標 "+fmtWan(tgt)+"元":"此範圍無目標可比對",status:rate!=null?(rate>=100?"success":rate>=85?"warning":"danger"):"neutral"},
+      {k:"客戶數",v:fmtN(a.cust),n:"本期範圍內、去重",status:"neutral"},
+      {k:"委刊單數",v:fmtN(a.ins),n:"本期範圍內、去重",status:"neutral"}
+    ];
+  }
+  const kEl=document.getElementById("ov-kpis");
+  if(kEl)kEl.innerHTML=kpis.map(x=>'<div class="kpi"'+(statColor[x.status]?' style="border-top-color:'+statColor[x.status]+'"':'')+'><div class="k">'+x.k+'</div><div class="v">'+x.v+'</div><div class="n">'+x.n+'</div></div>').join("");
+
+  // 分層比較：不同角色看不同層級的比較表（管理者角色預覽時，用示範對象的範圍計算，仍是真實資料、只是換個角度看）
+  const cmp=document.getElementById("ov-compare");
+  if(cmp){
+    const rateCell=(s,t)=>{const r2=t?(s/t*100):null;const c=r2!=null?(r2>=100?statColor.success:r2>=85?statColor.warning:statColor.danger):"#9aa3ad";return '<td style="font-weight:700;color:'+c+'">'+(r2!=null?r2.toFixed(1)+"%":"—")+'</td>';};
+    let title="",head="",body="";
+    if(demoU.role==="admin"){
+      title="各課比較";head="<th>課別</th><th>業績</th><th>目標</th><th>達成率</th>";
+      const courses=[...new Set(ORDER.map(g=>g.split(" - ")[0]))];
+      body=courses.map(c=>{const ca=agg((demoU.demo?allRows:rows).filter(r=>r.cls===c));const cg=ORDER.filter(g=>g.startsWith(c));const ct=cg.reduce((s,g)=>s+(periodTarget(g)||0),0)||null;
+        return '<tr><td>'+c+'</td><td>'+fmtWan(ca.sale)+'元</td><td>'+(ct?fmtWan(ct)+'元':'<span style="color:#98a2b3">未設</span>')+'</td>'+rateCell(ca.sale,ct)+'</tr>';}).join("");
+    }else if(demoU.role==="manager"){
+      title="本課各組比較";head="<th>組別</th><th>業績</th><th>目標</th><th>達成率</th>";
+      const gs=ORDER.filter(g=>g.startsWith(demoU.cls));
+      body=gs.map(g=>{const ga=agg(allRows.filter(r=>r.grp===g));const gt=periodTarget(g);
+        return '<tr><td>'+g.split(" - ").pop()+'</td><td>'+fmtWan(ga.sale)+'元</td><td>'+(gt?fmtWan(gt)+'元':'<span style="color:#98a2b3">未設</span>')+'</td>'+rateCell(ga.sale,gt)+'</tr>';}).join("");
+    }else if(demoU.role==="team_leader"){
+      title="組內業務排行";head="<th>名次</th><th>業務</th><th>業績</th><th>客戶數</th>";
+      const grows=allRows.filter(r=>r.grp===demoU.grp);
+      const by={};grows.forEach(r=>{(by[r.sales]=by[r.sales]||[]).push(r);});
+      const arr=Object.entries(by).map(([n,rs])=>({n,a:agg(rs)})).sort((x,y)=>y.a.sale-x.a.sale);
+      body=arr.map((x,i)=>'<tr><td>'+(i+1)+'</td><td>'+x.n+'</td><td>'+fmtWan(x.a.sale)+'元</td><td>'+fmtN(x.a.cust)+'</td></tr>').join("");
+    }
+    cmp.innerHTML=title?('<div class="card"><div class="card-head"><h2>'+title+'</h2></div><div class="tbl-wrap"><table><thead><tr>'+head+'</tr></thead><tbody>'+(body||'<tr><td colspan="4" class="note">尚無資料</td></tr>')+'</tbody></table></div></div>'):"";
+  }
+
+  const pages=allowedPages(navRole).filter(p=>p[0]!=="overview");
+  const desc={perf:"月度趨勢、站台、產品、產業、區域與業務分布",proj:"合作建案、在線建案、滲透率與客單價",team:"課、組、個人的目標與達成狀況",war:"Pipeline、預估、缺口與個人責任",week:"上週承諾、紅燈、主管決議與行動",goal:"半年、季度與月度目標設定",region:"縣市、行政區、同期與 YoY",okr:"O／KR、權重、進度、卡點與 Review",admin:"帳號、角色與資料範圍（僅管理者）"};
+  const links=document.getElementById("ov-links");if(!links)return;
+  links.innerHTML=pages.map(p=>'<a class="ov-link" onclick="document.getElementById(\'pageSel\').value=\''+p[0]+'\';document.getElementById(\'pageSel\').dispatchEvent(new Event(\'change\'))"><div class="t">'+p[1]+'</div><div class="d">'+(desc[p[0]]||"")+'</div></a>').join("");
+}
+let PREVIEW_ROLE=null,PREVIEW_PERSON=null;
 function buildPageMenu(role){
   const sel=document.getElementById("pageSel");const opts=allowedPages(role);
   sel.innerHTML=opts.map(o=>'<option value="'+o[0]+'">'+o[1]+'</option>').join("");
   sel.value=opts[0][0];sel.dispatchEvent(new Event("change"));
 }
-function applySession(u){SESSION=u;
+function currentPreviewScope(){
+  // 回傳目前生效角色（含管理者的角色預覽）對應的課/組，供底下業務清單抓取用
+  const eff=PREVIEW_ROLE||SESSION.role;
+  if(eff==="manager"){
+    if(SESSION.role==="manager")return {cls:SESSION.cls};
+    return {cls:[...new Set(ORDER.map(g=>g.split(" - ")[0]))][0]||"業務一課"};
+  }
+  if(eff==="team_leader"){
+    if(SESSION.role==="team_leader")return {grp:SESSION.grp};
+    const grp=ORDER[0];return {cls:grp.split(" - ")[0],grp};
+  }
+  return null;
+}
+function refreshPersonPreview(){
+  const pp=document.getElementById("personPreview");if(!pp)return;
+  const scope=currentPreviewScope();
+  if(!scope){pp.style.display="none";pp.innerHTML="";return;}
+  const om=orgMap();
+  const people=Object.keys(om).filter(n=>scope.grp?om[n].grp===scope.grp:om[n].cls===scope.cls).sort();
+  if(!people.length){pp.style.display="none";return;}
+  pp.style.display="";
+  pp.innerHTML='<option value="">－挑一位業務確認畫面－</option>'+people.map(n=>'<option value="'+n+'"'+(n===PREVIEW_PERSON?" selected":"")+'>業務：'+n+'</option>').join("");
+  pp.onchange=e=>setPreviewPerson(e.target.value);
+}
+function setPreviewRole(role){
+  PREVIEW_PERSON=null;
+  PREVIEW_ROLE=(role===SESSION.role)?null:role;
+  document.getElementById("previewFlag").classList.toggle("on",!!PREVIEW_ROLE);
+  buildPageMenu(PREVIEW_ROLE||SESSION.role);
+  refreshPersonPreview();
+}
+function setPreviewPerson(name){
+  PREVIEW_PERSON=name||null;
+  PREVIEW_ROLE=PREVIEW_PERSON?"sales":(SESSION.role==="manager"||SESSION.role==="team_leader"?null:PREVIEW_ROLE);
+  document.getElementById("previewFlag").classList.toggle("on",!!PREVIEW_PERSON);
+  buildPageMenu(PREVIEW_ROLE||SESSION.role);
+}
+function applySession(u){SESSION=u;PREVIEW_ROLE=null;PREVIEW_PERSON=null;
   document.getElementById("login").style.display="none";
   document.getElementById("app").classList.remove("hide");
   // 頂欄使用者資訊
   document.getElementById("whoami").innerHTML='<span>'+(u.name.startsWith("（")?ROLE_LABEL[u.role]:u.name)+'</span><span class="rl">'+ROLE_LABEL[u.role]+'</span><span class="sc">資料範圍：'+scopeText(u)+'</span>';
   document.getElementById("logout").style.display="";
+  // 管理者：可切換「以角色預覽」看其他角色會看到哪些分頁／經營總覽版型
+  // 管理者、課長、組長：都會另外出現「挑一位業務」選單，直接選底下真實業務逐一確認他登入後看到的畫面對不對
+  // 三者都僅切換畫面／預覽範圍，不改真實登入者的資料存取權限
+  const rp=document.getElementById("rolePreview");
+  if(u.role==="admin"){
+    rp.style.display="";
+    rp.innerHTML=Object.keys(ROLE_LABEL).map(r=>'<option value="'+r+'"'+(r===u.role?" selected":"")+'>預覽：'+ROLE_LABEL[r]+(r===u.role?"（本人）":"")+'</option>').join("");
+    rp.onchange=e=>setPreviewRole(e.target.value);
+  }else{rp.style.display="none";}
+  refreshPersonPreview();
+  document.getElementById("previewFlag").classList.remove("on");
   // 依角色設定可見頁面（業務只看自己的三頁；主管以上完整）
   buildPageMenu(u.role);
   // 依角色鎖定資料範圍：把 selSales 設成允許的業務，非管理者鎖住業務篩選
