@@ -1,1267 +1,163 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-Hant">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>數字廣告業績儀表板</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-<style>
-:root { color-scheme: light; }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: "Noto Sans TC", -apple-system, "Segoe UI", "Microsoft JhengHei", sans-serif; background: #f7f8fa; color: #1a1d23; }
-.top { background: #263E44; color: #fff; padding: 14px 22px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-.top h1 { font-size: 18px; font-weight: 700; }
-.top .right { display: flex; align-items: center; gap: 12px; }
-.top .snap { font-size: 12px; color: #b9ccd0; }
-.top select { font: inherit; font-size: 14px; font-weight: 700; padding: 7px 12px; border-radius: 8px; border: 2px solid #E6F31E; background: #263E44; color: #E6F31E; cursor: pointer; }
-.wrap { max-width: 1160px; margin: 0 auto; padding: 20px; }
-.bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 16px; background:#fff; border:1px solid #e4e7ec; border-radius:12px; padding:12px 14px; position: relative; z-index: 5; }
-#app > .bar { z-index: 40; }
-.pop { z-index: 60; }
-.ctrl { display: flex; align-items: center; gap: 6px; font-size: 13px; }
-.ctrl label { color: #5a6271; font-weight: 600; }
-.bar select { font: inherit; font-size: 13px; padding: 6px 10px; border: 1px solid #d1d5db; border-radius: 8px; background: #fff; }
-.treebtn { font: inherit; font-size: 13px; padding: 6px 12px; border: 1px solid #263E44; border-radius: 8px; background: #fff; color:#263E44; cursor: pointer; font-weight:600; }
-.treebtn.on { background:#eef3f4; }
-.pop { position: absolute; top: 100%; left: 0; margin-top: 6px; background:#fff; border:1px solid #cfd6da; border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,.14); padding:10px; width: 340px; max-height: 380px; overflow:auto; z-index: 50; display:none; }
-.pop.open { display:block; }
-.pop .act { display:flex; justify-content:space-between; margin-bottom:8px; font-size:12px; }
-.pop .act a { color:#263E44; cursor:pointer; text-decoration:underline; }
-.node { padding: 2px 0; }
-.node .row { display:flex; align-items:center; gap:6px; }
-.node .tg { width:16px; text-align:center; cursor:pointer; color:#8a97a0; user-select:none; font-size:11px; }
-.node label { font-size:13px; cursor:pointer; }
-.node .kids { margin-left: 18px; display:none; }
-.node.open > .kids { display:block; }
-.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 16px; }
-.kpi { background: #fff; border: 1px solid #e4e7ec; border-top: 3px solid #E6F31E; border-radius: 12px; padding: 14px 16px; }
-.kpi .k { font-size: 12px; color: #5a6271; font-weight: 600; }
-.ii { cursor: help; color: #9aa3ad; font-size: 12px; }
-.ii:hover { color: #263E44; }
-.kpi .v { font-size: 23px; font-weight: 700; color: #263E44; margin-top: 4px; }
-.kpi .n { font-size: 11px; color: #9aa3ad; margin-top: 2px; }
-.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-@media (max-width: 820px){ .grid2 { grid-template-columns: 1fr; } }
-.card { background: #fff; border: 1px solid #e4e7ec; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
-.card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px; flex-wrap: wrap; }
-.card h2 { font-size: 14px; font-weight: 700; color: #263E44; }
-.card-head button { padding: 5px 10px; font-size: 12px; border: 1px solid #263E44; color: #263E44; background: #fff; border-radius: 8px; cursor: pointer; }
-.chart-box { position: relative; height: 270px; }
-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
-th, td { padding: 7px 9px; text-align: right; border-bottom: 1px solid #f0f1f3; white-space: nowrap; }
-th:first-child, td:first-child { text-align: left; }
-th { color: #5a6271; background: #fafbfc; font-weight: 600; position: sticky; top: 0; }
-tbody tr:hover { background: #f8fafc; }
-.tbl-wrap { max-height: 440px; overflow: auto; border: 1px solid #f0f1f3; border-radius: 8px; }
-.tabs { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
-.tab { padding: 5px 12px; border: 1px solid #d1d5db; border-radius: 8px; background: #fff; font-size: 12.5px; cursor: pointer; }
-.tab.active { background: #eef3f4; border-color: #263E44; color: #263E44; font-weight: 700; }
-.note { font-size: 12px; color: #9aa3ad; margin-top: 8px; }
-.cap { font-size: 12px; color: #5a6675; background:#f3f6f7; border-left:3px solid #263E44; border-radius:0 6px 6px 0; padding:7px 10px; margin:0 0 12px; line-height:1.55; }
-.cap b { color:#263E44; }
-.ce,.wp,#wk-targets input { padding:3px 6px; border:1px solid #d1d5db; border-radius:5px; font:inherit; font-size:12px; }
-#wk-combo td,#wk-pipe td,#wk-action td { vertical-align:middle; }
-.hide { display: none; }
-.pagetitle { font-size: 16px; font-weight: 700; color: #263E44; margin: 4px 0 14px; }
-#loading { padding: 40px; text-align: center; color: #5a6271; }
-.okr-o { background:#fff; border:1px solid #e4e7ec; border-radius:12px; padding:16px; margin-bottom:16px; }
-.okr-o h3 { font-size:15px; color:#263E44; margin-bottom:2px; }
-.okr-o .w { font-size:12px; color:#9aa3ad; margin-bottom:12px; }
-.kr { border-top:1px solid #f0f1f3; padding:12px 0; }
-.kr:first-of-type { border-top:none; }
-.kr.manual { background:#fafbf3; margin:0 -8px; padding:12px 8px; border-radius:8px; }
-.kr .kh { display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap; }
-.kr .knm { font-size:13.5px; font-weight:600; color:#1a1d23; }
-.kr .kv { font-size:15px; font-weight:700; color:#263E44; }
-.kr .lv { font-size:12px; font-weight:700; padding:1px 8px; border-radius:20px; margin-left:6px; }
-.lv.優 { background:#dff3e6; color:#1f7a4d; } .lv.佳 { background:#fff3d6; color:#8a6300; } .lv.可 { background:#eef3f4; color:#5a6271; } .lv.未達 { background:#fdeaea; color:#b53b65; }
-.bar2 { height:10px; background:#eef1f3; border-radius:6px; margin:8px 0 5px; overflow:hidden; }
-.bar2 > i { display:block; height:100%; background:#263E44; border-radius:6px; }
-.kr .tiers { font-size:11px; color:#9aa3ad; }
-.kr input { width:90px; text-align:right; padding:4px 6px; border:1px solid #d1d5db; border-radius:6px; font:inherit; font-size:13px; }
-/* ── V0.1 登入／權限 ── */
-#login { position:fixed; inset:0; z-index:200; background:linear-gradient(150deg,#1c2e33 0%,#263E44 55%,#2f4d55 100%); display:flex; align-items:center; justify-content:center; padding:20px; }
-#login .box { width:100%; max-width:380px; background:#fff; border-radius:16px; box-shadow:0 18px 50px rgba(0,0,0,.35); padding:30px 28px 26px; }
-#login .brand { text-align:center; margin-bottom:22px; }
-#login .brand .lg { font-size:26px; font-weight:800; color:#263E44; letter-spacing:1px; }
-#login .brand .lg b { color:#8a9a1e; }
-#login .brand .sb { font-size:13px; color:#5a6271; margin-top:4px; font-weight:600; }
-#login label { display:block; font-size:12px; color:#5a6271; font-weight:700; margin:14px 0 5px; }
-#login input { width:100%; padding:11px 12px; border:1px solid #cfd6da; border-radius:9px; font:inherit; font-size:14px; }
-#login input:focus { outline:none; border-color:#263E44; box-shadow:0 0 0 3px rgba(38,62,68,.12); }
-#login .btn { width:100%; margin-top:20px; padding:12px; border:none; border-radius:9px; background:#263E44; color:#E6F31E; font-size:15px; font-weight:800; cursor:pointer; letter-spacing:2px; }
-#login .btn:hover { background:#1c2e33; }
-#login .err { color:#b53b65; font-size:12.5px; margin-top:12px; min-height:16px; text-align:center; }
-#login .demo { margin-top:18px; border-top:1px dashed #dfe4e7; padding-top:12px; font-size:11.5px; color:#8a97a0; line-height:1.7; }
-#login .demo b { color:#5a6271; }
-#login .demo .u { cursor:pointer; color:#263E44; text-decoration:underline; }
-.top .right .who { font-size:12px; color:#dfe9eb; display:flex; align-items:center; gap:8px; }
-.top .right .who .rl { background:#E6F31E; color:#263E44; font-weight:800; font-size:11px; padding:2px 8px; border-radius:20px; }
-.top .right .who .sc { color:#b9ccd0; }
-.top .right .lo { font-size:12px; font-weight:700; color:#263E44; background:#E6F31E; border:none; padding:6px 11px; border-radius:8px; cursor:pointer; }
-.scope-b { background:#eef3f4; border:1px solid #d4e0e2; border-radius:10px; padding:9px 13px; font-size:12.5px; color:#33474d; margin-bottom:14px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
-.scope-b .ic { font-size:15px; } .scope-b b { color:#263E44; }
-.matrix td.sys { color:#1f7a4d; font-weight:700; } .matrix td.man { color:#8a6300; font-weight:700; }
-.badge-sys { background:#dff3e6; color:#1f7a4d; } .badge-man { background:#fff3d6; color:#8a6300; }
-.matrix .bd { font-size:11px; font-weight:700; padding:1px 8px; border-radius:20px; }
-.utbl td .st-on { color:#1f7a4d; font-weight:700; } .utbl .rl2 { font-weight:700; color:#263E44; }
-.am-split { display:grid; grid-template-columns:340px 1fr; gap:16px; align-items:start; }
-@media (max-width: 820px){ .am-split { grid-template-columns:1fr; } }
-.ref { display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px solid #f0f1f3; font-size:13px; }
-.ref b { color:#263E44; }
-@media print {
-  @page { margin: 12mm; }
-  body { background:#fff; }
-  .top, #app > .bar, #page-war .bar, #war-pdf { display:none !important; }
-  #page-perf, #page-proj, #page-team, #page-region, #page-okr { display:none !important; }
-  .wrap { max-width:none; padding:0; }
-  .card, .kpi, .okr-o, .kpis, .tbl-wrap { break-inside:avoid; page-break-inside:avoid; box-shadow:none; }
-  .tbl-wrap { max-height:none; overflow:visible; }
-  .pagetitle { break-after:avoid; }
-  * { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
-}
-.am-f { margin-bottom:12px; }
-.am-f > label { display:block; font-size:13px; font-weight:700; color:#263E44; margin-bottom:5px; }
-.am-f textarea { width:100%; border:1px solid #d1d5db; border-radius:8px; padding:8px 10px; font:inherit; font-size:13px; resize:vertical; }
-.stars { display:inline-block; margin-bottom:6px; }
-.stars span { font-size:20px; color:#d1d5db; cursor:pointer; }
-.stars span.on { color:#E6B800; }
-.act-row { display:grid; grid-template-columns:1fr 90px 120px 70px 24px; gap:6px; margin-bottom:6px; }
-.act-row input, .act-row select { border:1px solid #d1d5db; border-radius:6px; padding:5px 6px; font:inherit; font-size:12.5px; }
-.act-row .del { cursor:pointer; color:#b53b65; text-align:center; align-self:center; }
-@media (max-width: 560px){ .act-row { grid-template-columns:1fr 1fr; } }
-@media (max-width: 560px){ .wrap { padding: 14px; } .kpis { grid-template-columns: 1fr 1fr; } .kpi .v { font-size: 20px; } .pop{width:280px;} }
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta
+    http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'"
+  >
+  <meta name="referrer" content="no-referrer">
+  <title>DigitM｜安全業績戰情室</title>
+  <link rel="stylesheet" href="./assets/styles.css">
+  <script src="./assets/app.js" defer></script>
 </head>
 <body>
-<div id="login">
-  <div class="box">
-    <div class="brand"><div class="lg">Digit<b>M</b> 數字廣告</div><div class="sb">業務經營戰情系統</div></div>
-    <div id="gwrap"><div id="gbtn" style="display:flex;justify-content:center;min-height:44px"></div></div>
-    <div class="note" style="text-align:center;margin-top:8px">請用公司 Google 帳號（@digitm.com.tw）登入</div>
-    <div class="err" id="lg-err"></div>
-    <details style="margin-top:18px">
-      <summary style="cursor:pointer;font-size:12px;color:#8a97a0;text-align:center">▸ 用示範帳號登入（測試用）</summary>
-      <label>帳號</label>
-      <input id="lg-acc" type="text" placeholder="請輸入公司帳號" autocomplete="username" onkeydown="if(event.key==='Enter')doLogin()">
-      <label>密碼</label>
-      <input id="lg-pw" type="password" placeholder="請輸入密碼" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
-      <button class="btn" onclick="doLogin()">登 入 系 統</button>
-      <div class="demo" id="lg-demo"></div>
-    </details>
-  </div>
-</div>
-<div class="top">
-  <h1>📊 數字廣告業績儀表板</h1>
-  <div class="right">
-    <select id="pageSel"><option value="perf">📈 業績總覽</option><option value="proj">🏗️ 建案分析</option><option value="team">🎯 課組戰情</option><option value="war">📋 業務戰報</option><option value="week">🗓️ 週會追蹤</option><option value="goal">🎯 目標中心</option><option value="region">🗺️ 區域歷年戰情</option><option value="okr">🏅 OKR 考核</option></select>
-    <span class="who" id="whoami"></span>
-    <button class="lo" id="logout" onclick="logout()" style="display:none">登出</button>
-    <span class="snap" id="snap"></span>
-  </div>
-</div>
-<div class="wrap">
-  <div id="loading">載入資料中…（首次約 1–2 秒）</div>
-  <div id="app" class="hide">
-    <div class="scope-b hide" id="scopebar"></div>
-    <div class="bar">
-      <div class="ctrl"><label>月份</label><select id="f-month"><option value="">全部</option></select></div>
-      <div class="ctrl"><label>季度</label><select id="f-quarter"><option value="">全部</option><option value="H1">H1</option><option value="H2">H2</option><option value="Q1">Q1</option><option value="Q2">Q2</option><option value="Q3">Q3</option><option value="Q4">Q4</option></select></div>
-      <div class="ctrl" style="position:relative"><button class="treebtn" id="btn-sales">業務：全部 ▾</button><div class="pop" id="pop-sales"></div></div>
-      <div class="ctrl" style="position:relative"><button class="treebtn" id="btn-region">建案地區：全部 ▾</button><div class="pop" id="pop-region"></div></div>
-      <div class="ctrl"><label>站台</label><select id="f-ch"><option value="">全部</option></select></div>
-      <div class="ctrl" style="position:relative"><button class="treebtn" id="btn-ad">廣告類型：全部 ▾</button><div class="pop" id="pop-ad"></div></div>
-      <span id="status" class="note"></span>
+  <a class="skip-link" href="#main">跳到主要內容</a>
+  <header class="masthead">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">DM</span>
+      <div>
+        <strong>DigitM 業績戰情室</strong>
+        <span>Secure Dashboard v2</span>
+      </div>
     </div>
+    <div class="session" id="session-area" aria-live="polite">
+      <span class="status-dot" aria-hidden="true"></span>
+      <span id="session-label">正在確認權限</span>
+      <button class="ghost-button" id="logout-button" type="button" hidden>登出</button>
+    </div>
+  </header>
 
-    <section id="page-perf">
-      <div class="cap" id="cap-kpi"></div>
-      <div class="kpis" id="perf-kpis"></div>
-      <div id="perf-detail" class="hide"></div>
-      <div class="grid2">
-        <div class="card"><div class="card-head"><h2>📈 每月業績趨勢</h2></div><div class="cap" id="cap-trend"></div><div class="chart-box"><canvas id="trend"></canvas></div></div>
-        <div class="card"><div class="card-head"><h2>🏢 各站台業績</h2></div><div class="cap" id="cap-ch"></div><div class="chart-box"><canvas id="chCh"></canvas></div></div>
-      </div>
-      <div class="card"><div class="card-head"><h2>📋 維度明細</h2><button onclick="dlDim()">⬇ 下載 CSV</button></div>
-        <div class="cap" id="cap-dim"></div>
-        <div class="tabs" id="dimtabs">
-          <div class="tab active" data-dim="cls">業務課</div><div class="tab" data-dim="grp">業務組</div><div class="tab" data-dim="sales">個別業務</div>
-          <div class="tab" data-dim="region">縣市</div><div class="tab" data-dim="customer">客戶</div><div class="tab" data-dim="industry">產業</div><div class="tab" data-dim="slot">版位群組</div>
+  <main id="main" class="page-shell">
+    <section class="access-panel" id="access-panel" aria-labelledby="access-title">
+      <p class="eyebrow">安全模式</p>
+      <h1 id="access-title">正在連接受保護的業績服務</h1>
+      <p id="access-message">資料只會在後端完成身分與角色驗證後載入。</p>
+      <a class="primary-button" id="login-link" href="/auth/login" hidden>使用公司帳號登入</a>
+    </section>
+
+    <section id="dashboard" hidden>
+      <nav class="module-nav" id="module-nav" aria-label="功能分頁">
+        <button class="module-tab is-active" type="button" data-module="overview">經營總覽</button>
+        <button class="module-tab" type="button" data-module="performance">業績總覽</button>
+        <button class="module-tab" type="button" data-module="projects">建案分析</button>
+        <button class="module-tab" type="button" data-module="teams">課組戰情</button>
+        <button class="module-tab" type="button" data-module="war-room">業務戰報</button>
+        <button class="module-tab" type="button" data-module="weekly">週會追蹤</button>
+        <button class="module-tab" type="button" data-module="targets">目標中心</button>
+        <button class="module-tab" type="button" data-module="regions">區域歷年戰情</button>
+        <button class="module-tab" type="button" data-module="okr">OKR 考核</button>
+      </nav>
+
+      <div class="module-view" id="module-overview" data-module-view="overview">
+      <div class="page-heading">
+        <div>
+          <p class="eyebrow">經營決策中心</p>
+          <h1>今天先處理什麼？</h1>
+          <p class="scope-text" id="scope-label"></p>
         </div>
-        <div class="tbl-wrap"><table id="dimtbl"><thead><tr><th>名稱</th><th>業績</th><th>占比</th><th>客戶數</th><th>客單價</th><th>委刊單</th></tr></thead><tbody></tbody></table></div>
-      </div>
-    </section>
-
-    <section id="page-proj" class="hide">
-      <div class="pagetitle">建案分析（合作建案隨月份/季度即時算；在線建案為 8/7 預測系統快照，不隨月份變）</div>
-      <div class="cap" id="cap-proj-kpi"></div>
-      <div class="kpis" id="proj-kpis"></div>
-      <div class="card"><div class="card-head"><h2>💎 有無價值貢獻</h2></div><div class="kpis" id="proj-value" style="margin:0"></div>
-        <div class="note">合作建案：已簽約房產且有縣市＋行政區。有價值滲透率＝有價值合作 ÷ 有價值在線。</div></div>
-      <div class="card"><div class="card-head"><h2>📋 維度明細</h2><button onclick="dlProj()">⬇ 下載 CSV</button></div>
-        <div class="cap" id="cap-proj-dim"></div>
-        <div class="tabs" id="proj-tabs"><div class="tab active" data-dim="grp">業務組</div><div class="tab" data-dim="cls">業務課</div><div class="tab" data-dim="region">縣市</div></div>
-        <div class="tbl-wrap"><table id="proj-tbl"><thead><tr><th>名稱</th><th>合作建案</th><th>在線建案</th><th>滲透率</th><th>有價值合作</th><th>房產業績</th><th>客單價</th></tr></thead><tbody></tbody></table></div>
-      </div>
-    </section>
-
-    <section id="page-team" class="hide">
-      <div class="pagetitle">課組戰情（隨篩選即時算；成長率為全年 2025 vs 2026）</div>
-      <div class="note" style="margin-bottom:12px">💡 <b>目標按季輸入</b>（存本機）：在下方面板填各組 Q1–Q4 目標，表格「目標／達成率」會依你上方選的期間自動累加（H1=Q1+Q2、全年=四季總和、單月=該季÷3）。業績/客單價/占比隨篩選變；滲透率、有無價值為房產7月、客單價成長率為全年。</div>
-      <details style="margin-bottom:12px"><summary style="cursor:pointer;font-weight:700;color:#263E44;padding:8px 0">⚙️ 設定各季目標（Q1–Q4，單位：元）</summary>
-        <div class="card" style="margin-top:8px"><div class="tbl-wrap"><table id="qtgt-tbl"><thead><tr><th>組別</th><th>Q1</th><th>Q2</th><th>Q3</th><th>Q4</th><th>全年合計</th></tr></thead><tbody></tbody></table></div></div>
-      </details>
-      <div class="card"><div class="card-head"><h2>🎯 各課組達成戰情</h2><button onclick="dlTeam()">⬇ 下載 CSV</button></div>
-        <div class="cap" id="cap-team"></div>
-        <div class="tbl-wrap"><table id="team-tbl"><thead><tr><th>課組</th><th>業績總額</th><th>目標</th><th>達成率</th><th>客單價</th><th>客單價成長率</th><th>滲透率</th><th>有價值合作</th><th>無價值合作</th><th>站內占比</th><th>再行銷占比</th></tr></thead><tbody></tbody></table></div>
-      </div>
-    </section>
-
-    <section id="page-war" class="hide">
-      <div class="bar" style="margin-bottom:14px">
-        <div class="ctrl"><label>課別</label><select id="war-cls"></select></div>
-        <button class="treebtn" id="war-pdf" style="background:#E6F31E;border-color:#d2df13;font-weight:700">🖨️ 下載 PDF</button>
-        <span class="note" id="war-sub"></span>
-      </div>
-      <div id="war-body"></div>
-    </section>
-
-    <section id="page-okr" class="hide">
-      <div class="pagetitle">H2 OKR 考核 <span id="okr-snap" style="font-size:12px;color:#9aa3ad;font-weight:400"></span></div>
-      <div class="bar" style="margin-bottom:14px">
-        <div class="ctrl" style="position:relative"><label>檢視對象</label><button class="treebtn" id="btn-okr">全部 ▾</button><div class="pop" id="pop-okr"></div></div>
-        <span class="note">實績自動接 DOS（H2＝7–12月）；灰底 KR 需手動輸入。門檻為範例個人基準，可日後改。</span>
-      </div>
-      <div class="cap" id="cap-okr"></div>
-      <div id="okr-body"></div>
-    </section>
-
-    <section id="page-week" class="hide">
-      <div class="pagetitle">🔥 週會戰情室 <span style="font-size:12px;color:#9aa3ad;font-weight:400">做決策·看未來·一起看 · 先篩到要看的組/人 · H2 26 週（不受期間下拉影響）</span></div>
-      <div class="card hide" id="wk-me" style="border-top:3px solid #E6F31E"></div>
-      <div class="card"><div class="card-head"><h2>⚙️ 半年目標設定（÷26＝週目標，對目前篩選範圍設）</h2></div>
-        <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;font-size:13px" id="wk-targets">
-          業績 <input id="wk-tperf" type="number" style="width:82px;padding:4px 6px;border:1px solid #d1d5db;border-radius:6px;font:inherit">萬
-          · 再行銷 <input id="wk-trem" type="number" style="width:70px;padding:4px 6px;border:1px solid #d1d5db;border-radius:6px;font:inherit">萬
-          · 包套 <input id="wk-tcombo" type="number" style="width:70px;padding:4px 6px;border:1px solid #d1d5db;border-radius:6px;font:inherit">萬
-          · 客戶數 <input id="wk-tcust" type="number" style="width:60px;padding:4px 6px;border:1px solid #d1d5db;border-radius:6px;font:inherit">
-        </div>
-        <div class="cap" id="cap-week" style="margin-top:10px"></div>
-      </div>
-      <div class="card"><div class="card-head"><h2>🔗 Google Sheet 連結（包套 / 行動 共用來源）</h2>
-        <span><button onclick="wkFetchSheets(true)">🔄 重讀 Sheet</button> <a id="wk-sheet-open" href="#" target="_blank" rel="noopener" style="margin-left:8px;padding:5px 10px;font-size:12px;border:1px solid #263E44;border-radius:8px;color:#263E44;text-decoration:none">✍ 開 Sheet 填寫 ↗</a></span></div>
-        <div style="font-size:13px;color:#4a5560">貼上 Google Sheet 連結：<input id="wk-editurl" style="width:70%" placeholder="https://docs.google.com/spreadsheets/d/..../edit"></div>
-        <div class="note">只要貼<b>一次連結</b>即可，我自動抓「包套登錄」「行動事項」兩個分頁（分頁請照這名稱）。⚠ Sheet 權限要設成「<b>任何知道連結的人 → 檢視者</b>」，儀表板才讀得到。④包套與行動事項會變成唯讀顯示 Sheet 內容＋「開 Sheet 填寫」鈕（留空＝本機自填）。</div>
-      </div>
-      <div class="card"><div class="card-head"><h2>① 進度總戰情（H2 累計 vs 應達）</h2></div><div class="kpis" id="wk-kpi"></div>
-        <div class="note">大數字＝<b>H2 累計實際</b>（到今天，非單週）；達成率＝累計實際÷累計應達(週目標×週次)。🟢≥100% 🟡85–100% 🔴<85%。DOS 無簽約日、無法切單週，「本週淨增」靠每週快照逐週長出來。點卡片可就地展開明細 ▾。</div></div>
-      <div id="wk-detail" class="hide"></div>
-      <div class="card"><div class="card-head"><h2>② 業績跑速（累計 理論 vs 實際）</h2></div>
-        <div class="kpis" id="wk-pace" style="margin-bottom:10px"></div>
-        <div class="chart-box" style="height:240px"><canvas id="wk-chart"></canvas></div></div>
-      <div class="card"><div class="card-head"><h2>③ 再行銷戰情 — 誰有賣？誰沒賣？</h2></div>
-        <div class="cap" id="cap-wkrem"></div>
-        <div class="tbl-wrap"><table id="wk-rem"><thead><tr><th>業務</th><th>再行銷累計</th><th>週目標</th><th>應達累計(第N週)</th><th>達成率</th><th>占個人業績</th></tr></thead><tbody></tbody></table></div></div>
-      <div class="card"><div class="card-head"><h2>④ 本週包套銷售登錄（業務自填）</h2><button onclick="wkAddCombo()">＋ 新增一筆</button></div>
-        <div class="kpis" id="wk-combo-kpi" style="margin-bottom:8px"></div>
-        <div class="tbl-wrap"><table id="wk-combo"><thead><tr><th>業務</th><th>客戶</th><th>建案</th><th>方案</th><th>金額</th><th>進單時間</th><th>狀態</th><th></th></tr></thead><tbody></tbody></table></div>
-        <div class="note">方案用選單、金額填數字；自動算包套業績/占比/件數/均價（存本機）。</div></div>
-      <div class="card"><div class="card-head"><h2>⑤ 個人業績結構 ＋ 健康度</h2><button onclick="dlWeekProd()">⬇ 下載 CSV</button></div>
-        <div class="cap" id="cap-wkprod"></div>
-        <div class="tbl-wrap"><table id="wk-prod"><thead><tr><th>業務</th><th>總業績</th><th>站內</th><th>再行銷</th><th>數媒站內</th><th>數媒再行銷</th><th>結構健康度</th></tr></thead><tbody></tbody></table></div></div>
-      <div class="card"><div class="card-head"><h2>⑥ Pipeline 戰情 — 下週業績在哪？</h2></div>
-        <div class="cap" id="cap-wkpipe"></div>
-        <div class="tbl-wrap"><table id="wk-pipe"><thead><tr><th>業務</th><th>下週預估(可填)</th><th>已確定<br>將實現</th><th>高機率<br>有效報價</th><th>風險<br>潛力</th><th>對週目標缺口</th></tr></thead><tbody></tbody></table></div></div>
-      <div class="card" style="background:#fff4f4;border-color:#f2c7c7"><div class="card-head"><h2>🚨 紅燈預警 ＋ 產品缺口</h2></div>
-        <div id="wk-alert" style="font-size:13px;line-height:1.9;color:#1a1d23"></div></div>
-      <div class="card" style="background:#f6faf2;border-color:#dbe8cf">
-        <div class="card-head"><h2>🎯 2026 H2 · 推廣再行銷混合銷售方案（KR 2.1）</h2></div>
-        <div style="font-size:13.5px;line-height:1.85;color:#1a1d23">
-          <div style="font-size:15px;font-weight:800;color:#263E44;margin-bottom:6px">再行銷 H2 回補 ≥ <span style="color:#1f7a4d">970 萬</span>　·　毛利率 ≥ <span style="color:#1f7a4d">55%</span></div>
-          <b>口徑：</b>站內再行銷 ＋ 數媒再行銷 合計（限 CPC / CPM / CPV / CPE 計價，<b>不含 CPL 名單廣告</b>）。<br>
-          <b>毛利率：</b>再行銷認<b>淨額</b>（帳上收入＝售價−成本＝毛利≈稅前利潤），毛利率＝淨額認列率，是淨利率關鍵槓桿，須 ≥ 55%。<br>
-          <b>把關：</b><span style="color:#b53b65">不得以大幅折讓（超低折扣）換取金額達標。</span><br>
-          <b>評分：</b>可（1~2 分）＝ H2 業績達成率 40%~59.99%。
+        <div class="snapshot-card">
+          <span>資料快照</span>
+          <strong id="snapshot">—</strong>
         </div>
       </div>
+
+      <section aria-labelledby="kpi-heading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">01｜全局</p>
+            <h2 id="kpi-heading">核心指標</h2>
+          </div>
+          <p>只呈現目前角色有權查看的彙總結果</p>
+        </div>
+        <div class="kpi-grid" id="kpi-grid"></div>
+      </section>
+
+      <section class="decision-grid" aria-label="決策資訊">
+        <article class="panel" aria-labelledby="priority-heading">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">02｜行動</p>
+              <h2 id="priority-heading">本週優先事項</h2>
+            </div>
+            <span class="tag">依風險排序</span>
+          </div>
+          <ol class="priority-list" id="priority-list"></ol>
+        </article>
+
+        <article class="panel" aria-labelledby="alert-heading">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">03｜風險</p>
+              <h2 id="alert-heading">需要主管介入</h2>
+            </div>
+          </div>
+          <ul class="alert-list" id="alert-list"></ul>
+        </article>
+      </section>
+
+      <section class="decision-grid" aria-label="趨勢與結構">
+        <article class="panel" aria-labelledby="trend-heading">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">04｜跑速</p>
+              <h2 id="trend-heading">月度趨勢</h2>
+            </div>
+          </div>
+          <div class="bar-chart" id="trend-chart" role="img" aria-label="月度業績趨勢"></div>
+        </article>
+
+        <article class="panel" aria-labelledby="mix-heading">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">05｜結構</p>
+              <h2 id="mix-heading">產品組合</h2>
+            </div>
+          </div>
+          <div class="mix-list" id="mix-list"></div>
+        </article>
+      </section>
+      </div>
+
+      <section class="module-view module-placeholder" data-module-view="performance" hidden>
+        <p class="eyebrow">經營管理</p><h1>業績總覽</h1>
+        <p>保留月度趨勢、站台、產品、產業、區域與業務分布；正式資料由後端依角色範圍彙總。</p>
+      </section>
+      <section class="module-view module-placeholder" data-module-view="projects" hidden>
+        <p class="eyebrow">經營管理</p><h1>建案分析</h1>
+        <p>保留合作建案、在線建案、滲透率、客單價與續約機會，並統一資料快照口徑。</p>
+      </section>
+      <section class="module-view module-placeholder" data-module-view="teams" hidden>
+        <p class="eyebrow">執行管理</p><h1>課組戰情</h1>
+        <p>保留課、組、個人的目標、實績、缺口、跑速與紅燈比較。</p>
+      </section>
+      <section class="module-view module-placeholder" data-module-view="war-room" hidden>
+        <p class="eyebrow">執行管理</p><h1>業務戰報</h1>
+        <p>保留 Commit、Best case、加權 Pipeline、缺口覆蓋與個人責任拆解。</p>
+      </section>
+      <section class="module-view module-placeholder" data-module-view="weekly" hidden>
+        <p class="eyebrow">執行管理</p><h1>週會追蹤</h1>
+        <p>保留上週承諾、三項紅燈、主管決議、負責人、期限與下週驗證。</p>
+      </section>
+      <section class="module-view module-placeholder" data-module-view="targets" hidden>
+        <p class="eyebrow">績效治理</p><h1>目標中心</h1>
+        <p>保留半年、季度、月度目標與版本控管；不再以瀏覽器本機資料作正式目標。</p>
+      </section>
+      <section class="module-view module-placeholder" data-module-view="regions" hidden>
+        <p class="eyebrow">經營管理</p><h1>區域歷年戰情</h1>
+        <p>保留縣市、行政區、同期、YoY 與主力業務分析，並標明截止日與組織口徑。</p>
+      </section>
+      <section class="module-view module-placeholder" data-module-view="okr" hidden>
+        <p class="eyebrow">績效治理</p><h1>OKR 考核</h1>
+        <p>保留個人與團隊 O／KR、權重、進度、證據、卡點、下一步與主管 Review。</p>
+      </section>
     </section>
+  </main>
 
-    <section id="page-goal" class="hide">
-      <div class="pagetitle">🎯 目標中心 <span style="font-size:12px;color:#9aa3ad;font-weight:400">主管在 Sheet「目標設定」分頁設每人目標 → 自動算達成/缺口/燈號 · 隨篩選(課/組/員)變 · H2 累計</span></div>
-      <div class="card"><div class="card-head"><h2>H2 目標達成總覽</h2><a id="goal-open" href="#" target="_blank" rel="noopener" style="padding:5px 10px;font-size:12px;border:1px solid #263E44;border-radius:8px;color:#263E44;text-decoration:none">✍ 開 Sheet 設目標 ↗</a></div>
-        <div class="cap" id="cap-goal"></div>
-        <div class="kpis" id="goal-kpi"></div>
-        <div class="tbl-wrap"><table id="goal-tbl"><thead><tr><th>業務</th><th>業績(現況/目標)</th><th>再行銷</th><th>客戶數</th><th>包套</th><th>H2進度</th><th>燈</th></tr></thead><tbody></tbody></table></div>
-      </div>
-    </section>
-
-    <section id="page-admin" class="hide">
-      <div class="pagetitle">🔐 使用者權限管理 <span style="font-size:12px;color:#9aa3ad;font-weight:400">僅管理者可見（V0.1 前端示範版）</span></div>
-      <div class="cap">此頁為 <b>V0.1 假圖</b>：帳號、角色與資料範圍先以前端示範，讓大家對齊「誰能看什麼」。真正的帳密驗證與資料層權限過濾需後端（已列入工程交付，暫緩）。</div>
-      <div class="card">
-        <div class="card-head"><h2>👥 使用者帳號</h2><button onclick="alert('V0.1 假圖：新增使用者流程待後端。')">＋ 新增使用者</button></div>
-        <div class="tbl-wrap"><table class="utbl"><thead><tr><th>姓名</th><th>帳號</th><th>角色</th><th>部門</th><th>組別</th><th>狀態</th></tr></thead><tbody id="utbl-body"></tbody></table></div>
-        <div class="note">角色可擴充（媒體企劃／財務／管理部／工程 PM）而不需改程式；每個角色綁定「可讀取的資料範圍」。</div>
-      </div>
-      <div class="card">
-        <div class="card-head"><h2>📊 資料責任矩陣（系統算 vs 人工填）</h2></div>
-        <div class="cap">原則：<b>系統能算的，一律系統算，業務不用填</b>。業務只填「系統不知道的事」。<b>目標中心（主管設方向）</b>與<b>週會（執行追蹤）</b>分開：目標由主管設定，執行進度由系統自動比對。</div>
-        <div class="tbl-wrap"><table class="matrix"><thead><tr><th>資料項目</th><th>來源／誰負責</th><th style="text-align:center">產生方式</th><th>說明</th></tr></thead><tbody id="matrix-body"></tbody></table></div>
-      </div>
-    </section>
-
-    <section id="page-region" class="hide">
-      <div class="pagetitle">🗺️ 區域歷年戰情 <span style="font-size:12px;color:#9aa3ad;font-weight:400">上方共用篩選（業務/課/組/地區/月份/站台）同步套用 · YoY 同期</span></div>
-      <div class="bar" style="margin-bottom:14px">
-        <div class="tabs" id="rg-level" style="margin:0"><div class="tab active" data-lv="city">縣市</div><div class="tab" data-lv="dist">行政區</div></div>
-        <div class="ctrl"><label>年</label><select id="rg-year"><option value="yoy">同期比較(25 vs 26)</option><option value="26">只看 2026</option><option value="25">只看 2025</option></select></div>
-        <div class="ctrl"><label>搜尋</label><input id="rg-search" placeholder="輸入縣市/行政區…" style="padding:6px 10px;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:13px"></div>
-        <button class="treebtn" onclick="dlRegion()">⬇ 下載 CSV</button>
-        <span class="note" id="rg-note"></span>
-      </div>
-      <div class="card" id="rg-summary" style="background:#f4f7f2;border-color:#dfe8d8"></div>
-      <div class="card"><div class="card-head"><h2>📊 逐月同期比較（2025 vs 2026）</h2><select id="rg-pick" style="font:inherit;font-size:13px;padding:6px 10px;border:1px solid #d1d5db;border-radius:8px"></select></div><div class="cap" id="cap-rg-chart"></div><div class="chart-box"><canvas id="rgChart"></canvas></div></div>
-      <div class="card"><div class="card-head"><h2>📋 各區同期戰情（依今年業績排序）</h2></div>
-        <div class="cap" id="cap-rg-tbl"></div>
-        <div class="tbl-wrap"><table id="rg-tbl"><thead><tr><th>區域</th><th>2026 至今</th><th>2025 同期</th><th>YoY 超前/落後</th><th>2025 全年</th><th>今年進度</th></tr></thead><tbody></tbody></table></div>
-      </div>
-    </section>
-  </div>
-</div>
-<script>
-const PDATA = {"snapshot": "2026/08/26", "growth": {"業務一課 - 業務一組": {"growth": -1.2, "arpu2026": 225671}, "業務一課 - 業務二組": {"growth": -10.6, "arpu2026": 223539}, "業務二課 - 業務三組": {"growth": -18.8, "arpu2026": 148632}, "業務二課 - 業務四組": {"growth": -12.6, "arpu2026": 124484}, "設計課 - 設計組": {"growth": 5.9, "arpu2026": 180463}}, "pipe": {"曾方音": {"f": 80267, "q": 685908, "p": 731430, "grp": "業務一課 - 業務二組"}, "呂佩宜": {"f": 96933, "q": 2210161, "p": 22876, "grp": "業務二課 - 業務三組"}, "簡艷華": {"f": 39500, "q": 649307, "p": 63465, "grp": "業務二課 - 業務四組"}, "黃淑萍": {"f": 250732, "q": 2166179, "p": 915376, "grp": "業務一課 - 業務一組"}, "趙紹亨": {"f": 58310, "q": 22286, "p": 380838, "grp": "業務一課 - 業務一組"}, "楊儀菲": {"f": 254622, "q": 24886, "p": 47143, "grp": "業務一課 - 業務二組"}, "陳怡雯": {"f": 896416, "q": 0, "p": 74137, "grp": "業務一課 - 業務二組"}, "曾家羚": {"f": 65529, "q": 2162221, "p": 477253, "grp": "業務二課 - 業務三組"}, "簡順隆": {"f": 0, "q": 2199915, "p": 257096, "grp": "業務一課 - 業務二組"}, "姚蘋芸": {"f": 0, "q": 406791, "p": 165841, "grp": "業務二課 - 業務四組"}, "彭莉芳": {"f": 45006, "q": 778011, "p": 288568, "grp": "業務一課 - 業務一組"}, "陳琬臻": {"f": 0, "q": 3114718, "p": 308921, "grp": "業務二課 - 業務三組"}, "鄧瑋婷": {"f": 39817, "q": 667282, "p": 146973, "grp": "業務二課 - 業務四組"}, "張淑瑜": {"f": 0, "q": 0, "p": 298537, "grp": "業務一課"}, "許孟瑋": {"f": 0, "q": 0, "p": 21600, "grp": "業務二課"}, "吳子敬": {"f": 0, "q": 0, "p": 187500, "grp": "業務一課 - 業務二組"}, "程湣傑": {"f": 0, "q": 0, "p": 653728, "grp": "媒體產品課 - 站台產品組"}, "李抒姮": {"f": 0, "q": 0, "p": 151238, "grp": "設計課 - 設計組"}, "仲綨柱": {"f": 0, "q": 0, "p": 168364, "grp": "業務一課 - 業務一組"}, "陳文昕": {"f": 0, "q": 0, "p": 842219, "grp": "行銷策略課 - 行銷一組"}, "趙斯蓓": {"f": 0, "q": 0, "p": 314342, "grp": "設計課 - 設計組"}}, "weekly": {"2026-W32": {"date": "2026/08/07", "cls": {"行銷策略課": {"signed": 0, "wpipe": 660266}, "業務二課": {"signed": 29652313, "wpipe": 2998292}, "媒體產品課": {"signed": 0, "wpipe": 1338745}, "設計課": {"signed": 1427191, "wpipe": 329906}, "業務一課": {"signed": 49660573, "wpipe": 4085136}}}, "2026-W33": {"date": "2026/08/13", "cls": {"行銷策略課": {"signed": 0, "wpipe": 589553}, "設計課": {"signed": 1427191, "wpipe": 325906}, "業務二課": {"signed": 29652313, "wpipe": 2856192}, "業務一課": {"signed": 49660573, "wpipe": 4629476}, "媒體產品課": {"signed": 0, "wpipe": 457610}}}, "2026-W34": {"date": "2026/08/23", "cls": {"設計課": {"signed": 1427191, "wpipe": 325906, "perf": 14916356, "rem": 976224}, "業務一課": {"signed": 49660573, "wpipe": 4629476, "perf": 51955607, "rem": 4918454}, "媒體產品課": {"signed": 0, "wpipe": 457610, "perf": 0, "rem": 0}, "業務二課": {"signed": 29652313, "wpipe": 2856192, "perf": 32150758, "rem": 3543194}, "行銷策略課": {"signed": 0, "wpipe": 589553, "perf": 0, "rem": 0}}}, "2026-W35": {"date": "2026/08/26", "cls": {"業務二課": {"signed": 36118329, "wpipe": 2856192, "perf": 44657809, "rem": 4864540}, "媒體產品課": {"signed": 0, "wpipe": 457610, "perf": 0, "rem": 0}, "業務一課": {"signed": 62641412, "wpipe": 4629476, "perf": 70352835, "rem": 6205417}, "行銷策略課": {"signed": 0, "wpipe": 589553, "perf": 0, "rem": 0}, "設計課": {"signed": 1434923, "wpipe": 325906, "perf": 17092215, "rem": 1105264}}}}};
-const fmtN=n=>Math.round(n).toLocaleString("en-US");
-const fmtWan=n=>{const x=Math.round(n);if(Math.abs(x)>=1e8)return (x/1e8).toLocaleString("en-US",{maximumFractionDigits:2})+"億";if(Math.abs(x)>=1e4)return (x/1e4).toLocaleString("en-US",{maximumFractionDigits:1})+"萬";return x.toLocaleString("en-US");};
-const fmtBoth=n=>`${fmtWan(n)}<span style="display:block;font-size:10px;color:#9aa3ad;font-weight:400">${fmtN(n)}</span>`;
-const PERIODS={H1:[1,2,3,4,5,6],H2:[7,8,9,10,11,12],Q1:[1,2,3],Q2:[4,5,6],Q3:[7,8,9],Q4:[10,11,12]};
-const ADN={"on-site":"站內廣告","remarketing":"再行銷","digitm":"數媒-站內","agent":"數媒-再行銷"};
-document.getElementById("snap").textContent="資料快照："+PDATA.snapshot;
-const wanLabel={id:"wanLabel",afterDatasetsDraw(c){const t=c.config.type,x=c.ctx;c.data.datasets.forEach((ds,di)=>{c.getDatasetMeta(di).data.forEach((el,i)=>{const v=ds.data[i];if(!v)return;x.save();x.font="bold 11px sans-serif";x.textAlign="center";x.textBaseline="middle";if(t==="bar"){x.fillStyle="#263E44";x.fillText(fmtWan(v),el.x,el.y-8);}else{const p=el.tooltipPosition();x.lineWidth=3;x.strokeStyle="rgba(0,0,0,.4)";x.strokeText(fmtWan(v),p.x,p.y);x.fillStyle="#fff";x.fillText(fmtWan(v),p.x,p.y);}x.restore();});});}};
-
-let ROWS=[], HOUSE=[], ONLINE=[], YOY=[], curDim="cls", projDim="grp", rgLevel="city", rgYear="yoy", YTD=7, trendChart, chChart, rgChart, warCharts=[];
-let INSDET={}; fetch("./ins_detail.json").then(r=>r.json()).then(j=>{INSDET=j||{};if(typeof PDKEY!=="undefined"&&(PDKEY==="ins"||PDKEY==="cust"))renderPerfDetail(PDKEY);}).catch(()=>{});
-const selSales=new Set(), selRegion=new Set(), selOkr=new Set(), selAd=new Set(); // 空=全部
-
-Promise.all([fetch("./data.json").then(r=>r.json()), fetch("./proj_rows.json").then(r=>r.json()), fetch("./yoy.json").then(r=>r.json()).catch(()=>({cols:[],dicts:{},rows:[]}))]).then(([d,pr,yy])=>{
-  if(yy&&yy.rows&&yy.rows.length){const c=yy.cols,gy=n=>c.indexOf(n),FF=['region','section','cls','grp','sales','ch','ad'];YOY=yy.rows.map(r=>{const o={y:r[gy('y')],m:r[gy('m')],sale:r[gy('sale')]};FF.forEach(f=>o[f]=yy.dicts[f][r[gy(f)]]);return o;});}
-  const gi=n=>d.cols.indexOf(n), F=['ins','ad','ch','cls','grp','sales','region','section','customer','industry','slot'];
-  ROWS=d.rows.map(r=>{const o={m:r[gi('m')],sale:r[gi('sale')],cust:r[gi('cust')]};F.forEach(f=>o[f]=d.dicts[f][r[gi(f)]]);return o;});
-  const hc=pr.house_cols, oc=pr.online_cols;
-  HOUSE=pr.house.map(r=>{const o={};hc.forEach((c,i)=>o[c]=r[i]);return o;});
-  ONLINE=pr.online.map(r=>{const o={};oc.forEach((c,i)=>o[c]=r[i]);return o;});
-  // 下拉
-  fill("f-month",[...Array(12)].map((_,i)=>[String(i+1),(i+1)+"月"]));
-  fill("f-ch",[...new Set(ROWS.map(r=>r.ch))].filter(x=>x).sort().map(v=>[v,v]));
-  buildSalesTree(); buildRegionTree(); buildOkrScope(); buildAdTree(); buildWar(); buildRegion();
-  document.getElementById("loading").classList.add("hide");
-  document.getElementById("f-month").addEventListener("change",()=>{if(val("f-month"))document.getElementById("f-quarter").value="";renderAll();});
-  document.getElementById("f-quarter").addEventListener("change",()=>{if(val("f-quarter"))document.getElementById("f-month").value="";renderAll();});
-  document.getElementById("f-ch").addEventListener("change",renderAll);
-  document.querySelectorAll("#dimtabs .tab").forEach(t=>t.addEventListener("click",()=>{sw("#dimtabs",t);curDim=t.dataset.dim;renderPerf();}));
-  document.querySelectorAll("#proj-tabs .tab").forEach(t=>t.addEventListener("click",()=>{sw("#proj-tabs",t);projDim=t.dataset.dim;renderProj();}));
-  renderAll();
-  gateAuth();
-}).catch(e=>{document.getElementById("loading").textContent="載入失敗："+e.message;});
-
-function fill(id,pairs){const s=document.getElementById(id);pairs.forEach(([v,t])=>{const o=document.createElement("option");o.value=v;o.textContent=t;s.appendChild(o);});}
-function val(id){return document.getElementById(id).value;}
-function sw(sel,t){document.querySelectorAll(sel+" .tab").forEach(x=>x.classList.remove("active"));t.classList.add("active");}
-
-// ---------- 多選樹狀 ----------
-function makeTree(popId, btnId, tree, sel, label, onChange){
-  const fire=()=>(onChange||renderAll)();
-  const pop=document.getElementById(popId), btn=document.getElementById(btnId);
-  pop.innerHTML='<div class="act"><a data-a="all">全選</a><a data-a="clear">清除</a></div>';
-  const root=document.createElement("div"); pop.appendChild(root);
-  function node(n){
-    const el=document.createElement("div"); el.className="node open";
-    const row=document.createElement("div"); row.className="row";
-    const leaves=collectLeaves(n);
-    const cb=document.createElement("input"); cb.type="checkbox";
-    const lb=document.createElement("label"); lb.textContent=n.label;
-    if(n.children){ const tg=document.createElement("span"); tg.className="tg"; tg.textContent="▾"; tg.onclick=()=>el.classList.toggle("open"); row.appendChild(tg); }
-    else { const sp=document.createElement("span"); sp.className="tg"; row.appendChild(sp); }
-    row.appendChild(cb); row.appendChild(lb);
-    lb.onclick=()=>{cb.checked=!cb.checked;cb.onchange();};
-    cb.onchange=()=>{ leaves.forEach(k=>cb.checked?sel.add(k):sel.delete(k)); refresh(); fire(); };
-    el.appendChild(row);
-    if(n.children){ const kids=document.createElement("div"); kids.className="kids"; n.children.forEach(c=>kids.appendChild(node(c))); el.appendChild(kids); }
-    el._cb=cb; el._leaves=leaves;
-    return el;
-  }
-  tree.forEach(n=>root.appendChild(node(n)));
-  function refresh(){ // 更新每個 checkbox 勾選狀態 + 按鈕文字
-    root.querySelectorAll(".node").forEach(el=>{ const on=el._leaves.filter(k=>sel.has(k)).length; el._cb.checked=on===el._leaves.length&&on>0; el._cb.indeterminate=on>0&&on<el._leaves.length; });
-    const _u=(label==="業務"||label==="檢視對象")?"人":"項";
-    const _disp=(label==="廣告類型")?(sel.size+" 項"):([...sel].slice(0,2).join("、")+(sel.size>2?" 等"+sel.size+_u:""));
-    btn.textContent=label+"："+(sel.size===0?"全部":_disp)+" ▾"; btn.classList.toggle("on",sel.size>0);
-  }
-  pop.querySelector('[data-a="all"]').onclick=()=>{root.querySelectorAll(".node").forEach(el=>el._leaves.forEach(k=>sel.add(k)));refresh();fire();};
-  pop.querySelector('[data-a="clear"]').onclick=()=>{sel.clear();refresh();fire();};
-  btn.onclick=(e)=>{e.stopPropagation();document.querySelectorAll(".pop").forEach(p=>{if(p!==pop)p.classList.remove("open");});pop.classList.toggle("open");};
-  pop.onclick=e=>e.stopPropagation();
-  refresh();
-}
-document.addEventListener("click",()=>document.querySelectorAll(".pop").forEach(p=>p.classList.remove("open")));
-function collectLeaves(n){ return n.children? n.children.flatMap(collectLeaves) : [n.key]; }
-
-function buildSalesTree(){
-  const h={};
-  ROWS.forEach(r=>{ if(!r.sales)return; (h[r.cls]=h[r.cls]||{})[r.grp]=(h[r.cls]||{})[r.grp]||new Set(); h[r.cls][r.grp].add(r.sales); });
-  const tree=Object.keys(h).sort().map(cls=>({label:cls,children:Object.keys(h[cls]).sort().map(grp=>({label:grp.replace("業務","").replace(" - ","-"),children:[...h[cls][grp]].sort().map(s=>({label:s,key:s}))}))}));
-  makeTree("pop-sales","btn-sales",tree,selSales,"業務");
-}
-function buildRegionTree(){
-  const h={};
-  ROWS.forEach(r=>{ if(!r.region)return; (h[r.region]=h[r.region]||new Set()).add(r.section||""); });
-  const tree=Object.keys(h).sort().map(city=>({label:city,children:[...h[city]].sort().map(sec=>({label:sec||"（未分行政區）",key:city+"|"+sec}))}));
-  makeTree("pop-region","btn-region",tree,selRegion,"建案地區");
-}
-function buildAdTree(){ makeTree("pop-ad","btn-ad",[{label:"站內廣告",key:"on-site"},{label:"再行銷",key:"remarketing"},{label:"數媒-站內",key:"digitm"},{label:"數媒-再行銷",key:"agent"}],selAd,"廣告類型",renderAll); }
-
-// ---------- 篩選 ----------
-function curMonths(){const mo=val("f-month"),qt=val("f-quarter");if(mo)return[+mo];if(qt)return PERIODS[qt];return null;}
-function curLabel(){const mo=val("f-month"),qt=val("f-quarter");if(mo)return mo+"月";if(qt)return qt;return "全年";}
-const AD_NAME={"on-site":"站內廣告","remarketing":"再行銷","digitm":"數媒-站內","agent":"數媒-再行銷"};
-function ctxText(){const p=["期間 <b>"+curLabel()+"</b>"];
-  if(selSales.size)p.push("業務 <b>"+[...selSales].slice(0,3).join("、")+(selSales.size>3?" 等"+selSales.size+"人":"")+"</b>");
-  if(selRegion.size)p.push("地區 <b>"+selRegion.size+" 區</b>");
-  const ch=val("f-ch"); if(ch)p.push("站台 <b>"+ch+"</b>");
-  if(selAd.size)p.push("廣告 <b>"+[...selAd].map(a=>AD_NAME[a]||a).join("、")+"</b>");
-  if(p.length===1)p.push("<b>全公司・全站台・全類型</b>");
-  return p.join("　·　");}
-function ctxHouse(){const p=["期間 <b>"+curLabel()+"</b>"];
-  if(selSales.size)p.push("業務 <b>"+[...selSales].slice(0,3).join("、")+(selSales.size>3?" 等"+selSales.size+"人":"")+"</b>");
-  if(selRegion.size)p.push("地區 <b>"+selRegion.size+" 區</b>");
-  if(p.length===1)p.push("<b>全公司</b>");
-  return p.join("　·　");}
-function matchSales(r){return selSales.size===0||selSales.has(r.sales);}
-function matchRegion(r){return selRegion.size===0||selRegion.has((r.region||"")+"|"+(r.section||""));}
-function fRows(){const ms=curMonths(),ch=val("f-ch");return ROWS.filter(r=>(!ms||ms.includes(r.m))&&(!ch||r.ch===ch)&&(!selAd.size||selAd.has(r.ad))&&matchSales(r)&&matchRegion(r));}
-function fHouse(){const ms=curMonths();return HOUSE.filter(r=>(!ms||ms.includes(r.m))&&matchSales(r)&&matchRegion(r));}
-function fOnline(){return ONLINE.filter(r=>matchSales(r)&&matchRegion(r));}
-
-function agg(rows){let s=0;const cu=new Set(),ins=new Set();for(const r of rows){s+=r.sale;if(r.cust!=-1)cu.add(r.cust);if(r.ins)ins.add(r.ins);}return{sale:s,cust:cu.size,ins:ins.size,arpu:cu.size?s/cu.size:0};}
-function groupBy(rows,f){const m={};for(const r of rows){const k=r[f]||"（未填）";(m[k]=m[k]||[]).push(r);}return Object.entries(m).map(([k,v])=>({name:k,...agg(v)})).sort((a,b)=>b.sale-a.sale);}
-function groupObj(rows,f){const m={};for(const r of rows){const k=r[f];(m[k]=m[k]||[]).push(r);}return m;}
-let _exid=0;
-function buildExpandable(tbody,tree){
-  _exid=0; let html="";
-  (function walk(nodes,depth,pid){nodes.forEach(n=>{const id="x"+(_exid++),has=n.children&&n.children.length,pad=8+depth*20;
-    html+=`<tr data-id="${id}" data-pid="${pid}" class="exrow" style="${depth>0?'display:none;':''}${depth===0?'background:#f6f8f9;font-weight:600;':''}${has?'cursor:pointer;':''}"><td style="padding-left:${pad}px">${has?'<span class="exp" style="display:inline-block;width:14px;color:#8a97a0">▸</span>':'<span style="display:inline-block;width:14px"></span>'}${n.name}</td>${n.cells}</tr>`;
-    if(has)walk(n.children,depth+1,id);});})(tree,0,"");
-  tbody.innerHTML=html||`<tr><td colspan="9" class="note">查無資料</td></tr>`;
-  tbody.querySelectorAll(".exrow").forEach(tr=>{ if(tr.querySelector(".exp")) tr.addEventListener("click",()=>exToggle(tbody,tr)); });
-}
-function exToggle(tb,tr){const id=tr.dataset.id,exp=tr.querySelector(".exp");if(!exp)return;const open=exp.textContent==="▾";exp.textContent=open?"▸":"▾";if(open){exHide(tb,id);}else{[...tb.querySelectorAll('.exrow[data-pid="'+id+'"]')].forEach(k=>k.style.display="");}}
-function exHide(tb,id){[...tb.querySelectorAll('.exrow[data-pid="'+id+'"]')].forEach(k=>{k.style.display="none";const e=k.querySelector(".exp");if(e)e.textContent="▸";exHide(tb,k.dataset.id);});}
-
-function renderAll(){ document.getElementById("status").textContent=curLabel()+" · "+fmtN(fRows().length)+" 筆"; renderPerf(); renderProj(); renderTeam(); renderWeek(); renderGoal(); if(YOY.length)renderRegion(); }
-document.getElementById("pageSel").addEventListener("change",e=>{const p=e.target.value;["perf","proj","team","okr","region","war","week","goal","admin"].forEach(x=>document.getElementById("page-"+x).classList.toggle("hide",x!==p));document.querySelector("#app > .bar").style.display=((p==="okr"||p==="war"||p==="admin")?"none":"");if(p==="okr")renderOKR();if(p==="region")renderRegion();if(p==="war")renderWar();if(p==="week")renderWeek();if(p==="goal")renderGoal();if(p==="admin")renderAdmin();});
-
-/* ══════════ V0.1 登入／角色／資料範圍（前端示範，真驗證需後端） ══════════ */
-const ROLE_LABEL={sales:"業務",team_leader:"組長",manager:"課長",admin:"管理者"};
-// 示範帳號（密碼皆 1234）；姓名需對得上資料裡的業務名，資料範圍才會真的變
-const DEMO_USERS=[
-  {acc:"godfrey",                  pw:"1234",name:"郭彥孝",role:"admin",     cls:"",     grp:""},
-  {acc:"mgr1@digitm.com.tw",       pw:"1234",name:"（業務一課 課長）",role:"manager",cls:"業務一課",grp:""},
-  {acc:"vanessachen@digitm.com.tw",pw:"1234",name:"陳怡雯",role:"team_leader",cls:"業務一課",grp:"業務一課 - 業務一組"},
-  {acc:"pennyhuang@digitm.com.tw", pw:"1234",name:"黃淑萍",role:"sales",     cls:"業務一課",grp:"業務一課 - 業務一組"}
-];
-let SESSION=null;
-/* ── Google 登入（公司信箱→角色→資料範圍） ── */
-const DOMAIN="digitm.com.tw";
-let GOOGLE_CLIENT_ID=localStorage.getItem("dm_gid")||"402828273314-ksole88krq46gul2659pd2a8rcoac1g3.apps.googleusercontent.com";   // DigitM OAuth 用戶端（可公開）
-const ADMIN_EMAILS=(localStorage.getItem("dm_admins")||"godfrey_guo@digitm.com.tw").split(",").map(s=>s.trim().toLowerCase()).filter(Boolean); // 管理者信箱（預設 Godfrey；可用 localStorage dm_admins 覆蓋，逗號分隔）
-const EMAIL_USERS={"vivi@digitm.com.tw":{name:"彭莉芳",role:"sales",cls:"業務一課",grp:"業務一課 - 業務一組"},"pennyhuang@digitm.com.tw":{name:"黃淑萍",role:"sales",cls:"業務一課",grp:"業務一課 - 業務一組"},"miachao@digitm.com.tw":{name:"趙紹亨",role:"sales",cls:"業務一課",grp:"業務一課 - 業務一組"},"rebichung@digitm.com.tw":{name:"仲綨柱",role:"sales",cls:"業務一課",grp:"業務一課 - 業務一組"},"ivy.tseng@digitm.com.tw":{name:"曾方音",role:"sales",cls:"業務一課",grp:"業務一課 - 業務二組"},"dirochien@digitm.com.tw":{name:"簡順隆",role:"sales",cls:"業務一課",grp:"業務一課 - 業務二組"},"fifiyang@digitm.com.tw":{name:"楊儀菲",role:"sales",cls:"業務一課",grp:"業務一課 - 業務二組"},"vanessachen@digitm.com.tw":{name:"陳怡雯",role:"team_leader",cls:"業務一課",grp:"業務一課 - 業務一組"},"aviis_tseng@digitm.com.tw":{name:"曾家羚",role:"sales",cls:"業務二課",grp:"業務二課 - 業務三組"},"j77725@digitm.com.tw":{name:"陳琬臻",role:"sales",cls:"業務二課",grp:"業務二課 - 業務三組"},"unalu@digitm.com.tw":{name:"呂佩宜",role:"sales",cls:"業務二課",grp:"業務二課 - 業務三組"},"jennyjian@digitm.com.tw":{name:"簡艷華",role:"sales",cls:"業務二課",grp:"業務二課 - 業務四組"},"wendyteng@digitm.com.tw":{name:"鄧瑋婷",role:"sales",cls:"業務二課",grp:"業務二課 - 業務四組"},"appleyao@digitm.com.tw":{name:"姚蘋芸",role:"sales",cls:"業務二課",grp:"業務二課 - 業務四組"},"kellychao@digitm.com.tw":{name:"趙斯蓓",role:"sales",cls:"設計課",grp:"設計課 - 設計組"},"aprilchang@digitm.com.tw":{name:"張瑋秦",role:"sales",cls:"設計課",grp:"設計課 - 設計組"},"yuralee@digitm.com.tw":{name:"李抒姮",role:"sales",cls:"設計課",grp:"設計課 - 設計組"},"erinkuo@digitm.com.tw":{name:"郭宴菱",role:"sales",cls:"設計課",grp:"設計課 - 設計組"}};
-function initGoogle(){
-  const wrap=document.getElementById("gwrap");if(!wrap)return;
-  if(!GOOGLE_CLIENT_ID){wrap.innerHTML='<div class="note" style="text-align:center;line-height:1.7">尚未啟用 Google 登入。<br><a class="u" style="cursor:pointer;color:#263E44;text-decoration:underline" onclick="setGid()">管理者點此貼上 Client ID 啟用</a></div>';return;}
-  if(!(window.google&&google.accounts&&google.accounts.id)){setTimeout(initGoogle,300);return;}
-  if(!document.getElementById("gbtn")){wrap.innerHTML='<div id="gbtn" style="display:flex;justify-content:center;min-height:44px"></div>';}
-  try{google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:onGoogle,hosted_domain:DOMAIN,auto_select:false});
-    google.accounts.id.renderButton(document.getElementById("gbtn"),{theme:"filled_blue",size:"large",text:"signin_with",shape:"pill",locale:"zh_TW"});
-  }catch(e){wrap.innerHTML='<div class="note" style="text-align:center;color:#b53b65">Google 登入初始化失敗：'+e.message+'　<a class="u" style="cursor:pointer" onclick="setGid()">重設 Client ID</a></div>';}
-}
-function setGid(){const v=prompt("貼上 Google OAuth Client ID（結尾 .apps.googleusercontent.com）：",GOOGLE_CLIENT_ID||"");if(v!==null){localStorage.setItem("dm_gid",v.trim());const a=prompt("（選填）管理者信箱，多個用逗號分隔，例：boss@digitm.com.tw",localStorage.getItem("dm_admins")||"");if(a!==null)localStorage.setItem("dm_admins",a.trim());location.reload();}}
-function b64u(s){s=s.replace(/-/g,"+").replace(/_/g,"/");while(s.length%4)s+="=";return decodeURIComponent(escape(atob(s)));}
-function onGoogle(resp){
-  try{
-    const p=JSON.parse(b64u((resp.credential||"").split(".")[1]||""));
-    const email=(p.email||"").toLowerCase(),name=p.name||email;
-    if(!email.endsWith("@"+DOMAIN)){document.getElementById("lg-err").textContent="請用公司信箱（@"+DOMAIN+"）登入，此帳號為 "+email;return;}
-    let u=EMAIL_USERS[email];
-    if(ADMIN_EMAILS.includes(email))u={name:(u&&u.name)||name,role:"admin",cls:"",grp:""};
-    if(!u)u={name:name,role:"sales",cls:"",grp:""}; // 網域內但不在名單：暫給業務、以姓名對範圍
-    u=Object.assign({acc:email,gmail:true},u);
-    localStorage.setItem("dm_session",JSON.stringify(u));applySession(u);
-  }catch(e){document.getElementById("lg-err").textContent="Google 登入解析失敗："+e.message;}
-}
-// 由 ROWS 推每位業務所屬 課／組
-function orgMap(){const m={};ROWS.forEach(r=>{if(r.sales)m[r.sales]={cls:r.cls,grp:r.grp};});return m;}
-function scopeSales(u){const om=orgMap();const all=Object.keys(om);
-  if(u.role==="admin")return null;                                   // null = 全部
-  if(u.role==="manager")return all.filter(s=>om[s].cls===u.cls);
-  if(u.role==="team_leader")return all.filter(s=>om[s].grp===u.grp);
-  return [u.name];                                                    // 業務：只有自己
-}
-function scopeText(u){if(u.role==="admin")return"全台所有業務";if(u.role==="manager")return u.cls+"（全部組別）";if(u.role==="team_leader")return u.grp.split(" - ").pop()+"（本組）";return"僅本人（"+u.name+"）";}
-function doLogin(){const a=val("lg-acc").trim(),p=val("lg-pw").trim();const u=DEMO_USERS.find(x=>x.acc===a&&x.pw===p);
-  if(!u){document.getElementById("lg-err").textContent="帳號或密碼錯誤（示範密碼：1234）";return;}
-  localStorage.setItem("dm_session",JSON.stringify(u));applySession(u);}
-function logout(){localStorage.removeItem("dm_session");SESSION=null;location.reload();}
-function gateAuth(){document.getElementById("lg-demo").innerHTML="<b>示範帳號</b>（密碼皆 1234）：<br>"+DEMO_USERS.map(u=>'<span class="u" onclick="fillLogin(\''+u.acc+'\')">'+u.acc+'</span> ＝ '+ROLE_LABEL[u.role]+(u.name.startsWith("（")?"":" "+u.name)).join("<br>");
-  const s=localStorage.getItem("dm_session");if(s){try{applySession(JSON.parse(s));return;}catch(e){}}
-  document.getElementById("login").style.display="flex";initGoogle();}
-function fillLogin(a){document.getElementById("lg-acc").value=a;document.getElementById("lg-pw").value="1234";}
-// 依角色決定可見頁面：業務只留 我的業績／我的週會／我的目標；主管以上看完整管理視角
-function allowedPages(role){
-  if(role==="sales")return[["perf","📈 我的業績"],["week","🗓️ 我的週會"],["goal","🎯 我的目標"],["okr","🏅 我的 OKR"]];
-  const base=[["perf","📈 業績總覽"],["proj","🏗️ 建案分析"],["team","🎯 課組戰情"],["war","📋 業務戰報"],["week","🗓️ 週會追蹤"],["goal","🎯 目標中心"],["region","🗺️ 區域歷年戰情"],["okr","🏅 OKR 考核"]];
-  if(role==="admin")base.push(["admin","🔐 使用者權限管理"]);
-  return base;
-}
-function buildPageMenu(role){
-  const sel=document.getElementById("pageSel");const opts=allowedPages(role);
-  sel.innerHTML=opts.map(o=>'<option value="'+o[0]+'">'+o[1]+'</option>').join("");
-  sel.value=opts[0][0];sel.dispatchEvent(new Event("change"));
-}
-function applySession(u){SESSION=u;
-  document.getElementById("login").style.display="none";
-  document.getElementById("app").classList.remove("hide");
-  // 頂欄使用者資訊
-  document.getElementById("whoami").innerHTML='<span>'+(u.name.startsWith("（")?ROLE_LABEL[u.role]:u.name)+'</span><span class="rl">'+ROLE_LABEL[u.role]+'</span><span class="sc">資料範圍：'+scopeText(u)+'</span>';
-  document.getElementById("logout").style.display="";
-  // 依角色設定可見頁面（業務只看自己的三頁；主管以上完整）
-  buildPageMenu(u.role);
-  // 依角色鎖定資料範圍：把 selSales 設成允許的業務，非管理者鎖住業務篩選
-  const sc=scopeSales(u);selSales.clear();
-  const sb=document.getElementById("scopebar");
-  if(sc){sc.forEach(s=>selSales.add(s));
-    sb.className="scope-b";sb.innerHTML='<span class="ic">🔒</span> 你目前的資料範圍：<b>'+scopeText(u)+'</b>　（此範圍由角色決定，正式版於資料層鎖定，無法自行擴大）';
-    const bs=document.getElementById("btn-sales");if(bs){bs.disabled=true;bs.style.opacity=.55;bs.style.cursor="not-allowed";bs.textContent="業務範圍已鎖定 🔒";}
-  }else{sb.className="scope-b hide";const bs=document.getElementById("btn-sales");if(bs){bs.disabled=false;bs.style.opacity="";bs.style.cursor="";}}
-  // OKR 範圍：業務只看自己的 OKR（鎖定），主管以上維持原本檢視對象
-  selOkr.clear();const bo=document.getElementById("btn-okr");
-  if(u.role==="sales"){selOkr.add(u.name);if(bo){bo.disabled=true;bo.style.opacity=.55;bo.style.cursor="not-allowed";}}
-  else if(bo){bo.disabled=false;bo.style.opacity="";bo.style.cursor="";}
-  if(typeof updateSalesLabel==="function")try{updateSalesLabel();}catch(e){}
-  renderAll();
-}
-function renderAdmin(){
-  const ub=document.getElementById("utbl-body");if(ub)ub.innerHTML=DEMO_USERS.map(u=>{
-    const grp=u.grp?u.grp.split(" - ").pop():(u.role==="admin"?"—":"—");
-    return '<tr><td>'+(u.name.startsWith("（")?ROLE_LABEL[u.role]+"示範":u.name)+'</td><td>'+u.acc+'</td><td class="rl2">'+ROLE_LABEL[u.role]+'</td><td>'+(u.cls||"全台")+'</td><td>'+grp+'</td><td><span class="st-on">● 啟用</span></td></tr>';
-  }).join("");
-  const M=[
-    ["業績金額","DOS 系統","sys","每月自動結算，業務不用填"],
-    ["再行銷業績","DOS 系統","sys","自動歸類廣告類型計算"],
-    ["客戶數／客單價","DOS 系統","sys","依成交客戶自動統計"],
-    ["目標達成率","系統計算","sys","實際 ÷ 目標，自動比對"],
-    ["半年／週目標","主管（目標中心）","man","主管設定方向，業務不設自己的目標"],
-    ["OKR / KR","主管（目標中心）","man","主管設定，季度 Review"],
-    ["Pipeline 未來預估","業務（週會）","man","系統帶 DOS 底稿，業務補未來"],
-    ["包套方案登錄","業務（週會）","man","系統不知道的成交內容"],
-    ["本週三件必做","業務（週會）","man","執行追蹤，業務自填"],
-  ];
-  const mb=document.getElementById("matrix-body");if(mb)mb.innerHTML=M.map(r=>'<tr><td style="text-align:left">'+r[0]+'</td><td style="text-align:left">'+r[1]+'</td><td style="text-align:center"><span class="bd '+(r[2]==="sys"?"badge-sys":"badge-man")+'">'+(r[2]==="sys"?"系統自動算":"人工填")+'</span></td><td style="text-align:left;color:#5a6675">'+r[3]+'</td></tr>').join("");
-}
-
-// ---------- 業績總覽 ----------
-/* ── 業績總覽：點 KPI 就地展開「算式＋可核對明細」（覆核用；隨篩選連動） ── */
-let PDKEY=null, PDDATA={head:[],rows:[],name:"明細"};
-function togglePerfDetail(k){if(PDKEY===k){closePerfDetail();return;}PDKEY=k;renderPerfDetail(k);}
-function closePerfDetail(){PDKEY=null;const el=document.getElementById("perf-detail");if(el){el.className="hide";el.innerHTML="";}}
-function buildPerfDetail(k){const rows=fRows();
-  if(k==="cust"){const custSet=new Set(),bnameSet=new Set();rows.forEach(r=>{if(r.cust!==-1)custSet.add(r.cust);const b=(INSDET[String(r.ins||"").replace(/^number:/,"")]||{}).p;if(b)bnameSet.add(b);});
-    const by={};rows.forEach(r=>{if(r.cust===-1)return;const det=INSDET[String(r.ins||"").replace(/^number:/,"")]||{};const bname=det.p||"";const key=(r.customer||"")+"||"+bname;const o=by[key]=by[key]||{cust:r.customer||"(未填)",name:bname,sales:r.sales||"",s:0,ins:new Set()};o.s+=r.sale;if(r.ins)o.ins.add(r.ins);if(!o.sales&&r.sales)o.sales=r.sales;});
-    const list=Object.values(by).sort((a,b)=>b.s-a.s);
-    return {title:"建案數",formula:`建案數 ＝ 去重建案名 ＝ <b>${fmtN(bnameSet.size)}</b> 個　·　客戶 ＝ <b>${fmtN(custSet.size)}</b> 家（去重客戶）`,note:"以建案名為主的「建案 × 客戶」明細（建案名以委刊單編號對應 raw；非房產無建案名）。建案名去重＝建案數、客戶去重＝家數。",head:["建案名","客戶","業務","業績","委刊單數"],rows:list.map(o=>[o.name||"(非房產/無)",o.cust,o.sales,fmtN(o.s),fmtN(o.ins.size)]),name:"客戶建案明細"};}
-  if(k==="ins"){const by={};rows.forEach(r=>{if(!r.ins)return;const o=by[r.ins]=by[r.ins]||{no:String(r.ins).replace(/^number:/,""),cust:r.customer||"",sales:r.sales||"",ch:new Set(),s:0};o.s+=r.sale;if(r.ch)o.ch.add(r.ch);});
-    const list=Object.values(by).sort((a,b)=>b.s-a.s);
-    return {title:"委刊單數",formula:`委刊單數 ＝ 去重委刊單 ＝ <b>${fmtN(list.length)}</b> 張`,note:"客戶名稱／建案名(產品名稱) 來自 raw 已簽約報表，以委刊單編號對應。",head:["委刊單號","客戶名稱","建案名/產品名稱","業務","站台","業績"],rows:list.map(o=>{const d=INSDET[o.no]||{};return [o.no,d.c||o.cust,d.p||"",o.sales,[...o.ch].join("、"),fmtN(o.s)];}),name:"委刊單明細"};}
-  if(k==="arpu"){const HB=fHouse();let hs=0;const by={};HB.forEach(r=>{hs+=r.sale;if(r.region&&r.section){const o=by[r.pid]=by[r.pid]||{pid:r.pid,name:r.pname||"",region:r.region,section:r.section,sales:r.sales||"",s:0};o.s+=r.sale;if(!o.name&&r.pname)o.name=r.pname;}});
-    const list=Object.values(by).sort((a,b)=>b.s-a.s);const N=list.length,arpu=N?Math.round(hs/N):0;
-    return {title:"客單價(每案)",formula:`房產業績 <b>${fmtN(hs)}</b> 元 ÷ 合作建案 <b>${fmtN(N)}</b> 案 ＝ <b>${fmtN(arpu)}</b> 元/案`,note:"建案名來自 raw 房產明細（產品名稱）。分子＝房產全部已簽約業績；分母＝有行政區的合作建案（逐列數＝分母、金額加總≈分子）。",head:["建案名","縣市","行政區","業務","該案房產業績"],rows:list.map(o=>[o.name||"("+o.pid+")",o.region,o.section,o.sales,fmtN(o.s)]),name:"客單價_建案明細"};}
-  return {title:"",formula:"",head:[],rows:[],name:"明細"};
-}
-function renderPerfDetail(k){const d=buildPerfDetail(k);PDDATA=d;const el=document.getElementById("perf-detail");if(!el)return;el.className="card";
-  el.innerHTML=`<div class="card-head"><h2>🔎 ${d.title} 算式與明細（${fmtN(d.rows.length)} 筆）</h2><span><button onclick="dlPerfDetail()">⬇ 下載 CSV</button> <button onclick="closePerfDetail()">收合 ▲</button></span></div>`+
-    `<div class="cap">${d.formula}　<span style="color:#9aa3ad">（隨上方篩選連動；選哪個業務/月份就看那個範圍）</span>${d.note?`<br><span style="color:#8a6300">${d.note}</span>`:""}</div>`+
-    `<div class="tbl-wrap"><table><thead><tr>${d.head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${d.rows.length?d.rows.map(r=>`<tr>${r.map(c=>`<td>${c==null?"":c}</td>`).join("")}</tr>`).join(""):`<tr><td class="note" colspan="${d.head.length}">查無資料</td></tr>`}</tbody></table></div>`;}
-function dlPerfDetail(){const esc=c=>'"'+String(c==null?"":c).replace(/"/g,'""')+'"';const csv=[PDDATA.head.map(esc).join(",")].concat(PDDATA.rows.map(r=>r.map(esc).join(","))).join("\n");const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["﻿"+csv],{type:"text/csv"}));a.download=PDDATA.name+".csv";document.body.appendChild(a);a.click();a.remove();}
-function renderPerf(){
-  const rows=fRows(),a=agg(rows);
-  // 客單價＝房產業績÷合作建案數（房產口徑；來自 fHouse）
-  const HB=fHouse();
-  const hArpuMap=key=>{const m={};HB.forEach(r=>{const k=r[key];if(k==null||k==="")return;(m[k]=m[k]||{s:0,p:new Set()});m[k].s+=r.sale;if(r.region&&r.section)m[k].p.add(r.pid);});const o={};for(const k in m)o[k]=m[k].p.size?Math.round(m[k].s/m[k].p.size):null;return o;};
-  let hs=0;const hp=new Set();HB.forEach(r=>{hs+=r.sale;if(r.region&&r.section)hp.add(r.pid);});
-  const kpiArpu=hp.size?Math.round(hs/hp.size):0;
-  const bnameSet=new Set();rows.forEach(r=>{const b=(INSDET[String(r.ins||"").replace(/^number:/,"")]||{}).p;if(b)bnameSet.add(b);});
-  const TT={perf:"總業績＝以業務(人)認列——把該範圍名下所有已簽約業績全部加總，不因站台或產業排除任何項目（591 房產＋周邊 100／8891／518／數媒等都計入）。",cust:"建案數＝去重的『建案名稱』個數，含全產業（房產＋車＋設計等，以委刊單編號對應建案名）。點開可看客戶與建案的明細，含去重客戶家數對照。",arpu:"客單價(每案)＝房產業績 ÷ 合作建案棟數（去重，只算房產）。分母是『建案棟數』不是『客戶家數』；因一家代銷常有多個建案，建案數通常比客戶數多，兩者不同屬正常。"};
-  const kdefs=[["總業績",fmtWan(a.sale)+"元",fmtN(a.sale),null,'perf'],["建案數",fmtN(bnameSet.size),"distinct 去重",'cust','cust'],["客單價(每案)",fmtWan(kpiArpu)+"元","房產業績÷建案 "+fmtN(hp.size)+" 案",'arpu','arpu'],["委刊單數",fmtN(a.ins),"distinct 去重",'ins',null]];
-  document.getElementById("perf-kpis").innerHTML=kdefs.map(k=>`<div class="kpi"${k[3]?` style="cursor:pointer" onclick="togglePerfDetail('${k[3]}')" title="點看算式與明細"`:""}><div class="k">${k[0]}${TT[k[4]]?` <span class="ii" title="${TT[k[4]]}" onclick="event.stopPropagation()">ⓘ</span>`:""}${k[3]?' <span style="font-weight:400;color:#9aa3ad">▾</span>':""}</div><div class="v">${k[1]}</div><div class="n">${k[2]}</div></div>`).join("");
-  if(typeof PDKEY!=="undefined"&&PDKEY)renderPerfDetail(PDKEY);
-  const mon={};for(const r of rows)mon[r.m]=(mon[r.m]||0)+r.sale;
-  const labels=[...Array(12)].map((_,i)=>(i+1)+"月"),data=labels.map((_,i)=>Math.round(mon[i+1]||0));
-  if(trendChart)trendChart.destroy();
-  trendChart=new Chart(document.getElementById("trend"),{type:"bar",data:{labels,datasets:[{data,backgroundColor:"#263E44",borderRadius:4}]},plugins:[wanLabel],options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:18}},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>"NT$"+fmtN(c.raw)}}},scales:{y:{ticks:{callback:v=>(v/1e6)+"M"}}}}});
-  const cg=groupBy(rows,"ch").slice(0,8);
-  if(chChart)chChart.destroy();
-  chChart=new Chart(document.getElementById("chCh"),{type:"doughnut",data:{labels:cg.map(x=>x.name),datasets:[{data:cg.map(x=>Math.round(x.sale)),backgroundColor:["#263E44","#4d6f77","#7a9aa1","#b5c400","#3a5f68","#a7c0c5","#5f8089","#cdd8da"]}]},plugins:[wanLabel],options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"right",labels:{font:{size:11},boxWidth:12}},tooltip:{callbacks:{label:c=>c.label+"：NT$"+fmtN(c.raw)}}}}});
-  const tbD=document.querySelector("#dimtbl tbody"), tot=rows.reduce((s,r)=>s+r.sale,0)||1;
-  const pc=(a,arpuVal)=>`<td>${fmtN(a.sale)}</td><td>${(a.sale/tot*100).toFixed(1)}%</td><td>${fmtN(a.cust)}</td><td>${arpuVal==null?"—":fmtN(arpuVal)}</td><td>${fmtN(a.ins)}</td>`;
-  const DZ=c=>(c||"").includes("設計");  // 設計課→客戶基準（無建案概念）
-  if(curDim==="cls"){
-    const G=(arr,k)=>groupObj(arr,k), mCls=hArpuMap("cls"),mGrp=hArpuMap("grp"),mSal=hArpuMap("sales");
-    const tree=Object.entries(G(rows,"cls")).map(([cls,cr])=>({name:cls||"（未填）",st:agg(cr),cr,cls})).sort((a,b)=>b.st.sale-a.st.sale).map(c=>{const dz=DZ(c.cls);return {name:c.name,cells:pc(c.st,dz?c.st.arpu:mCls[c.cls]),children:
-      Object.entries(G(c.cr,"grp")).map(([grp,g2])=>({name:grp,st:agg(g2),g2,grp})).sort((a,b)=>b.st.sale-a.st.sale).map(g=>({name:(g.name||"").replace("業務","").replace(" - ","-"),cells:pc(g.st,dz?g.st.arpu:mGrp[g.grp]),children:
-        Object.entries(G(g.g2,"sales")).map(([s,s2])=>({name:s||"（未填）",st:agg(s2),s})).sort((a,b)=>b.st.sale-a.st.sale).map(s=>({name:s.name,cells:pc(s.st,dz?s.st.arpu:mSal[s.s])}))
-      }))};
-    });
-    buildExpandable(tbD,tree);
-  } else {
-    const arr=groupBy(rows,curDim), hasP={grp:1,sales:1,region:1}, map=hasP[curDim]?hArpuMap(curDim):null;
-    const scl={}; if(curDim==="sales")rows.forEach(r=>{scl[r.sales]=r.cls;});
-    const pick=x=>{ if(curDim==="grp")return DZ(x.name)?x.arpu:(map?map[x.name]:null);
-      if(curDim==="sales")return scl[x.name]==="設計課"?x.arpu:(map?map[x.name]:null);
-      if(curDim==="region")return map?map[x.name]:null; return null; };
-    tbD.innerHTML=arr.map(x=>`<tr><td>${x.name}</td>${pc(x,pick(x))}</tr>`).join("");
-  }
-  // ── 說明列（隨篩選即時變）──
-  const ctx=ctxText();
-  let bestM=0,bestV=-1;for(const k in mon){if(mon[k]>bestV){bestV=mon[k];bestM=k;}}
-  const topCh=cg[0], dimNm=(document.querySelector("#dimtabs .tab.active")||{}).textContent||"";
-  const dimN=(curDim==="cls")?"":groupBy(rows,curDim).length;
-  setCap("cap-kpi",`目前範圍：${ctx}。<b>總業績</b>＝全產業已簽約加總；<b>建案數・委刊單</b>為 distinct 去重；<b>客單價(每案)</b>＝<u>房產業績÷合作建案數</u>（房產口徑，與各業務比較表一致，不受站台/廣告篩選影響）。共 ${fmtN(rows.length)} 筆明細。`);
-  setCap("cap-trend",`每根柱＝該月<b>已簽約業績</b>（${ctx}）。目前最高：<b>${bestM}月</b>（${fmtWan(bestV||0)}元）。切月/季會只留該區間。`);
-  setCap("cap-ch",topCh?`各站台業績占比（${ctx}）。最大站台：<b>${topCh.name}</b>，占 <b>${(topCh.sale/(a.sale||1)*100).toFixed(1)}%</b>（${fmtWan(topCh.sale)}元）。`:`各站台業績占比（${ctx}）。`);
-  setCap("cap-dim",`依<b>【${dimNm}】</b>拆解（${ctx}）：<b>占比</b>＝該列業績÷篩選後總業績；<b>客單價</b>＝房產課(一/二課)用<u>業績÷建案數</u>、<b>設計課</b>用<u>業績÷客戶數</u>（設計課無建案）；客戶/產業/版位維度顯示「—」${curDim==="cls"?"。點列可展開 課→組→員":"，共 "+dimN+" 列"}。`);
-}
-function setCap(id,html){const e=document.getElementById(id);if(e)e.innerHTML=html;}
-function dlDim(){const rows=fRows(),arr=groupBy(rows,curDim),tot=arr.reduce((s,x)=>s+x.sale,0)||1,nm=document.querySelector("#dimtabs .tab.active").textContent;
-  const HB=fHouse(),hasP={cls:1,grp:1,sales:1,region:1},map={};if(hasP[curDim]){HB.forEach(r=>{const k=r[curDim];if(k==null||k==="")return;(map[k]=map[k]||{s:0,p:new Set()});map[k].s+=r.sale;if(r.region&&r.section)map[k].p.add(r.pid);});}
-  const scl={}; if(curDim==="sales")rows.forEach(r=>{scl[r.sales]=r.cls;});
-  const dz=n=>(curDim==="grp"&&n.includes("設計"))||(curDim==="sales"&&scl[n]==="設計課")||(curDim==="cls"&&n.includes("設計"));
-  const ap=(n,x)=>{if(dz(n))return x.arpu;const m=map[n];return m&&m.p.size?Math.round(m.s/m.p.size):"";};
-  dl(`業績明細_${curLabel()}_${nm}.csv`,[[nm,"業績","占比","客戶數","客單價","委刊單"],...arr.map(x=>[x.name,x.sale,(x.sale/tot*100).toFixed(2)+"%",x.cust,ap(x.name,x),x.ins])]);}
-
-// ---------- 建案分析 ----------
-function projStats(house,online){
-  const coop=new Set(),coopv=new Set();let sale=0;const cust=new Set();
-  for(const r of house){ sale+=r.sale; if(r.cust!=-1)cust.add(r.cust);
-    if(r.region&&r.section){ coop.add(r.pid); if(r.value==="有價值")coopv.add(r.pid); } }
-  const on=online.length, onv=online.filter(r=>r.value==="有價值").length;
-  return {coop:coop.size,coopv:coopv.size,coopn:coop.size-coopv.size,online:on,onlinev:onv,
-    pen:on?coop.size/on*100:null, penv:onv?coopv.size/onv*100:null, sale:Math.round(sale),cust:cust.size,arpu:coop.size?Math.round(sale/coop.size):0};
-}
-function renderProj(){
-  const h=fHouse(),o=fOnline(),s=projStats(h,o);
-  document.getElementById("proj-kpis").innerHTML=[["合作建案數",fmtN(s.coop),"房產·有縣市+行政區"],["在線建案數",fmtN(s.online),"預測系統"],["整體滲透率",(s.pen!=null?s.pen.toFixed(1)+"%":"—"),"合作÷在線"],["客單價(每案)",fmtWan(s.arpu)+"元","房產業績÷建案"],["房產業績",fmtWan(s.sale)+"元",fmtN(s.sale)]].map(k=>`<div class="kpi"><div class="k">${k[0]}</div><div class="v">${k[1]}</div><div class="n">${k[2]}</div></div>`).join("");
-  document.getElementById("proj-value").innerHTML=[["有價值合作",fmtN(s.coopv),""],["無價值合作",fmtN(s.coopn),""],["有價值在線",fmtN(s.onlinev),""],["有價值滲透率",(s.penv!=null?s.penv.toFixed(1)+"%":"—"),""]].map(k=>`<div class="kpi"><div class="k">${k[0]}</div><div class="v">${k[1]}</div><div class="n">${k[2]}</div></div>`).join("");
-  // 維度表
-  const tb=document.querySelector("#proj-tbl tbody");
-  const cell=st=>`<td>${fmtN(st.coop)}</td><td>${fmtN(st.online)}</td><td>${st.pen!=null?st.pen.toFixed(1)+"%":"—"}</td><td>${fmtN(st.coopv)}</td><td>${fmtN(st.sale)}</td><td>${fmtN(st.arpu)}</td>`;
-  const G=(arr,k)=>groupObj(arr,k);
-  const nodeFrom=(ch,co,name,kidKey)=>{const st=projStats(ch,co);const n={name,cells:cell(st)};if(kidKey){const hk=G(ch,kidKey),ok=G(co,kidKey);const ks=[...new Set([...Object.keys(hk),...Object.keys(ok)])];const nk=kidKey==="grp"?"sales":(kidKey==="section"?null:null);
-    n.children=ks.map(k=>({k,st:projStats(hk[k]||[],ok[k]||[])})).sort((a,b)=>b.st.coop-a.st.coop).map(x=>nodeFrom(hk[x.k]||[],ok[x.k]||[], (kidKey==="grp"?(x.k||"").replace("業務","").replace(" - ","-"):(x.k||"（未填）")), nk));}
-    return n;};
-  if(projDim==="region"){
-    const cities=[...new Set([...h,...o].map(r=>r.region).filter(x=>x))];
-    const tree=cities.map(c=>({c,st:projStats(h.filter(r=>r.region===c),o.filter(r=>r.region===c))})).sort((a,b)=>b.st.coop-a.st.coop).map(x=>{
-      const ch=h.filter(r=>r.region===x.c),co=o.filter(r=>r.region===x.c);
-      const secs=[...new Set([...ch,...co].map(r=>r.section))];
-      return {name:x.c,cells:cell(x.st),children:secs.map(sec=>({sec,st:projStats(ch.filter(r=>r.section===sec),co.filter(r=>r.section===sec))})).sort((a,b)=>b.st.coop-a.st.coop).map(s=>({name:s.sec||"（未分區）",cells:cell(s.st)}))};
-    });
-    buildExpandable(tb,tree);
-  } else if(projDim==="cls"){
-    const hc=G(h,"cls"),oc=G(o,"cls");const clss=[...new Set([...Object.keys(hc),...Object.keys(oc)])];
-    const tree=clss.map(c=>({c,st:projStats(hc[c]||[],oc[c]||[])})).sort((a,b)=>b.st.coop-a.st.coop).map(x=>nodeFrom(hc[x.c]||[],oc[x.c]||[],x.c,"grp"));
-    buildExpandable(tb,tree);
-  } else {
-    const hb=G(h,projDim),ob=G(o,projDim);const names=[...new Set([...Object.keys(hb),...Object.keys(ob)])];
-    const rowsOut=names.map(nm=>({name:nm||"（未填）",...projStats(hb[nm]||[],ob[nm]||[])})).sort((a,b)=>b.coop-a.coop);
-    tb.innerHTML=rowsOut.map(x=>`<tr><td>${x.name}</td>${cell(x)}</tr>`).join("");
-  }
-  const ctx=ctxHouse(), pdNm=(document.querySelector("#proj-tabs .tab.active")||{}).textContent||"";
-  setCap("cap-proj-kpi",`房產類建案指標（${ctx}）。<b>合作建案</b>＝已簽約房產且有縣市+行政區、去重；<b>在線建案</b>為 8/7 預測系統快照（不隨月份變）；<b>滲透率</b>＝合作÷在線；<b>客單價</b>＝房產業績÷建案數（每案）。`);
-  setCap("cap-proj-dim",`依<b>【${pdNm}】</b>拆解（${ctx}）：各列為該分類的合作/在線/滲透率/有價值合作/房產業績/客單價${projDim==="cls"||projDim==="region"?"。點列可展開下一層":""}。`);
-}
-function dlProj(){const h=fHouse(),o=fOnline(),key=projDim,hb={},ob={};h.forEach(r=>{(hb[r[key]]=hb[r[key]]||[]).push(r);});o.forEach(r=>{(ob[r[key]]=ob[r[key]]||[]).push(r);});const names=[...new Set([...Object.keys(hb),...Object.keys(ob)])];const rowsOut=names.map(nm=>{const st=projStats(hb[nm]||[],ob[nm]||[]);return[nm,st.coop,st.online,(st.pen!=null?st.pen.toFixed(1)+"%":""),st.coopv,st.sale,st.arpu];});dl(`建案分析_${key}.csv`,[["名稱","合作建案","在線建案","滲透率","有價值合作","房產業績","客單價"],...rowsOut]);}
-
-// ---------- 課組戰情 ----------
-const ORDER=["業務一課 - 業務一組","業務一課 - 業務二組","業務二課 - 業務三組","業務二課 - 業務四組","設計課 - 設計組"];
-function tKey(g){return "dm_target_2026_"+g;} function getTarget(g){const v=localStorage.getItem(tKey(g));return v?+v:null;}
-// ── 各季目標（新制）──
-function qKey(g,q){return "dm_qtgt_2026_"+g+"_q"+q;}
-function getQ(g,q){const v=localStorage.getItem(qKey(g,q));return v?+v:null;}
-function hasQ(g){return [1,2,3,4].some(q=>getQ(g,q)!=null);}
-function yearQ(g){return [1,2,3,4].reduce((s,q)=>s+(getQ(g,q)||0),0);}
-// 依目前篩選期間算目標：逐月累加（該月所屬季目標÷3）；無季目標則回退舊全年目標按月比例
-function periodTarget(g){
-  const ms=curMonths()||[1,2,3,4,5,6,7,8,9,10,11,12];
-  if(hasQ(g)){let s=0;ms.forEach(m=>{const q=Math.ceil(m/3);s+=(getQ(g,q)||0)/3;});return Math.round(s);}
-  const old=getTarget(g); if(old==null)return null; return Math.round(old*ms.length/12);
-}
-function renderQtgt(){
-  const tb=document.querySelector("#qtgt-tbl tbody"); if(!tb)return; tb.innerHTML="";
-  ORDER.forEach(g=>{
-    const nm=g.replace("業務","").replace(" - ","-");
-    const inp=q=>`<input type="number" data-g="${g}" data-q="${q}" value="${getQ(g,q)!=null?getQ(g,q):''}" placeholder="—" style="width:104px;text-align:right;padding:4px 6px;border:1px solid #d1d5db;border-radius:6px;font:inherit;font-size:12.5px">`;
-    const tr=document.createElement("tr");
-    tr.innerHTML=`<td>${nm}</td><td>${inp(1)}</td><td>${inp(2)}</td><td>${inp(3)}</td><td>${inp(4)}</td><td style="font-weight:700;color:#263E44">${fmtN(yearQ(g))}</td>`;
-    tb.appendChild(tr);
-  });
-  tb.querySelectorAll("input").forEach(i=>i.addEventListener("input",()=>{const v=i.value?+i.value:null;if(v)localStorage.setItem(qKey(i.dataset.g,i.dataset.q),v);else localStorage.removeItem(qKey(i.dataset.g,i.dataset.q));renderQtgt();renderTeam();}));
-}
-function renderTeam(){
-  renderQtgt();
-  const rows=fRows(); const byg={};
-  rows.forEach(r=>{(byg[r.grp]=byg[r.grp]||[]).push(r);});
-  // 房產（滲透率）依篩選
-  const h=fHouse(),o=fOnline(),hb={},ob={};
-  h.forEach(r=>{(hb[r.grp]=hb[r.grp]||[]).push(r);}); o.forEach(r=>{(ob[r.grp]=ob[r.grp]||[]).push(r);});
-  const tb=document.querySelector("#team-tbl tbody"); tb.innerHTML="";
-  ORDER.forEach(full=>{
-    const rws=byg[full]||[]; const a=agg(rws);
-    let onsite=0,remkt=0; rws.forEach(r=>{ if(r.ad==="on-site")onsite+=r.sale; else if(r.ad==="remarketing"||r.ad==="agent")remkt+=r.sale; });
-    const st=projStats(hb[full]||[],ob[full]||[]);
-    const gr=(PDATA.growth[full]||{}).growth, arpuFy=(PDATA.growth[full]||{}).arpu2026;
-    const name=full.replace("業務","").replace(" - ","-");
-    const tgt=periodTarget(full), rate=tgt?(a.sale/tgt*100).toFixed(1)+"%":"—", rc=tgt?(a.sale>=tgt?"#1f7a4d":"#b53b65"):"";
-    const grTxt=gr!=null?(gr>0?"+":"")+gr+"%":"—", gc=gr!=null?(gr>=0?"#1f7a4d":"#b53b65"):"";
-    const tr=document.createElement("tr");
-    const dz=full.includes("設計"), arpuV=dz?a.arpu:st.arpu;
-    tr.innerHTML=`<td>${name}</td><td>${fmtN(a.sale)}</td><td style="text-align:right">${tgt!=null?fmtN(tgt):"<span style='color:#98a2b3'>未設</span>"}</td><td class="rate" style="font-weight:700;color:${rc}">${rate}</td><td>${fmtN(arpuV)}<span style="font-size:10px;color:#9aa3ad">${dz?" /客戶":" /案"}</span></td><td style="font-weight:700;color:${gc}">${grTxt}</td><td>${st.pen!=null?st.pen.toFixed(1)+"%":"—"}</td><td>${fmtN(st.coopv)}</td><td>${fmtN(st.coopn)}</td><td>${a.sale?(onsite/a.sale*100).toFixed(1):0}%</td><td>${a.sale?(remkt/a.sale*100).toFixed(1):0}%</td>`;
-    tb.appendChild(tr);
-  });
-  setCap("cap-team",`各課組於【${ctxText()}】的表現。<b>目標</b>依所選期間累加（H1=Q1+Q2、全年=四季、單月=該季÷3）；<b>達成率</b>＝該期間業績÷該期間目標。<b>客單價</b>：房產課(一/二課)＝業績÷建案數，<b>設計課</b>＝業績÷客戶數（隨期間）。<b>成長率</b>＝2025vs2026 同基準比較（房產課建案基準、設計課客戶基準）；滲透率、有無價值為房產7月。`);
-}
-function dlTeam(){const rows=fRows(),byg={};rows.forEach(r=>{(byg[r.grp]=byg[r.grp]||[]).push(r);});const h=fHouse(),o=fOnline(),hb={},ob={};h.forEach(r=>{(hb[r.grp]=hb[r.grp]||[]).push(r);});o.forEach(r=>{(ob[r.grp]=ob[r.grp]||[]).push(r);});
-  const out=ORDER.map(full=>{const a=agg(byg[full]||[]);let on=0,re=0;(byg[full]||[]).forEach(r=>{if(r.ad==="on-site")on+=r.sale;else if(r.ad==="remarketing"||r.ad==="agent")re+=r.sale;});const st=projStats(hb[full]||[],ob[full]||[]);const g=(PDATA.growth[full]||{});const t=periodTarget(full);return [full.replace("業務","").replace(" - ","-"),a.sale,(t||""),(t?(a.sale/t*100).toFixed(1)+"%":""),(full.includes("設計")?a.arpu:st.arpu),(g.growth!=null?g.growth+"%":""),(st.pen!=null?st.pen.toFixed(1)+"%":""),st.coopv,st.coopn,(a.sale?(on/a.sale*100).toFixed(1):0)+"%",(a.sale?(re/a.sale*100).toFixed(1):0)+"%"];});
-  dl("課組戰情.csv",[["課組","業績總額","目標","達成率","客單價(房產÷建案,設計÷客戶)","客單價成長率","滲透率","有價值合作","無價值合作","站內占比","再行銷占比"],...out]);}
-
-// ---------- 週會追蹤 ----------
-const H2M=[7,8,9,10,11,12], NWK=26;
-const PLANS=["591站內＋再行銷","591站內＋數媒","站內＋再行銷＋數媒","影音＋站內","影音＋再行銷","年度包套","客製整合方案","其他"];
-const STATUS=["提案","洽談","成交"];
-let wkChart=null;
-const wSt=k=>{try{return JSON.parse(localStorage.getItem(k)||"[]");}catch(e){return [];}};
-const wSet=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
-let SHEETDATA={pkg:null,act:null,tgt:null};
-function csvParse(t){return t.replace(/\r/g,"").split("\n").filter(x=>x.trim()).map(l=>{const o=[];let c="",q=false;for(let i=0;i<l.length;i++){const ch=l[i];if(ch==='"'){if(q&&l[i+1]==='"'){c+='"';i++;}else q=!q;}else if(ch===","&&!q){o.push(c);c="";}else c+=ch;}o.push(c);return o.map(x=>x.trim());});}
-function sheetRows(rows,headKey,cols){if(!Array.isArray(rows))return [];let hi=rows.findIndex(r=>r.some(c=>c===headKey));if(hi<0)return [];const hdr=rows[hi],ix={};cols.forEach(c=>ix[c]=hdr.indexOf(c));return rows.slice(hi+1).filter(r=>r.some(c=>c&&c.trim())).map(r=>{const o={};cols.forEach(c=>o[c]=ix[c]>=0?(r[ix[c]]||""):"");return o;});}
-const numOf=v=>+String(v||"").replace(/[^0-9.]/g,"")||0;
-function sheetId(){const eu=localStorage.getItem("dm_sheet_edit")||"";const m=eu.match(/\/d\/([a-zA-Z0-9_-]{20,})/);return m?m[1]:"";}
-async function wkFetchSheets(force){const id=sheetId();if(!id){SHEETDATA={pkg:null,act:null,tgt:null};renderWeek();if(typeof renderGoal==="function")renderGoal();return;}
-  const gv=name=>`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(name)}`;
-  const go=async u=>{try{const t=await fetch(u,{cache:"no-store"}).then(r=>r.text());return t.trim().startsWith("<")?"err":csvParse(t);}catch(e){return "err";}};
-  if(force||SHEETDATA.pkg===null)SHEETDATA.pkg=await go(gv("包套登錄"));
-  if(force||SHEETDATA.act===null)SHEETDATA.act=await go(gv("行動事項"));
-  if(force||SHEETDATA.tgt===null)SHEETDATA.tgt=await go(gv("目標設定"));
-  renderWeek();if(typeof renderGoal==="function")renderGoal();}
-function targetsMap(){const m={};if(!Array.isArray(SHEETDATA.tgt))return m;
-  if(!SHEETDATA.tgt.some(r=>r.includes("業務")&&r.includes("業績")))return m; // 沒有「業績」表頭＝不是目標設定分頁(gviz 找不到會回傳預設分頁)
-  sheetRows(SHEETDATA.tgt,"業務",["業務","業績","再行銷","包套","客戶"]).forEach(o=>{if(o.業務&&o.業務.trim())m[o.業務.trim()]={perf:numOf(o.業績),rem:numOf(o.再行銷),pkg:numOf(o.包套),cust:numOf(o.客戶)};});return m;}
-function wkT(k,def){const v=localStorage.getItem("dm_wk_"+k);return v!==null&&v!==""?+v:def;}
-function weekNo(){const s=PDATA.snapshot?new Date(PDATA.snapshot):new Date();const jul1=new Date(s.getFullYear(),6,1);return Math.max(1,Math.min(NWK,Math.ceil((s-jul1)/(7*864e5))));}
-function ctxWk(){const p=[];if(selSales.size)p.push(selSales.size+" 業務");if(selRegion.size)p.push(selRegion.size+" 區");const ch=val("f-ch");if(ch)p.push("站台 "+ch);return p.length?p.join("・"):"全台全業務";}
-function weekRows(){const ch=val("f-ch");return ROWS.filter(r=>H2M.includes(r.m)&&(!ch||r.ch===ch)&&(!selAd.size||selAd.has(r.ad))&&matchSales(r)&&matchRegion(r));}
-function lamp(r){return r>=100?"🟢":r>=85?"🟡":"🔴";}
-function renderWeek(){
-  const N=weekNo(), due=N/NWK, R=weekRows();
-  ["tperf","trem","tcombo","tcust"].forEach(k=>{const el=document.getElementById("wk-"+k);if(!el)return;if(!el.value)el.value=wkT(k,{tperf:1400,trem:150,tcombo:100,tcust:40}[k]);el.onchange=()=>{localStorage.setItem("dm_wk_"+k,el.value);renderWeek();};});
-  if(!localStorage.getItem("dm_sheet_edit"))localStorage.setItem("dm_sheet_edit","https://docs.google.com/spreadsheets/d/1V6h5NhYoXqwc2IATPvZNCFU0YcG521tFgiAGIvGgaVk/edit");
-  const eel=document.getElementById("wk-editurl");
-  if(eel){if(!eel.value)eel.value=localStorage.getItem("dm_sheet_edit")||"";eel.onchange=()=>{localStorage.setItem("dm_sheet_edit",eel.value.trim());SHEETDATA={pkg:null,act:null};wkFetchSheets(true);};}
-  const oa=document.getElementById("wk-sheet-open"),eu=localStorage.getItem("dm_sheet_edit");if(oa)oa.href=eu||"#";
-  const tPerf=wkT("tperf",1400),tRem=wkT("trem",150),tCombo=wkT("tcombo",100),tCust=wkT("tcust",40);
-  const byS={};R.forEach(r=>{const s=r.sales||"(未填)";const d=byS[s]=byS[s]||{on:0,re:0,dm:0,da:0};if(r.ad==="on-site")d.on+=r.sale;else if(r.ad==="remarketing")d.re+=r.sale;else if(r.ad==="digitm")d.dm+=r.sale;else if(r.ad==="agent")d.da+=r.sale;});
-  const ppl=Object.entries(byS).map(([s,d])=>({s,...d,tot:d.on+d.re+d.dm+d.da,rem:d.re+d.da})).sort((a,b)=>b.tot-a.tot);
-  const perf=ppl.reduce((s,x)=>s+x.tot,0)/1e4, rem=ppl.reduce((s,x)=>s+x.rem,0)/1e4, nCust=new Set(R.filter(r=>r.cust!=-1).map(r=>r.cust)).size;
-  const combo=wSt("dm_wkcombo"), done=combo.filter(c=>c.status==="成交"), comboAmt=done.reduce((s,c)=>s+(+c.amt||0),0)/1e4;
-  // ① KPI
-  const kpi=(name,tot,act,u,key)=>{const dv=tot*due,rt=dv?act/dv*100:0;return `<div class="kpi" style="border-top-color:${rt>=100?'#1f7a4d':rt>=85?'#caa500':'#b53b65'};cursor:pointer" onclick="toggleDetail('${key}')" title="點看明細（就地展開）"><div class="k">${lamp(rt)} ${name} <span style="font-weight:400;color:#9aa3ad">· 累計 ▾</span></div><div class="v">${fmtN(act)}${u}</div><div class="n">應達 ${fmtN(dv)}${u}(第${N}週) · 達成 <b>${rt.toFixed(0)}%</b></div></div>`;};
-  document.getElementById("wk-kpi").innerHTML=kpi("總業績",tPerf,perf,"萬","perf")+kpi("再行銷",tRem,rem,"萬","rem")+kpi("包套(成交)",tCombo,comboAmt,"萬","combo")+kpi("客戶數",tCust,nCust,"家","cust");
-  if(DETAIL_KEY)renderDetail(DETAIL_KEY);
-  setCap("cap-week",`目前 H2 <b>第 ${N} / ${NWK} 週</b>（快照 ${PDATA.snapshot||""}）｜範圍：${ctxWk()}。週目標＝半年目標÷26；應達＝週目標×${N}。🟢≥100% 🟡85–100% 🔴<85%。`);
-  // ② 跑速
-  const wPerf=tPerf/NWK, dueV=tPerf*due, lg=dueV-perf;
-  document.getElementById("wk-pace").innerHTML=
-    `<div class="kpi"><div class="k">半年目標</div><div class="v">${fmtN(tPerf)}萬</div><div class="n">週目標 ${wPerf.toFixed(1)}萬</div></div>`+
-    `<div class="kpi"><div class="k">理論進度</div><div class="v">${(due*100).toFixed(1)}%</div><div class="n">第 ${N}/26 週</div></div>`+
-    `<div class="kpi"><div class="k">實際進度</div><div class="v">${(perf/tPerf*100).toFixed(1)}%</div><div class="n">累計 ${fmtN(perf)}萬</div></div>`+
-    `<div class="kpi" style="border-top-color:${lg>0?'#b53b65':'#1f7a4d'}"><div class="k">${lg>0?'落後':'超前'}</div><div class="v" style="color:${lg>0?'#b53b65':'#1f7a4d'}">${fmtN(Math.abs(lg))}萬</div><div class="n">≈ ${wPerf?(Math.abs(lg)/wPerf).toFixed(1):0} 週</div></div>`;
-  const mEndWk={7:4,8:9,9:13,10:17,11:22,12:26}, byM={};R.forEach(r=>{byM[r.m]=(byM[r.m]||0)+r.sale;});
-  const snM=+((PDATA.snapshot||"").split("/")[1])||new Date().getMonth()+1;
-  const labels=[],theo=[];for(let w=1;w<=NWK;w++){labels.push("W"+w);theo.push(+(wPerf*w).toFixed(1));}
-  let cum=0;const act=Array(NWK).fill(null);for(let m=7;m<=12;m++){if(m<=snM){cum+=(byM[m]||0)/1e4;act[mEndWk[m]-1]=+cum.toFixed(1);}}
-  if(wkChart)wkChart.destroy();
-  wkChart=new Chart(document.getElementById("wk-chart"),{type:"line",data:{labels,datasets:[
-    {label:"應有累計",data:theo,borderColor:"#b5c400",borderDash:[6,4],pointRadius:0},
-    {label:"實際累計",data:act,borderColor:"#263E44",backgroundColor:"#263E44",pointRadius:4,spanGaps:true,tension:.2}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"top"},tooltip:{callbacks:{label:c=>c.dataset.label+"："+fmtN(c.raw)+"萬"}}},scales:{y:{ticks:{callback:v=>v+"萬"}}}}});
-  // ③ 再行銷
-  const remWkP=tRem/NWK/(ppl.length||1);
-  document.querySelector("#wk-rem tbody").innerHTML=ppl.map(x=>{const rm=x.rem/1e4,dueC=remWkP*N,rt=dueC?rm/dueC*100:0;
-    return `<tr><td>${x.s}</td><td><b>${fmtN(rm)}萬</b></td><td>${remWkP.toFixed(2)}萬/週</td><td>${fmtN(dueC)}萬</td><td style="font-weight:700">${lamp(rt)} ${rt.toFixed(0)}%</td><td>${x.tot?(x.rem/x.tot*100).toFixed(0):0}%</td></tr>`;}).join("")||`<tr><td colspan="6" class="note">查無資料</td></tr>`;
-  setCap("cap-wkrem",`再行銷＝站台再行銷＋數媒再行銷(累計)。週目標＝半年再行銷目標÷26÷人數；應達累計＝週目標×第${N}週(例：5.77萬×10週=57.7萬)；達成率＝再行銷累計÷應達累計；占個人＝該人再行銷÷該人總業績。`);
-  // ⑤ 個人結構 + 健康度
-  const cel=(v,t)=>`${fmtN(v)}<span style="font-size:10px;color:#9aa3ad"> ${t?(v/t*100).toFixed(0):0}%</span>`;
-  const health=x=>{const o=x.on/(x.tot||1),re=x.rem/(x.tot||1),dm=(x.dm+x.da)/(x.tot||1);
-    return `站內${o>.7?"🔴":o>.55?"🟡":"🟢"} 再行銷${re<.10?"🔴":re<.18?"🟡":"🟢"} 數媒${dm<.10?"🔴":dm<.20?"🟡":"🟢"}`;};
-  document.querySelector("#wk-prod tbody").innerHTML=ppl.map(x=>`<tr><td>${x.s}</td><td><b>${fmtN(x.tot)}</b></td><td>${cel(x.on,x.tot)}</td><td>${cel(x.re,x.tot)}</td><td>${cel(x.dm,x.tot)}</td><td>${cel(x.da,x.tot)}</td><td style="font-size:11px">${health(x)}</td></tr>`).join("")||`<tr><td colspan="7" class="note">查無資料</td></tr>`;
-  setCap("cap-wkprod",`各業務 H2 四類產品業績＋占比。健康度：站內>70%🔴過度依賴、再行銷<10%🔴弱、數媒<10%🔴弱。範圍：${ctxWk()}。`);
-  // ④ 包套
-  renderCombo(ppl, perf*1e4);
-  // ⑥ Pipeline
-  renderWkPipe(ppl, tPerf);
-  // 🚨 紅燈 + 產品缺口
-  const al=[]; const r1=dueV?perf/dueV*100:0, r2=tRem*due?rem/(tRem*due)*100:0;
-  if(r1<85)al.push(`🔴 業績落後：累計達成 ${r1.toFixed(0)}%（<85%），落後 ${fmtN(lg)}萬。`);
-  if(r2<85)al.push(`🔴 再行銷落後：累計達成 ${r2.toFixed(0)}%。`);
-  if(done.length===0)al.push("🔴 本週包套：0 件成交，須推整合方案。");
-  const gaps=ppl.map(x=>{const o=x.on/(x.tot||1),re=x.rem/(x.tot||1),dm=(x.dm+x.da)/(x.tot||1),w=[];if(o>.7)w.push("站內過重");if(re<.10)w.push("再行銷弱");if(dm<.10)w.push("數媒弱");return w.length?`${x.s}：${w.join("、")}`:null;}).filter(Boolean);
-  document.getElementById("wk-alert").innerHTML=(al.length?al.join("<br>"):"🟢 目前無紅燈")+(gaps.length?"<br><br><b>🧩 產品缺口（下週該教他賣什麼）</b><br>"+gaps.map(g=>"· "+g).join("<br>"):"");
-  renderWkMe(N,tPerf,ppl);
-}
-// 個人週會戰情摘要（業務登入才顯示：你這週還差多少 / Pipeline 夠不夠 / 三件必做）
-function renderWkMe(N,tPerf,ppl){
-  const box=document.getElementById("wk-me");if(!box)return;
-  const u=SESSION;
-  if(!u||u.role!=="sales"){box.classList.add("hide");return;}
-  box.classList.remove("hide");
-  const name=u.name;
-  const me=ppl.find(x=>x.s===name)||{tot:0,rem:0};
-  const actCum=me.tot/1e4;                                   // H2 累計業績(萬)
-  const tm=targetsMap()[name];
-  const est=!(tm&&tm.perf);
-  const half=est?tPerf:tm.perf;                              // 個人半年目標(萬)：優先 Sheet 目標設定，否則用上方「目標設定」欄(單人範圍＝本人目標)
-  const wk=half/NWK, due=wk*N, gap=due-actCum, rt=due?actCum/due*100:0;
-  const PIPE=PDATA.pipe||{}, pv=PIPE[name]||{f:0,q:0,p:0};
-  const pipeReady=(pv.f+pv.q)/1e4;                           // 已確定+高機率(萬)
-  const pipeOK=gap<=0||pipeReady>=gap, cover=gap>0?pipeReady/gap:null;
-  let acts=[];
-  if(Array.isArray(SHEETDATA.act))acts=sheetRows(SHEETDATA.act,"負責",["負責","事項","期限","狀態"]).filter(o=>(o.負責||"").trim()===name).slice(0,3);
-  const lampC=rt>=100?"#1f7a4d":rt>=85?"#caa500":"#b53b65";
-  const gapTxt=gap>0?`還差 <b style="color:#b53b65">${fmtN(gap)}</b> 萬`:`超前 <b style="color:#1f7a4d">${fmtN(-gap)}</b> 萬`;
-  const panel=(title,inner,bd)=>`<div style="flex:1;min-width:210px;background:#fafbfc;border:1px solid #eceff1;border-left:4px solid ${bd};border-radius:10px;padding:12px 14px"><div style="font-size:12px;color:#5a6271;font-weight:700;margin-bottom:6px">${title}</div>${inner}</div>`;
-  const p1=panel(`📉 你這週還差多少 ${lamp(rt)}`,`<div style="font-size:22px;font-weight:800;color:#263E44">${gapTxt}</div><div style="font-size:11px;color:#9aa3ad;margin-top:3px">應達 ${fmtN(due)}萬(第${N}週)· 已做 ${fmtN(actCum)}萬 · 達成 ${rt.toFixed(0)}%</div>`,lampC);
-  const p2=panel(`🎯 Pipeline 夠不夠 ${pipeOK?"🟢":"🔴"}`,`<div style="font-size:22px;font-weight:800;color:${pipeOK?"#1f7a4d":"#b53b65"}">${pipeOK?"夠":"不夠"}</div><div style="font-size:11px;color:#9aa3ad;margin-top:3px">手上(已確定+高機率) ${fmtN(pipeReady)}萬${gap>0?` · 需補 ${fmtN(gap)}萬`+(cover!==null?` · 覆蓋 ${(cover*100).toFixed(0)}%`:""):" · 缺口已補足"}</div>`,pipeOK?"#1f7a4d":"#b53b65");
-  const actInner=acts.length?`<ol style="margin:0 0 0 16px;padding:0;font-size:12.5px;color:#33474d;line-height:1.7">${acts.map(a=>`<li>${a.事項||""}${a.期限?` <span style="color:#9aa3ad">(${a.期限})</span>`:""} ${a.狀態==="完成"?"✅":""}</li>`).join("")}</ol>`:`<div style="font-size:12.5px;color:#b53b65">尚未填寫 · <a href="${localStorage.getItem("dm_sheet_edit")||"#"}" target="_blank" rel="noopener" style="color:#263E44">開 Sheet 登錄 ↗</a></div>`;
-  const p3=panel("✅ 本週三件必做",actInner,"#263E44");
-  box.innerHTML=`<div class="card-head" style="margin-bottom:10px"><h2>👋 ${name}，這是你本週的戰情（第 ${N}/${NWK} 週）</h2></div><div style="display:flex;gap:12px;flex-wrap:wrap">${p1}${p2}${p3}</div>${est?`<div class="note" style="margin-top:9px">＊個人業績目標尚未在 Sheet「目標設定」設定，暫以上方「半年目標設定」欄的 ${fmtN(half)}萬 為本人半年目標。主管在目標中心設定個人目標後即以實際值計算。</div>`:""}`;
-}
-/* ── 明細就地展開（點 KPI → ①下方展開表格，再點收合；切頁自然收起） ── */
-const AD_LABEL={"on-site":"站內","remarketing":"站台再行銷","digitm":"數媒站內","agent":"數媒再行銷"};
-let DETAIL_KEY=null, DETAIL={head:[],rows:[],name:"明細"};
-function toggleDetail(k){if(DETAIL_KEY===k){closeDetail();return;}DETAIL_KEY=k;renderDetail(k);}
-function closeDetail(){DETAIL_KEY=null;const el=document.getElementById("wk-detail");if(el){el.className="hide";el.innerHTML="";}}
-function buildDetail(k){
-  if(k==="combo"){const pu=localStorage.getItem("dm_sheet_edit");let combo=[];
-    if(pu&&Array.isArray(SHEETDATA.pkg))combo=sheetRows(SHEETDATA.pkg,"業務",["業務","客戶","建案","方案","金額","進單時間","狀態"]).map(o=>({sales:o.業務,cust:o.客戶,proj:o.建案,plan:o.方案,amt:o.金額,time:o.進單時間,status:o.狀態}));
-    else combo=wSt("dm_wkcombo");
-    const done=combo.filter(c=>c.status==="成交");
-    return {title:"包套（成交）明細",head:["業務","客戶","建案","方案","金額","進單時間","狀態"],rows:done.map(c=>[c.sales||"",c.cust||"",c.proj||"",c.plan||"",fmtN(numOf(c.amt)),c.time||"",c.status||""]),name:"包套明細"};}
-  if(k==="cust"){const R=weekRows(),by={};R.forEach(r=>{if(r.cust===-1)return;const c=r.customer||"(未填)";const o=by[c]=by[c]||{amt:0,n:0,s:new Set()};o.amt+=r.sale;o.n++;if(r.sales)o.s.add(r.sales);});
-    return {title:"客戶明細（H2）",head:["客戶","往來業務","投放筆數","金額"],rows:Object.entries(by).sort((a,b)=>b[1].amt-a[1].amt).map(([c,o])=>[c,[...o.s].slice(0,3).join("、")+(o.s.size>3?" 等":""),fmtN(o.n),fmtN(o.amt)]),name:"客戶明細"};}
-  const filt=k==="rem"?(r=>r.ad==="remarketing"||r.ad==="agent"):null,nm=k==="rem"?"再行銷":"總業績";
-  let R=weekRows();if(filt)R=R.filter(filt);R=R.sort((a,b)=>b.sale-a.sale);
-  return {title:nm+" 累計明細（H2）",head:["月份","廣告類型","業務","客戶","產品(版位)","站台","地區","金額"],rows:R.map(r=>[r.m+"月",AD_LABEL[r.ad]||r.ad,r.sales||"",r.customer||"",r.slot||"",r.ch||"",r.region||"",fmtN(r.sale)]),name:nm+"明細"};
-}
-function renderDetail(k){const d=buildDetail(k);DETAIL=d;const el=document.getElementById("wk-detail");if(!el)return;el.className="card";
-  el.innerHTML=`<div class="card-head"><h2>🔎 ${d.title}（${fmtN(d.rows.length)} 筆）</h2><span><button onclick="dlDetail()">⬇ 下載 CSV</button> <button onclick="closeDetail()">收合 ▲</button></span></div>`+
-    `<div class="tbl-wrap"><table><thead><tr>${d.head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${d.rows.length?d.rows.map(r=>`<tr>${r.map(c=>`<td>${c==null?"":c}</td>`).join("")}</tr>`).join(""):`<tr><td class="note" colspan="${d.head.length}">查無資料</td></tr>`}</tbody></table></div>`;}
-function dlDetail(){const esc=c=>'"'+String(c==null?"":c).replace(/"/g,'""')+'"';const csv=[DETAIL.head.map(esc).join(",")].concat(DETAIL.rows.map(r=>r.map(esc).join(","))).join("\n");const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["﻿"+csv],{type:"text/csv"}));a.download=DETAIL.name+".csv";document.body.appendChild(a);a.click();a.remove();}
-function renderCombo(ppl,perfEl){
-  const pu=localStorage.getItem("dm_sheet_edit");let combo,ro=false;
-  if(pu){if(SHEETDATA.pkg===null){wkFetchSheets(false);document.getElementById("wk-combo-kpi").innerHTML="";document.querySelector("#wk-combo tbody").innerHTML=`<tr><td colspan="8" class="note">讀取 Sheet 中…</td></tr>`;return;}
-    if(SHEETDATA.pkg==="err"){document.getElementById("wk-combo-kpi").innerHTML="";document.querySelector("#wk-combo tbody").innerHTML=`<tr><td colspan="8" class="note" style="color:#b53b65">讀取 Sheet 失敗：請確認分頁名為「包套登錄」且權限設為「任何知道連結的人可檢視」。</td></tr>`;return;}
-    combo=sheetRows(SHEETDATA.pkg,"業務",["業務","客戶","建案","方案","金額","進單時間","狀態"]).map(o=>({sales:o.業務,cust:o.客戶,proj:o.建案,plan:o.方案,amt:o.金額,time:o.進單時間,status:o.狀態}));ro=true;}
-  else combo=wSt("dm_wkcombo");
-  const done=combo.filter(c=>c.status==="成交"),amt=done.reduce((s,c)=>s+numOf(c.amt),0);
-  document.getElementById("wk-combo-kpi").innerHTML=
-    `<div class="kpi"><div class="k">包套件數</div><div class="v">${combo.length}</div><div class="n">成交 ${done.length}${ro?" · 來源 Sheet":""}</div></div>`+
-    `<div class="kpi"><div class="k">包套業績(成交)</div><div class="v">${fmtN(amt/1e4)}萬</div><div class="n">占總業績 ${perfEl?(amt/perfEl*100).toFixed(1):0}%</div></div>`+
-    `<div class="kpi"><div class="k">平均包套金額</div><div class="v">${fmtN(done.length?amt/done.length:0)}</div><div class="n">元/件</div></div>`;
-  const tb=document.querySelector("#wk-combo tbody");
-  if(ro){tb.innerHTML=combo.map(c=>`<tr><td>${c.sales||""}</td><td>${c.cust||""}</td><td>${c.proj||""}</td><td>${c.plan||""}</td><td>${c.amt?fmtN(numOf(c.amt)):""}</td><td>${c.time||""}</td><td>${c.status||""}</td><td style="color:#9aa3ad;font-size:11px">Sheet</td></tr>`).join("")||`<tr><td colspan="8" class="note">Sheet 尚無資料，按「開 Sheet 填寫」新增</td></tr>`;return;}
-  const opt=(a,v)=>a.map(o=>`<option${o===v?" selected":""}>${o}</option>`).join(),so=["",...ppl.map(x=>x.s)];
-  tb.innerHTML=combo.map((c,i)=>`<tr data-i="${i}"><td><select class="ce" data-f="sales" style="width:82px">${opt(so,c.sales)}</select></td><td><input class="ce" data-f="cust" value="${c.cust||''}" placeholder="客戶" style="width:88px"></td><td><input class="ce" data-f="proj" value="${c.proj||''}" placeholder="建案" style="width:88px"></td><td><select class="ce" data-f="plan" style="width:150px">${opt(["",...PLANS],c.plan)}</select></td><td><input class="ce" data-f="amt" type="number" value="${c.amt||''}" placeholder="金額" style="width:80px"></td><td><input class="ce" data-f="time" value="${c.time||''}" placeholder="時間" style="width:80px"></td><td><select class="ce" data-f="status" style="width:66px">${opt(["",...STATUS],c.status)}</select></td><td><button onclick="wkDelCombo(${i})" style="border:none;background:none;color:#b53b65;cursor:pointer;font-size:14px">✕</button></td></tr>`).join("")||`<tr><td colspan="8" class="note">尚無登錄，按「＋新增一筆」</td></tr>`;
-  document.querySelectorAll("#wk-combo .ce").forEach(el=>el.addEventListener("change",()=>{const i=+el.closest("tr").dataset.i,a=wSt("dm_wkcombo");a[i][el.dataset.f]=el.value;wSet("dm_wkcombo",a);renderWeek();}));
-}
-function wkAddCombo(){const eu=localStorage.getItem("dm_sheet_edit");if(eu){window.open(eu,"_blank");return;}const a=wSt("dm_wkcombo");a.push({sales:"",cust:"",proj:"",plan:"",amt:"",time:"",status:"提案"});wSet("dm_wkcombo",a);renderWeek();}
-function wkDelCombo(i){const a=wSt("dm_wkcombo");a.splice(i,1);wSet("dm_wkcombo",a);renderWeek();}
-function renderWkPipe(ppl,tPerf){
-  const PIPE=PDATA.pipe||{}, wkGoal=tPerf/NWK/(ppl.length||1), goalT=tPerf/NWK;
-  const pred={};wSt("dm_wkpred").forEach(x=>pred[x.s]=x.v);
-  let tf=0,tq=0,tp=0,tpr=0;
-  const body=ppl.map(x=>{const v=PIPE[x.s]||{f:0,q:0,p:0},f=v.f/1e4,q=v.q/1e4,p=v.p/1e4;tf+=f;tq+=q;tp+=p;
-    const dv=(pred[x.s]!==undefined&&pred[x.s]!=="")?+pred[x.s]:+(f+q*0.5).toFixed(1);tpr+=dv;const gap=wkGoal-dv;
-    return `<tr data-p="${x.s}"><td>${x.s}</td><td><input class="wp" value="${pred[x.s]!==undefined?pred[x.s]:''}" placeholder="${(f+q*0.5).toFixed(1)}" style="width:60px"> 萬</td><td>${fmtN(f)}萬</td><td>${fmtN(q)}萬</td><td>${fmtN(p)}萬</td><td style="color:${gap>0?'#b53b65':'#1f7a4d'};font-weight:600">${gap>0?'缺 '+fmtN(gap):'足'}萬</td></tr>`;}).join("");
-  document.querySelector("#wk-pipe tbody").innerHTML=(body||`<tr><td colspan="6" class="note">查無資料</td></tr>`)+
-    (ppl.length?`<tr style="font-weight:700;background:#f6f8f9"><td>課合計</td><td>${fmtN(tpr)}萬</td><td>${fmtN(tf)}萬</td><td>${fmtN(tq)}萬</td><td>${fmtN(tp)}萬</td><td style="color:${goalT-tpr>0?'#b53b65':'#1f7a4d'}">目標 ${fmtN(goalT)}萬 · ${goalT-tpr>0?'缺 '+fmtN(goalT-tpr):'足'}萬</td></tr>`:"");
-  document.querySelectorAll("#wk-pipe .wp").forEach(el=>el.addEventListener("change",()=>{const p=el.closest("tr").dataset.p,a=wSt("dm_wkpred").filter(x=>x.s!==p);a.push({s:p,v:el.value});wSet("dm_wkpred",a);renderWeek();}));
-  setCap("cap-wkpipe",`已確定/高機率/風險＝DOS 的將實現/有效報價/潛力(per person 自動帶)。下週預估可手填覆蓋(留空＝將實現+有效報價×50%)。缺口＝下週業績目標(週目標÷人數)−下週預估。`);
-}
-function renderWkAction(){
-  const au=localStorage.getItem("dm_sheet_edit"),tb=document.querySelector("#wk-action tbody");
-  if(au){if(SHEETDATA.act===null){wkFetchSheets(false);tb.innerHTML=`<tr><td colspan="5" class="note">讀取 Sheet 中…</td></tr>`;return;}
-    if(SHEETDATA.act==="err"){tb.innerHTML=`<tr><td colspan="5" class="note" style="color:#b53b65">讀取 Sheet 失敗：請確認已發布到網路(CSV)。</td></tr>`;return;}
-    const rows=sheetRows(SHEETDATA.act,"負責",["負責","事項","期限","狀態"]);
-    tb.innerHTML=rows.map(r=>`<tr><td>${r.負責||""}</td><td>${r.事項||""}</td><td>${r.期限||""}</td><td>${r.狀態||""}</td><td style="color:#9aa3ad;font-size:11px">Sheet</td></tr>`).join("")||`<tr><td colspan="5" class="note">Sheet 尚無資料，按「開 Sheet 填寫」新增</td></tr>`;return;}
-  const a=wSt("dm_wkaction"),opt=v=>["待辦","進行中","完成"].map(o=>`<option${o===v?" selected":""}>${o}</option>`).join("");
-  document.querySelector("#wk-action tbody").innerHTML=a.map((x,i)=>
-    `<tr data-i="${i}"><td><input class="ce" data-f="who" value="${x.who||''}" placeholder="負責人" style="width:82px"></td><td><input class="ce" data-f="what" value="${x.what||''}" placeholder="事項" style="width:300px"></td><td><input class="ce" data-f="due" value="${x.due||''}" placeholder="期限" style="width:88px"></td><td><select class="ce" data-f="status" style="width:72px">${opt(x.status)}</select></td><td><button onclick="wkDelAction(${i})" style="border:none;background:none;color:#b53b65;cursor:pointer;font-size:14px">✕</button></td></tr>`).join("")||`<tr><td colspan="5" class="note">尚無行動事項，按「＋新增」</td></tr>`;
-  document.querySelectorAll("#wk-action .ce").forEach(el=>el.addEventListener("change",()=>{const i=+el.closest("tr").dataset.i,arr=wSt("dm_wkaction");arr[i][el.dataset.f]=el.value;wSet("dm_wkaction",arr);}));
-}
-function wkAddAction(){const eu=localStorage.getItem("dm_sheet_edit");if(eu){window.open(eu,"_blank");return;}const a=wSt("dm_wkaction");a.push({who:"",what:"",due:"",status:"待辦"});wSet("dm_wkaction",a);renderWkAction();}
-function wkDelAction(i){const a=wSt("dm_wkaction");a.splice(i,1);wSet("dm_wkaction",a);renderWkAction();}
-function dlWeekProd(){const R=weekRows(),byS={};R.forEach(r=>{const s=r.sales||"(未填)";const d=byS[s]=byS[s]||{on:0,re:0,dm:0,da:0};if(r.ad==="on-site")d.on+=r.sale;else if(r.ad==="remarketing")d.re+=r.sale;else if(r.ad==="digitm")d.dm+=r.sale;else if(r.ad==="agent")d.da+=r.sale;});
-  const out=Object.entries(byS).map(([s,d])=>[s,d.on,d.re,d.dm,d.da,d.on+d.re+d.dm+d.da]).sort((a,b)=>b[5]-a[5]);
-  dl("個人產品結構_H2.csv",[["業務","站內","再行銷","數媒站內","數媒再行銷","總計"],...out]);}
-
-// ---------- 目標中心 ----------
-function renderGoal(){
-  if(SHEETDATA.tgt===null&&localStorage.getItem("dm_sheet_edit"))wkFetchSheets(false);
-  const tm=targetsMap(), R=weekRows();
-  const byS={};R.forEach(r=>{const s=r.sales||"(未填)";const d=byS[s]=byS[s]||{tot:0,rem:0,cust:new Set()};d.tot+=r.sale;if(r.ad==="remarketing"||r.ad==="agent")d.rem+=r.sale;if(r.cust!=-1)d.cust.add(r.cust);});
-  const pkgBy={};if(Array.isArray(SHEETDATA.pkg))sheetRows(SHEETDATA.pkg,"業務",["業務","金額","狀態"]).forEach(o=>{if(o.狀態==="成交"){const n=(o.業務||"").trim();pkgBy[n]=(pkgBy[n]||0)+numOf(o.金額);}});
-  const oa=document.getElementById("goal-open"),eu=localStorage.getItem("dm_sheet_edit");if(oa)oa.href=eu||"#";
-  if(!Object.keys(tm).length){setCap("cap-goal",`尚未讀到「目標設定」分頁。請在 Google Sheet 新增分頁 <b>目標設定</b>，第一列欄位：業務 ｜ 業績 ｜ 再行銷 ｜ 包套 ｜ 客戶（金額單位：萬），主管填好各業務目標即可自動帶入。`);
-    document.getElementById("goal-kpi").innerHTML="";document.querySelector("#goal-tbl tbody").innerHTML=`<tr><td colspan="7" class="note">請於 Sheet 新增「目標設定」分頁並填各業務目標。</td></tr>`;return;}
-  const names=[...new Set([...Object.keys(tm),...Object.keys(byS)])].filter(n=>byS[n]||tm[n]).sort((a,b)=>((byS[b]?.tot||0)-(byS[a]?.tot||0)));
-  const cel=(act,tgt)=>{const rt=tgt?act/tgt*100:0;return `<td>${fmtN(act)}<span style="color:#9aa3ad">/${fmtN(tgt)}</span><span style="font-size:10px;color:${rt>=100?'#1f7a4d':rt>=85?'#caa500':'#b53b65'}"> ${tgt?rt.toFixed(0)+'%':'—'}</span></td>`;};
-  let TA=0,TT=0;
-  const body=names.map(n=>{const a=byS[n]||{tot:0,rem:0,cust:new Set()},t=tm[n]||{};
-    const perf=a.tot/1e4,rem=a.rem/1e4,cust=a.cust.size||0,pkg=(pkgBy[n]||0)/1e4,prog=t.perf?perf/t.perf*100:0;
-    TA+=perf;TT+=(t.perf||0);
-    return `<tr><td>${n}</td>${cel(perf,t.perf||0)}${cel(rem,t.rem||0)}<td>${cust}<span style="color:#9aa3ad">/${t.cust||0}</span><span style="font-size:10px;color:#9aa3ad"> ${t.cust?(cust/t.cust*100).toFixed(0)+'%':'—'}</span></td>${cel(pkg,t.pkg||0)}<td style="font-weight:700;color:${prog>=100?'#1f7a4d':prog>=50?'#caa500':'#b53b65'}">${t.perf?prog.toFixed(0)+'%':'—'}</td><td>${lamp(prog)}</td></tr>`;}).join("");
-  document.querySelector("#goal-tbl tbody").innerHTML=body||`<tr><td colspan="7" class="note">此範圍查無業務</td></tr>`;
-  document.getElementById("goal-kpi").innerHTML=
-    `<div class="kpi"><div class="k">H2 業績現況</div><div class="v">${fmtN(TA)}萬</div><div class="n">目標 ${fmtN(TT)}萬</div></div>`+
-    `<div class="kpi" style="border-top-color:${TT&&TA/TT>=1?'#1f7a4d':'#b53b65'}"><div class="k">整體達成</div><div class="v">${TT?(TA/TT*100).toFixed(0):0}%</div><div class="n">缺口 ${fmtN(Math.max(0,TT-TA))}萬</div></div>`+
-    `<div class="kpi"><div class="k">人數</div><div class="v">${names.length}</div><div class="n">已設目標 ${Object.keys(tm).length} 人</div></div>`;
-  setCap("cap-goal",`業績/再行銷/客戶＝DOS 自動算(H2 累計)；包套＝Sheet「成交」加總。目標由主管在「目標設定」分頁設(單位萬)。範圍：${ctxWk()}。🟢≥100% 🟡85–100% 🔴<85%。`);
-}
-
-// ---------- OKR 考核 ----------
-const OKR_TARGETS={
- "簡艷華":{q3:700,q4:700,remkt:150,combo1:3,combo2:6,cust:70,arpu:136000},
- "姚蘋芸":{q3:700,q4:700,remkt:150,combo1:3,combo2:6,cust:70,arpu:136000},
- "鄧瑋婷":{q3:700,q4:700,remkt:150,combo1:3,combo2:6,cust:70,arpu:136000},
- "邱佳鈴":{q3:200,q4:200,remkt:50,combo1:2,combo2:2,cust:30,arpu:136000},
- "曾家羚":{q3:780,q4:710,remkt:213,combo1:3,combo2:7,cust:120,arpu:136000},
- "陳琬臻":{q3:780,q4:710,remkt:213,combo1:3,combo2:7,cust:120,arpu:136000}
-};
-const OKR=[
- {o:"O1 極大化 H2 營收動能",krs:[
-   {key:"q3",name:"Q3 業績（Jul–Sep）",unit:"萬",auto:"q3",t:{ok:40,good:60,opt:80}},
-   {key:"q4",name:"Q4 業績（Oct–Dec）",unit:"萬",auto:"q4",t:{ok:40,good:60,opt:80}}]},
- {o:"O2 站內 × 數媒再行銷綜效",krs:[
-   {key:"remkt",name:"H2 再行銷業績",unit:"萬",auto:"remkt",t:{ok:60,good:75,opt:85}},
-   {key:"combo1",name:"影音＋再行銷 支數",unit:"支",manual:true,t:{ok:33,good:67,opt:100}},
-   {key:"combo2",name:"再行銷混合方案 組數",unit:"組",manual:true,t:{ok:33,good:67,opt:100}}]},
- {o:"O3 核心客戶 × 客單價",krs:[
-   {key:"cust",name:"服務客戶家數（H2）",unit:"家",auto:"cust",t:{ok:60,good:75,opt:80}},
-   {key:"arpu",name:"平均客單價（H2）",unit:"元",auto:"arpu",ratio:true,t:{ok:0,good:60,opt:80}}]}
-];
-function buildOkrScope(){
-  const h={};
-  ROWS.forEach(r=>{ if(!r.sales)return; (h[r.cls]=h[r.cls]||{})[r.grp]=(h[r.cls]||{})[r.grp]||new Set(); h[r.cls][r.grp].add(r.sales); });
-  const tree=Object.keys(h).sort().map(cls=>({label:cls,children:Object.keys(h[cls]).sort().map(grp=>({label:grp.replace("業務","").replace(" - ","-"),children:[...h[cls][grp]].sort().map(s=>({label:s,key:s}))}))}));
-  makeTree("pop-okr","btn-okr",tree,selOkr,"檢視對象",renderOKR);
-}
-function okrPeople(){ return selOkr.size? [...selOkr] : Object.keys(OKR_TARGETS); }
-function okrRows(){ const P=okrPeople(); return ROWS.filter(r=>P.includes(r.sales)); }
-function autoVal(k,rows){
-  const H=[7,8,9,10,11,12], sum=(ms,f)=>rows.filter(r=>ms.includes(r.m)&&(!f||f(r))).reduce((s,r)=>s+r.sale,0);
-  if(k==="q3")return sum([7,8,9])/1e4;
-  if(k==="q4")return sum([10,11,12])/1e4;
-  if(k==="remkt")return sum(H,r=>r.ad==="remarketing"||r.ad==="agent")/1e4;
-  if(k==="cust"){const c=new Set();rows.forEach(r=>{if(H.includes(r.m)&&r.cust!=-1)c.add(r.cust);});return c.size;}
-  if(k==="arpu"){const c=new Set();let s=0;rows.forEach(r=>{if(H.includes(r.m)){s+=r.sale;if(r.cust!=-1)c.add(r.cust);}});return c.size?s/c.size:0;}
-  return 0;
-}
-function sumTarget(key,people,ratio){const ts=people.map(p=>(OKR_TARGETS[p]||{})[key]).filter(v=>v!=null);if(!ts.length)return null;return ratio?Math.max(...ts):ts.reduce((a,b)=>a+b,0);}
-function tierLv(rate,t){if(rate>=t.opt)return"優";if(rate>=t.good)return"佳";if(rate>=t.ok)return"可";return"未達";}
-function mKey(id){return "okr_"+(selOkr.size?[...selOkr].sort().join("|"):"all")+"_"+id;}
-function fmtKR(v,unit){if(unit==="元")return fmtN(Math.round(v))+"元";if(unit==="萬")return (Math.round(v*10)/10).toLocaleString("en-US")+"萬";return fmtN(v)+unit;}
-function faceSVG(lv,size){size=size||24;const M={"優":["#d3ecc6","M8,14.5 Q13,21 18,14.5"],"佳":["#e4edca","M8,15 Q13,19 18,15"],"可":["#e7eaee","M8.5,16 L17.5,16"],"未達":["#f6dde3","M8,17.5 Q13,13.5 18,17.5"],"啟動":["#e7eaee","M8.5,16 L17.5,16"],"無目標":["#eef1f3","M9,16 L17,16"]};const[c,m]=M[lv]||M["可"];return `<svg width="${size}" height="${size}" viewBox="0 0 26 26" style="vertical-align:middle;flex:none"><circle cx="13" cy="13" r="11.5" fill="${c}"/><circle cx="9.6" cy="11" r="1.25" fill="#3a3a3a"/><circle cx="16.4" cy="11" r="1.25" fill="#3a3a3a"/><path d="${m}" stroke="#3a3a3a" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg>`;}
-function okrAchievements(people,rows){
-  const out=[];
-  const q3=autoVal("q3",rows),tq3=sumTarget("q3",people); if(tq3&&q3/tq3>=0.6)out.push(`Q3 業績已達 ${(q3/tq3*100).toFixed(0)}%（${fmtKR(q3,"萬")}）`);
-  const cust=autoVal("cust",rows),tc=sumTarget("cust",people); if(tc&&cust/tc>=0.6)out.push(`已服務 ${cust} 家客戶（目標 ${tc}）`);
-  const arpu=autoVal("arpu",rows),ta=sumTarget("arpu",people,true); if(ta&&arpu>=ta)out.push(`客單價 ${fmtN(Math.round(arpu))} 元，已達標 💰`);
-  if(YOY.length){const P=new Set(people),reg={};YOY.forEach(r=>{if(!P.has(r.sales)||!r.region||r.m>YTD)return;const a=reg[r.region]||(reg[r.region]={a:0,b:0});if(r.y===26)a.a+=r.sale;else a.b+=r.sale;});const best=Object.entries(reg).filter(([k,v])=>v.b>0).map(([k,v])=>({k,y:(v.a-v.b)/v.b*100})).sort((a,b)=>b.y-a.y)[0];if(best&&best.y>3)out.push(`${best.k} 較去年同期 +${best.y.toFixed(0)}% 📈`);}
-  return out;
-}
-function renderOKR(){
-  const people=okrPeople(), rows=okrRows(), withT=people.filter(p=>OKR_TARGETS[p]).length;
-  setCap("cap-okr",`檢視對象：<b>${selOkr.size?[...selOkr].slice(0,3).join("、")+(selOkr.size>3?" 等"+selOkr.size+"人":""):"二課全體"}</b>（${people.length} 人合計）。<b>實績</b>為 H2（7–12月）自動接 DOS；<b>目標</b>＝所選對象個人目標加總；<b>達成率</b>＝實績÷目標，門檻 可/佳/優。灰底 KR（如包套組數）需手動輸入、存本機。`);
-  document.getElementById("okr-snap").textContent="· 對象："+(selOkr.size?[...selOkr].slice(0,3).join("、")+(selOkr.size>3?" 等"+selOkr.size+"人":""):"二課全體")+(withT?"":"（此範圍尚無考核目標，目前僅二課已建）");
-  const ach=okrAchievements(people,rows);
-  const mood=ach.length>=2?"優":ach.length===1?"佳":"可";
-  const line=mood==="優"?"表現亮眼，繼續保持！":mood==="佳"?"有好的開始，再加把勁！":"全力衝刺，數字會說話！";
-  const summary=`<div class="okr-o" style="background:#f6faf2;border-color:#dbe8cf"><div style="display:flex;align-items:center;gap:14px">${faceSVG(mood,52)}<div><div style="font-weight:700;color:#263E44;font-size:15px">${line}</div><div style="font-size:12.5px;color:#5a6271;margin-top:5px;line-height:1.7">${ach.length?"✨ "+ach.join("　｜　"):"目前尚無亮點數據，開始接單累積吧！"}</div></div></div></div>`;
-  document.getElementById("okr-body").innerHTML=summary+OKR.map(o=>{
-    const krs=o.krs.map(k=>{
-      const tgt=sumTarget(k.key,people,k.ratio);
-      let act; if(k.auto)act=autoVal(k.auto,rows); else{const mv=localStorage.getItem(mKey(k.key));act=mv?+mv:0;}
-      let rate=tgt?act/tgt*100:null, lv, badge;
-      if(rate==null){lv="無目標";badge=`<span class="lv 可">無目標</span>`;}
-      else if(act<=0){lv="啟動";badge=`<span class="lv 可">尚未啟動</span>`;}
-      else{lv=tierLv(rate,k.t);badge=`<span class="lv ${lv}">${lv} ${rate.toFixed(0)}%</span>`;}
-      const pct=rate==null?0:Math.min(100,Math.round(rate));
-      const right=k.manual?`目標 ${tgt==null?"—":fmtKR(tgt,k.unit)}　實績 <input type="number" data-m="${k.key}" value="${localStorage.getItem(mKey(k.key))||''}" placeholder="輸入" style="width:64px"> ${k.unit}`:`目標 ${tgt==null?"—":fmtKR(tgt,k.unit)}　實績 <b class="kv">${fmtKR(act,k.unit)}</b>`;
-      return `<div class="kr ${k.manual?'manual':''}"><div class="kh"><span class="knm" style="display:inline-flex;align-items:center;gap:6px">${faceSVG(lv)} ${k.name}${k.manual?' ✍手動':''}</span><span>${right} ${badge}</span></div><div class="bar2"><i style="width:${pct}%"></i></div><div class="tiers">達成率＝實績÷目標　門檻 可≥${k.t.ok}% 佳≥${k.t.good}% 優≥${k.t.opt}%</div></div>`;
-    }).join("");
-    return `<div class="okr-o"><h3>${o.o}</h3>${krs}</div>`;
-  }).join("");
-  document.querySelectorAll("#okr-body input").forEach(inp=>inp.addEventListener("input",()=>{const id=inp.dataset.m,v=inp.value;if(v)localStorage.setItem(mKey(id),v);else localStorage.removeItem(mKey(id));renderOKR();}));
-}
-
-// ---------- 阿米巴顧問建議書 ----------
-let amStars=0;
-function buildAmoeba(){
-  const d=document.getElementById("am-dept"); d.innerHTML="";
-  [...new Set(ROWS.map(r=>r.grp))].filter(x=>x&&x!=="(未分組)").sort().forEach(g=>{const o=document.createElement("option");o.value=g;o.textContent=g.replace("業務","").replace(" - ","-");d.appendChild(o);});
-  const m=document.getElementById("am-month");
-  for(let i=1;i<=12;i++){const o=document.createElement("option");o.value=i;o.textContent=i+"月";if(i===7)o.selected=true;m.appendChild(o);}
-  const st=document.getElementById("am-stars"); st.innerHTML="";
-  for(let i=1;i<=5;i++){const sp=document.createElement("span");sp.textContent="★";sp.onclick=()=>{amStars=i;paintStars();};st.appendChild(sp);}
-  d.addEventListener("change",loadReport); m.addEventListener("change",loadReport);
-  document.getElementById("am-new").onclick=clearForm;
-  document.getElementById("am-addact").onclick=()=>addActRow();
-  document.getElementById("am-save").onclick=()=>saveReport("draft");
-  document.getElementById("am-publish").onclick=()=>saveReport("published");
-  document.getElementById("am-export").onclick=exportReport;
-}
-function paintStars(){document.querySelectorAll("#am-stars span").forEach((s,i)=>s.classList.toggle("on",i<amStars));}
-function amKey(){return "amoeba_report_"+document.getElementById("am-dept").value+"_"+document.getElementById("am-month").value;}
-function refData(){
-  const dept=document.getElementById("am-dept").value, mo=+document.getElementById("am-month").value;
-  const rows=ROWS.filter(r=>r.grp===dept&&r.m===mo), a=agg(rows);
-  let on=0,re=0; rows.forEach(r=>{if(r.ad==="on-site")on+=r.sale;else if(r.ad==="remarketing"||r.ad==="agent")re+=r.sale;});
-  const h=HOUSE.filter(r=>r.grp===dept&&r.m===mo), o=ONLINE.filter(r=>r.grp===dept), st=projStats(h,o);
-  const tgt=localStorage.getItem("dm_target_2026_"+dept), rate=tgt?(a.sale/+tgt*100).toFixed(1)+"%":"—";
-  return {sale:a.sale,cust:a.cust,arpu:a.arpu,ins:a.ins,onsite:a.sale?(on/a.sale*100).toFixed(1):0,remkt:a.sale?(re/a.sale*100).toFixed(1):0,pen:st.pen,rate};
-}
-function renderAmRef(){
-  const r=refData();
-  document.getElementById("am-ref").innerHTML=[["當月業績",fmtWan(r.sale)+"元"],["目標達成率",r.rate],["客戶家數",fmtN(r.cust)+" 家"],["客單價",fmtN(r.arpu)+" 元"],["委刊單",fmtN(r.ins)+" 張"],["站內占比",r.onsite+"%"],["再行銷占比",r.remkt+"%"],["建案滲透率",(r.pen!=null?r.pen.toFixed(1)+"%":"—")]].map(x=>`<div class="ref"><span>${x[0]}</span><b>${x[1]}</b></div>`).join("");
-}
-function addActRow(a){a=a||{task:"",owner:"",due:"",status:"pending"};
-  const div=document.createElement("div");div.className="act-row";
-  div.innerHTML=`<input placeholder="改善措施" value="${(a.task||"").replace(/"/g,'&quot;')}"><input placeholder="負責人" value="${(a.owner||"").replace(/"/g,'&quot;')}"><input type="date" value="${a.due||""}"><select><option value="pending"${a.status==="pending"?" selected":""}>待辦</option><option value="doing"${a.status==="doing"?" selected":""}>進行</option><option value="done"${a.status==="done"?" selected":""}>完成</option></select><span class="del">✕</span>`;
-  div.querySelector(".del").onclick=()=>div.remove(); document.getElementById("am-actions").appendChild(div);
-}
-function collectActions(){return [...document.querySelectorAll("#am-actions .act-row")].map(d=>{const i=d.querySelectorAll("input"),s=d.querySelector("select");return {task:i[0].value,owner:i[1].value,due:i[2].value,status:s.value};}).filter(a=>a.task);}
-function clearForm(){amStars=0;paintStars();document.getElementById("am-overall").value="";document.getElementById("am-diag").value="";document.getElementById("am-rec").value="";document.getElementById("am-actions").innerHTML="";document.getElementById("am-status").textContent="新建議書（未儲存）";}
-function loadReport(){
-  renderAmRef();
-  const raw=localStorage.getItem(amKey());
-  if(!raw){clearForm();return;}
-  const r=JSON.parse(raw); amStars=r.score||0; paintStars();
-  document.getElementById("am-overall").value=r.overall||"";document.getElementById("am-diag").value=r.diagnosis||"";document.getElementById("am-rec").value=r.recommend||"";
-  document.getElementById("am-actions").innerHTML="";(r.actions||[]).forEach(addActRow);
-  document.getElementById("am-status").textContent=(r.status==="published"?"已發佈":"草稿")+" · 更新 "+(r.updated||"");
-}
-function saveReport(status){
-  const rep={dept:document.getElementById("am-dept").value,month:document.getElementById("am-month").value,score:amStars,overall:document.getElementById("am-overall").value,diagnosis:document.getElementById("am-diag").value,recommend:document.getElementById("am-rec").value,actions:collectActions(),status,updated:new Date().toLocaleString("zh-TW")};
-  localStorage.setItem(amKey(),JSON.stringify(rep));
-  document.getElementById("am-status").textContent=(status==="published"?"✓ 已發佈":"✓ 已存草稿")+" · "+rep.updated; renderAmList();
-}
-function renderAmList(){
-  const rows=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith("amoeba_report_")){try{rows.push(JSON.parse(localStorage.getItem(k)));}catch(e){}}}
-  rows.sort((a,b)=>(b.month)-(a.month));
-  document.querySelector("#am-list tbody").innerHTML=rows.map(r=>`<tr><td>${r.dept.replace("業務","").replace(" - ","-")}</td><td>${r.month}月</td><td>${"★".repeat(r.score||0)||"—"}</td><td>${r.status==="published"?"已發佈":"草稿"}</td><td style="font-size:11px">${r.updated||""}</td><td><a style="color:#263E44;cursor:pointer" onclick="openReport('${r.dept}','${r.month}')">開啟</a></td></tr>`).join("")||`<tr><td colspan="6" class="note">尚無建議書</td></tr>`;
-}
-function openReport(dept,month){document.getElementById("am-dept").value=dept;document.getElementById("am-month").value=month;loadReport();window.scrollTo(0,0);}
-function exportReport(){
-  const dept=document.getElementById("am-dept").value.replace("業務","").replace(" - ","-"),mo=document.getElementById("am-month").value,r=refData(),acts=collectActions();
-  const md=`# 阿米巴顧問建議書 — ${dept} ${mo}月\n\n## 部門當月數據\n- 業績：${fmtN(r.sale)} 元｜目標達成率：${r.rate}\n- 客戶家數：${r.cust} 家｜客單價：${r.arpu} 元｜委刊單：${r.ins} 張\n- 站內占比 ${r.onsite}%｜再行銷占比 ${r.remkt}%｜建案滲透率 ${r.pen!=null?r.pen.toFixed(1)+"%":"—"}\n\n## 一、整體評價（${"★".repeat(amStars)||"未評"}）\n${document.getElementById("am-overall").value}\n\n## 二、落後原因診斷\n${document.getElementById("am-diag").value}\n\n## 三、顧問具體建議\n${document.getElementById("am-rec").value}\n\n## 四、部門行動承諾\n`+(acts.length?acts.map(a=>`- [ ] ${a.task}（負責：${a.owner}｜期限：${a.due}｜狀態：${a.status}）`).join("\n"):"（待部門填寫）")+"\n";
-  const b=new Blob([md],{type:"text/markdown;charset=utf-8"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=`阿米巴建議書_${dept}_${mo}月.md`;a.click();
-}
-function renderAmoeba(){renderAmRef();loadReport();renderAmList();}
-
-// ---------- 區域歷年戰情（用 YoY 明細 + 共用篩選）----------
-function buildRegion(){
-  YTD=parseInt((PDATA.snapshot||"2026/07").split("/")[1])||7;
-  document.querySelectorAll("#rg-level .tab").forEach(t=>t.addEventListener("click",()=>{sw("#rg-level",t);rgLevel=t.dataset.lv;document.getElementById("rg-pick").dataset.lv="";renderRegion();}));
-  document.getElementById("rg-year").addEventListener("change",()=>{rgYear=document.getElementById("rg-year").value;renderRegion();});
-  document.getElementById("rg-search").addEventListener("input",renderRegion);
-  document.getElementById("rg-pick").addEventListener("change",renderRgChart);
-}
-function fYoy(){const ch=val("f-ch");return YOY.filter(r=>(!ch||r.ch===ch)&&(!selAd.size||selAd.has(r.ad))&&matchSales(r)&&matchRegion(r));}
-function rgPeriod(){return curMonths()||[...Array(YTD)].map((_,i)=>i+1);}
-function rgAgg(){
-  const rows=fYoy(),per=rgPeriod(),acc={};
-  const nameOf=r=>rgLevel==="city"?r.region:(r.section?r.region+"｜"+r.section:null);
-  for(const r of rows){const n=nameOf(r);if(!n)continue;const a=acc[n]||(acc[n]={s25:0,s26:0,fy25:0,bs:{}});
-    if(r.y===25){if(per.includes(r.m))a.s25+=r.sale;a.fy25+=r.sale;}
-    else if(per.includes(r.m)){a.s26+=r.sale;a.bs[r.sales]=(a.bs[r.sales]||0)+r.sale;}}
-  return acc;
-}
-function rgRows(){
-  const acc=rgAgg(),q=document.getElementById("rg-search").value.trim();
-  let out=Object.entries(acc).map(([name,v])=>{const L=Object.entries(v.bs||{}).sort((a,b)=>b[1]-a[1])[0];
-    return {name,s25:v.s25,s26:v.s26,fy25:v.fy25,yoy:v.s25?(v.s26-v.s25)/v.s25*100:null,prog:v.fy25?v.s26/v.fy25*100:0,lead:L?L[0]:"",leadS:L?L[1]:0};});
-  if(q)out=out.filter(x=>x.name.includes(q));
-  const sk=rgYear==="25"?"s25":"s26";
-  return out.filter(x=>x.s25||x.s26).sort((a,b)=>b[sk]-a[sk]);
-}
-function renderRegion(){
-  if(!YOY.length){document.getElementById("rg-note").textContent="資料載入中…";return;}
-  document.getElementById("rg-note").textContent="期間 "+(curMonths()?curLabel():"1–"+YTD+"月")+"　範圍 "+(selSales.size?selSales.size+" 業務":"全業務")+"／"+(selRegion.size?selRegion.size+" 區":"全區");
-  const rows=rgRows(),head=document.querySelector("#rg-tbl thead tr"),body=document.querySelector("#rg-tbl tbody");
-  if(rgYear==="yoy"){
-    head.innerHTML="<th>區域</th><th>主力業務</th><th>2026 期間</th><th>2025 同期</th><th>YoY 成長/衰退</th><th>2025 全年</th><th>今年進度</th>";
-    body.innerHTML=rows.map(x=>{const b=x.yoy==null?"—":`<b style="color:${x.yoy>=0?'#1f7a4d':'#b53b65'}">${x.yoy>=0?'▲ 成長 ':'▼ 衰退 '}${Math.abs(x.yoy).toFixed(1)}%</b>`;return `<tr><td>${x.name.replace('｜','-')}</td><td>${x.lead||'—'}</td><td>${fmtBoth(x.s26)}</td><td>${fmtBoth(x.s25)}</td><td>${b}</td><td>${fmtBoth(x.fy25)}</td><td>${x.prog.toFixed(0)}%</td></tr>`;}).join("")||`<tr><td colspan="7" class="note">查無資料</td></tr>`;
-  }else{
-    const yr=rgYear==="25"?"2025":"2026",key=rgYear==="25"?"s25":"s26",tot=rows.reduce((s,x)=>s+x[key],0)||1;
-    head.innerHTML=`<th>區域</th><th>主力業務</th><th>${yr} 期間業績</th><th>占比</th>`;
-    body.innerHTML=rows.map(x=>`<tr><td>${x.name.replace('｜','-')}</td><td>${x.lead||'—'}</td><td>${fmtBoth(x[key])}</td><td>${(x[key]/tot*100).toFixed(1)}%</td></tr>`).join("")||`<tr><td colspan="4" class="note">查無資料</td></tr>`;
-  }
-  renderRgSummary(rows);
-  const lvl=rgLevel==="city"?"縣市":"行政區", per=curMonths()?curLabel():"1–"+YTD+"月", scp=selSales.size?selSales.size+" 位業務":"全業務";
-  setCap("cap-rg-chart",`選定<b>${lvl}</b>的逐月業績：<b>深色＝2026</b>、<b>淺色＝2025</b>，比同一個月今年 vs 去年，看哪幾個月領先或落後。範圍：${scp}。`);
-  setCap("cap-rg-tbl",rgYear==="yoy"
-    ?`各${lvl}於<b>期間 ${per}</b>今年 vs 去年同期（${scp}）：<b>YoY</b>＝(今年−去年同期)÷去年同期；<b>今年進度</b>＝今年期間÷2025全年；主力業務＝該區今年業績最高者。依今年業績排序。`
-    :`各${lvl}於 <b>${rgYear==="25"?"2025":"2026"}</b> 期間 ${per} 的業績與占比（${scp}）。占比＝該區÷全部區合計。`);
-  const pick=document.getElementById("rg-pick");
-  if(pick.dataset.lv!==rgLevel){pick.innerHTML="";rows.forEach(x=>{const o=document.createElement("option");o.value=x.name;o.textContent=x.name.replace('｜','-');pick.appendChild(o);});pick.dataset.lv=rgLevel;}
-  renderRgChart();
-}
-function renderRgSummary(rows){
-  const el=document.getElementById("rg-summary"); if(!el)return;
-  const yv=rows.filter(x=>x.yoy!=null);
-  const t26=rows.reduce((s,x)=>s+x.s26,0), t25=rows.reduce((s,x)=>s+x.s25,0);
-  const ov=t25?((t26-t25)/t25*100):0;
-  const grow=yv.filter(x=>x.yoy>=0).length, drop=yv.filter(x=>x.yoy<0).length;
-  const up=[...yv].sort((a,b)=>b.yoy-a.yoy)[0], dn=[...yv].sort((a,b)=>a.yoy-b.yoy)[0];
-  const scope=(selSales.size?selSales.size+" 位業務":"全業務")+"、"+(rgLevel==="city"?"縣市":"行政區");
-  const oc=ov>=0?"#1f7a4d":"#b53b65";
-  el.innerHTML=`<div style="font-size:13.5px;line-height:1.9;color:#1a1d23">
-    <b style="color:#263E44">📍 區域表現說明</b>（${scope}，期間 ${curMonths()?curLabel():"1–"+YTD+"月"}）<br>
-    整體同期 <b style="color:${oc}">${ov>=0?"成長":"衰退"} ${Math.abs(ov).toFixed(1)}%</b>（今年 ${fmtWan(t26)} vs 去年同期 ${fmtWan(t25)}）；共 ${yv.length} 區，<b style="color:#1f7a4d">${grow} 區成長</b>、<b style="color:#b53b65">${drop} 區衰退</b>。
-    ${up?`最強 <b>${up.name.replace('｜','-')}</b> ${up.yoy>=0?"+":""}${up.yoy.toFixed(1)}%（主力 ${up.lead||"—"}）；`:""}${dn&&dn!==up?`最弱 <b>${dn.name.replace('｜','-')}</b> ${dn.yoy.toFixed(1)}%（主力 ${dn.lead||"—"}）。`:""}
-  </div>`;
-}
-function renderRgChart(){
-  const name=document.getElementById("rg-pick").value;
-  const rows=fYoy().filter(r=>(rgLevel==="city"?r.region:(r.section?r.region+"｜"+r.section:""))===name);
-  if(!name||!rows.length){if(rgChart)rgChart.destroy();return;}
-  const y25=Array(12).fill(0),y26=Array(12).fill(0);
-  rows.forEach(r=>{(r.y===25?y25:y26)[r.m-1]+=r.sale;});
-  const labels=[...Array(12)].map((_,i)=>(i+1)+"月");
-  if(rgChart)rgChart.destroy();
-  rgChart=new Chart(document.getElementById("rgChart"),{type:"bar",data:{labels,datasets:[{label:"2025",data:y25,backgroundColor:"#a7c0c5",borderRadius:3},{label:"2026",data:y26,backgroundColor:"#263E44",borderRadius:3}]},plugins:[wanLabel],options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:16}},plugins:{legend:{position:"top"},tooltip:{callbacks:{label:c=>c.dataset.label+"：NT$"+fmtN(c.raw)}}},scales:{y:{ticks:{callback:v=>(v/1e6)+"M"}}}}});
-}
-function dlRegion(){const rows=rgRows();if(rgYear==="yoy"){dl("區域戰情_"+(rgLevel==="city"?"縣市":"行政區")+".csv",[["區域","2026期間","2025同期","YoY%","2025全年","進度%"],...rows.map(x=>[x.name.replace('｜','-'),x.s26,x.s25,(x.yoy!=null?x.yoy.toFixed(1)+"%":""),x.fy25,x.prog.toFixed(0)+"%"])]);}else{const key=rgYear==="25"?"s25":"s26";dl("區域_"+rgYear+".csv",[["區域",rgYear+"期間業績"],...rows.map(x=>[x.name.replace('｜','-'),x[key]])]);}}
-
-// ---------- 業務戰報 ----------
-const GRP_TARGETS={
- "業務一課 - 業務一組":{q3:3546},
- "業務一課 - 業務二組":{q3:3496},
- "業務二課 - 業務三組":{q3:2248,q4:2129,h2:4377,remkt_q3:274,remkt_q4:259,remkt_h2:533,coop_q3:195,coop_q4:185,coop_h2:380},
- "業務二課 - 業務四組":{q3:2400,q4:2222,h2:4622,remkt_q3:227,remkt_q4:210,remkt_h2:437,coop_q3:241,coop_q4:223,coop_h2:464},
- "設計課 - 設計組":{q3:1110}
-};
-const wanT=w=>Math.round(w).toLocaleString("en-US")+"萬";
-// 業績目標(萬)：優先讀課組戰情頁「各季目標」(元)，未設才用內建 GRP_TARGETS
-function gtVal(g,k){const gt=GRP_TARGETS[g]||{};
-  if(k==="q3"){const v=getQ(g,3);return v!=null?Math.round(v/1e4):(gt.q3||0);}
-  if(k==="q4"){const v=getQ(g,4);return v!=null?Math.round(v/1e4):(gt.q4||0);}
-  if(k==="h2"){const a=getQ(g,3),b=getQ(g,4);if(a!=null||b!=null)return Math.round(((a||0)+(b||0))/1e4);return gt.h2||0;}
-  return gt[k]||0;}
-function buildWar(){const s=document.getElementById("war-cls");s.innerHTML="";[...new Set(ROWS.map(r=>r.cls))].filter(x=>x&&x!=="(其他)").sort().forEach(c=>{const o=document.createElement("option");o.value=c;o.textContent=c;if(c==="業務二課")o.selected=true;s.appendChild(o);});s.addEventListener("change",renderWar);const pb=document.getElementById("war-pdf");if(pb)pb.addEventListener("click",()=>{const cls=document.getElementById("war-cls").value;pb.textContent="產生中…";html2pdf().set({margin:[8,8,10,8],filename:`業務戰報_${cls}_${(PDATA.snapshot||"").replace(/\//g,"")}.pdf`,image:{type:"jpeg",quality:0.95},html2canvas:{scale:2,useCORS:true,backgroundColor:"#f7f8fa"},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},pagebreak:{mode:["css","legacy"]}}).from(document.getElementById("war-body")).save().then(()=>{pb.textContent="🖨️ 下載 PDF";});});}
-function wSum(rows,ms,f){return rows.filter(r=>ms.includes(r.m)&&(!f||f(r))).reduce((s,r)=>s+r.sale,0);}
-function wHouse(hrows,ms){const pid=new Set(),cu=new Set();let sale=0;hrows.forEach(r=>{if(ms.includes(r.m)){sale+=r.sale;if(r.cust!=-1)cu.add(r.cust);if(r.region&&r.section)pid.add(r.pid);}});return{sale,coop:pid.size,cust:cu.size,arpu:cu.size?sale/cu.size:0,arpuP:pid.size?sale/pid.size:0};}
-function warYoY(cls,ms){if(!YOY.length)return null;let a=0,b=0;YOY.forEach(r=>{if(r.cls===cls&&ms.includes(r.m)){if(r.y===26)a+=r.sale;else b+=r.sale;}});return b?(a-b)/b*100:null;}
-function renderWar(){
-  const cls=document.getElementById("war-cls").value;
-  const dzW=cls.includes("設計"), wArpu=o=>dzW?o.arpu:o.arpuP;  // 設計課→客戶、房產課→建案
-  const grps=[...new Set(ROWS.filter(r=>r.cls===cls).map(r=>r.grp))].filter(x=>x&&x!=="(未分組)").sort();
-  const R=ROWS.filter(r=>r.cls===cls), H=HOUSE.filter(r=>r.cls===cls);
-  const Q3=[7,8,9],Q4=[10,11,12],H2=[7,8,9,10,11,12];
-  const T=k=>grps.reduce((s,g)=>s+gtVal(g,k),0);
-  const hasT=grps.some(g=>GRP_TARGETS[g]||hasQ(g));
-  document.getElementById("war-sub").textContent="範圍："+grps.map(g=>g.split(" - ")[1]||g).join("＋")+" ｜ 房產類 Q3 進行中快照 ｜ 快照 "+(PDATA.snapshot||"");
-  const q3h=wHouse(H,Q3), tgtQ3=T("q3"), rateQ3=tgtQ3?q3h.sale/(tgtQ3*1e4)*100:null, yoy=warYoY(cls,Q3);
-  const PIPE=PDATA.pipe||{}, wpeople=[...new Set(R.filter(r=>r.sales).map(r=>r.sales))];
-  let pf=0,pq=0,pp=0; wpeople.forEach(p=>{const x=PIPE[p];if(x){pf+=x.f;pq+=x.q;pp+=x.p;}});
-  const wpipe=pf*0.7+pq*0.2+pp*0.7, wEst=q3h.sale+wpipe, gapS=Math.max(0,tgtQ3*1e4-q3h.sale), cover=gapS?wpipe/gapS*100:0;
-  const WK=PDATA.weekly||{}, wks=Object.keys(WK).sort(), curW=wks.length?(WK[wks[wks.length-1]].cls||{})[cls]:null, prevW=wks.length>1?(WK[wks[wks.length-2]].cls||{})[cls]:null;
-  const wkLeft=Math.max(1,Math.ceil((new Date(2026,8,30)-new Date())/(7*864e5))), needWk=gapS/wkLeft;
-  const es={7:new Set(),8:new Set(),9:new Set()},ea=new Set();
-  H.forEach(r=>{if(!r.ins)return;if(r.endm>=7&&r.endm<=9)es[r.endm].add(r.ins);else if(r.endm>9)ea.add(r.ins);});
-  const moData=Q3.map(m=>H.filter(r=>r.m===m).reduce((s,r)=>s+r.sale,0));
-  const moSum=m=>H.filter(r=>r.m===m).reduce((s,r)=>s+r.sale,0);
-  const snM=(+((PDATA.snapshot||"").split("/")[1]))||(new Date().getMonth()+1);
-  const mLast=snM-1, mPrev=snM-2, moChg=moSum(mLast)-moSum(mPrev);
-  const perData=[...new Set(H.map(r=>r.sales))].filter(x=>x).map(p=>{const hp=H.filter(r=>r.sales===p);const q=wHouse(hp,Q3);const x=PIPE[p]||{f:0,q:0,p:0};return{name:p,signed:q.sale,short:x.f+x.q,pot:x.p};}).filter(x=>x.signed>0).sort((a,b)=>(b.signed+b.short+b.pot)-(a.signed+a.short+a.pot));
-  const kc=(k,v,n,col)=>`<div class="kpi"><div class="k">${k}</div><div class="v"${col?` style="color:${col}"`:""}>${v}</div><div class="n">${n}</div></div>`;
-  const cap=t=>`<div class="cap">${t}</div>`;
-  const wrng=grps.map(g=>g.split(" - ")[1]||g).join("＋");
-  // OKR
-  const h2s=wSum(R,H2)/1e4,tH2=T("h2"),h2r=wSum(R,H2,r=>r.ad==="remarketing"||r.ad==="agent")/1e4,tRe=T("remkt_h2"),h2c=wHouse(H,H2).coop,tCo=T("coop_h2");
-  const okrCard=(nm,val,unit,tgt)=>{const rate=tgt?val/tgt*100:null;const col=rate==null?"#5a6271":rate>=100?"#1f7a4d":"#263E44";return `<div class="kpi" style="border-top-color:#263E44"><div class="k">${nm}</div><div class="v">${unit==="家"?fmtN(val)+"家":wanT(val)}</div><div class="n">目標 ${unit==="家"?fmtN(tgt)+"家":wanT(tgt)}｜達成 <b style="color:${col}">${rate!=null?rate.toFixed(1)+"%":"—"}</b>｜缺口 ${tgt?(unit==="家"?fmtN(Math.max(0,tgt-val))+"家":wanT(Math.max(0,tgt-val))):"—"}</div></div>`;};
-  // 組拆解
-  const grpRow=(g)=>{const rg=R.filter(r=>r.grp===g),hg=H.filter(r=>r.grp===g),gt=GRP_TARGETS[g]||{};
-    const s=wSum(rg,H2)/1e4,re=wSum(rg,H2,r=>r.ad==="remarketing"||r.ad==="agent")/1e4,co=wHouse(hg,H2).coop;
-    const cell=(v,t,u)=>`<td>${u==="家"?fmtN(v):wanT(v)}</td><td>${t?(u==="家"?fmtN(t):wanT(t)):"—"}</td><td>${t?(v/t*100).toFixed(1)+"%":"—"}</td>`;
-    return `<tr><td>${g.split(" - ")[1]||g}</td>${cell(s,gtVal(g,"h2"),"萬")}${cell(re,gt.remkt_h2,"萬")}${cell(co,gt.coop_h2,"家")}</tr>`;};
-  // 個人拆解
-  const people=[...new Set(R.filter(r=>r.sales).map(r=>r.sales))];
-  const persRow=(p)=>{const hp=H.filter(r=>r.sales===p);const q=wHouse(hp,Q3);const x=PIPE[p]||{f:0,q:0,p:0};const short=x.f+x.q,wt=q.sale+x.f*0.7+x.q*0.2+x.p*0.7;return `<tr><td>${p}</td><td>${fmtWan(q.sale)}</td><td>${fmtWan(short)}</td><td>${fmtWan(x.p)}</td><td>${fmtWan(wt)}</td><td>${fmtN(q.coop)}</td><td>${fmtWan(wArpu(q))}</td></tr>`;};
-  // 季度節奏拆解（某季各組 業績/再行銷/合作建案 目前 vs 目標）
-  const qtr=(ms,qk)=>{
-    const ac=(v,t,u)=>{const c=t?(v/t*100>=100?"#1f7a4d":"#263E44"):"#9aa3ad";return `<td>${u==="家"?fmtN(v):wanT(v)}</td><td style="color:${c};font-weight:600">${t?(v/t*100).toFixed(1)+"%":"—"}</td>`;};
-    // 課別合計
-    const cs=wSum(R,ms)/1e4,cre=wSum(R,ms,r=>r.ad==="remarketing"||r.ad==="agent")/1e4,cco=wHouse(H,ms).coop;
-    const ct=grps.reduce((s,g)=>s+gtVal(g,qk),0),crt=grps.reduce((s,g)=>s+((GRP_TARGETS[g]||{})["remkt_"+qk]||0),0),cct=grps.reduce((s,g)=>s+((GRP_TARGETS[g]||{})["coop_"+qk]||0),0);
-    const body=grps.map(g=>{const rg=R.filter(r=>r.grp===g),hg=H.filter(r=>r.grp===g),gt=GRP_TARGETS[g]||{};
-      const s=wSum(rg,ms)/1e4,re=wSum(rg,ms,r=>r.ad==="remarketing"||r.ad==="agent")/1e4,co=wHouse(hg,ms).coop;
-      return `<tr><td>${g.split(" - ")[1]||g}</td>${ac(s,gtVal(g,qk),"萬")}${ac(re,gt["remkt_"+qk],"萬")}${ac(co,gt["coop_"+qk],"家")}</tr>`;}).join("");
-    return `<div class="tbl-wrap"><table><thead><tr><th>組別</th><th>業績</th><th>達成</th><th>再行銷</th><th>達成</th><th>合作建案</th><th>達成</th></tr></thead><tbody>${body}<tr style="font-weight:700;background:#fafbfc"><td>課合計</td>${ac(cs,ct,"萬")}${ac(cre,crt,"萬")}${ac(cco,cct,"家")}</tr></tbody></table></div>`;
-  };
-  // 產品線 Q3 房產
-  const adName={"on-site":"站內廣告","remarketing":"再行銷","digitm":"數媒-站內","agent":"數媒-再行銷"};
-  const adSum={}; R.forEach(r=>{if(r.industry==="房產類"&&Q3.includes(r.m))adSum[r.ad]=(adSum[r.ad]||0)+r.sale;});
-  const adTot=Object.values(adSum).reduce((a,b)=>a+b,0)||1;
-  const adRows=["on-site","remarketing","digitm","agent"].map(a=>`<div class="ref"><span>${adName[a]}</span><b>${fmtWan(adSum[a]||0)}（${((adSum[a]||0)/adTot*100).toFixed(1)}%）</b></div>`).join("");
-  // 月度 Q3 房產
-  const moRows=Q3.map(m=>{const v=H.filter(r=>r.m===m).reduce((s,r)=>s+r.sale,0);return `<div class="ref"><span>${m}月</span><b>${fmtWan(v)}（占Q3目標 ${tgtQ3?(v/(tgtQ3*1e4)*100).toFixed(1):"—"}%）</b></div>`;}).join("");
-  // 主管摘要
-  const sumTxt=`Q3 房產已簽約 ${fmtWan(q3h.sale)}，以${grps.map(g=>g.split(" - ")[1]).join("＋")}目標 ${wanT(tgtQ3)} 計，達成 ${rateQ3!=null?rateQ3.toFixed(1)+"%":"—"}（Q3 進行中、屬期中快照）。合作建案 ${q3h.coop} 件、客單價 ${fmtWan(wArpu(q3h))}。H2 OKR：業績達 ${(tH2?h2s/tH2*100:0).toFixed(1)}%、再行銷 ${(tRe?h2r/tRe*100:0).toFixed(1)}%、合作建案 ${(tCo?h2c/tCo*100:0).toFixed(1)}%。`;
-  document.getElementById("war-body").innerHTML=
-    `<div class="pagetitle">📋 ${cls} 業務戰報 ${hasT?"":'<span style="font-size:12px;color:#b53b65;font-weight:400">（此課尚無組目標，達成率待補）</span>'}</div>`+
-    cap(`本報表範圍：<b>${cls}（${wrng}）</b>，房產類、Q3 進行中快照（${PDATA.snapshot||""}）。<b>加權預估</b>＝已簽約＋加權Pipeline（將實現×70%＋有效報價×20%＋潛力×70%）；<b>達成率</b>＝業績÷Q3目標；<b>YoY</b>為與去年同期比。`)+
-    `<div class="kpis">${kc("Q3 目標業績",wanT(tgtQ3),grps.map(g=>(g.split(" - ")[1]||g)+" "+(gtVal(g,"q3")||"—")+"萬").join(" / "))}
-      ${kc("Q3 已簽約業績",fmtWan(q3h.sale)+"元",`達成率 ${rateQ3!=null?rateQ3.toFixed(1)+"%":"—"} ｜ YoY ${yoy!=null?(yoy>=0?"+":"")+yoy.toFixed(1)+"%":"—"}`,rateQ3!=null&&rateQ3>=60?"#1f7a4d":"#263E44")}
-      ${kc("加權預估業績",fmtWan(wEst)+"元",`加權達成 ${tgtQ3?(wEst/(tgtQ3*1e4)*100).toFixed(1):"—"}% ｜ 缺口 ${wanT(Math.max(0,tgtQ3-Math.round(wEst/1e4)))}`)}
-      ${kc("Q3 合作建案／客單價",fmtN(q3h.coop)+" 件",`去重合作建案 ｜ 客單價 ${fmtWan(wArpu(q3h))}`)}</div>`+
-    `<div class="card"><div class="card-head"><h2>📈 下半季展望 · 每週領先指標</h2></div>${cap(`<b>上月業績變化</b>＝上月(${mLast}月)房產已簽約 − 前月(${mPrev}月)，直接取 DOS 逐月業績、月月有數（本月進行中故取最近完整月）；<b>達標所需週均</b>＝已簽缺口÷剩餘週數；<b>Pipeline週變化</b>＝加權Pipeline本週−上週。`)}<div class="kpis" style="margin:0">${kc("上月業績變化",(moChg>=0?"+":"")+fmtWan(moChg)+"元",mLast+"月 vs "+mPrev+"月（房產）")}${kc("達標所需週均",fmtWan(needWk)+"元","已簽缺口 "+wanT(Math.round(gapS/1e4))+" / 剩 "+wkLeft+" 週")}${kc("Pipeline 週變化",(curW&&prevW)?fmtWan(curW.wpipe-prevW.wpipe)+"元":"累積中",(curW&&prevW)?"加權 pipeline 週變化":"下週起可比")}</div></div>`+
-    `<div class="card"><div class="card-head"><h2>🎯 Pipeline 子彈（Q3 房產）</h2></div>${cap(`Q3 房產尚未簽約但在追的商機，依機率加權：<b>將實現</b>(forecast) 70%、<b>有效報價</b>(quotation_valid，14天內) 20%、<b>潛力</b>(potential) 70%。<b>覆蓋率</b>＝加權Pipeline÷已簽缺口，看子彈夠不夠補洞。`)}<div class="kpis" style="margin:0">${kc("加權 Pipeline 合計",fmtWan(wpipe)+"元","覆蓋已簽缺口 "+cover.toFixed(1)+"%")}${kc("將實現 (70%)",fmtWan(pf)+"元","forecast")}${kc("有效報價 (20%)",fmtWan(pq)+"元","quotation_valid")}${kc("潛力 (70%)",fmtWan(pp)+"元","potential")}</div><div class="note">加權 Pipeline = 將實現×70% + 有效報價×20% + 潛力×70%；加權預估 = 已簽約 + 加權 Pipeline。</div></div>`+
-    `<div class="card"><div class="card-head"><h2>🎯 2026 H2 業務OKR 追蹤（全產業）</h2></div>${cap(`H2（7–12月）三大目標的課合計 目前 vs 目標：業績、再行銷為<b>全產業</b>，合作建案為<b>房產去重</b>。達成＝實績÷目標，缺口＝目標−實績。業績目標吃課組戰情頁的季目標（Q3+Q4）。`)}<div class="kpis" style="margin:0">${okrCard("O-1 H2 業績",h2s,"萬",tH2)}${okrCard("O-2 H2 再行銷",h2r,"萬",tRe)}${okrCard("O-3 H2 合作建案",h2c,"家",tCo)}</div></div>`+
-    `<div class="card"><div class="card-head"><h2>📊 組別 OKR 拆解（H2）</h2></div>${cap(`把 H2 三大 OKR 拆到各組：每組的<b>業績／再行銷（萬）、合作建案（家）</b>目前 vs 目標與達成率。看哪一組落後、缺口在誰身上。`)}<div class="tbl-wrap"><table><thead><tr><th>組別</th><th>業績目前</th><th>業績目標</th><th>達成</th><th>再行銷目前</th><th>再行銷目標</th><th>達成</th><th>建案目前</th><th>建案目標</th><th>達成</th></tr></thead><tbody>${grps.map(grpRow).join("")}</tbody></table></div></div>`+
-    `<div class="card"><div class="card-head"><h2>🌀 季度節奏拆解</h2></div><div style="font-weight:700;color:#263E44;margin-bottom:6px">Q3 進行中（即時概況）</div>${qtr(Q3,"q3")}<div style="font-weight:700;color:#263E44;margin:14px 0 6px">Q4 預先認列（下季基本盤）</div>${qtr(Q4,"q4")}<div class="note">業績、再行銷為全產業；合作建案為房產去重。Q4 為預先認列，不代表完整季度成績。</div></div>`+
-    `<div class="card"><div class="card-head"><h2>👥 個人責任拆解（Q3 房產）</h2></div>${cap(`每位業務的 Q3 房產：<b>已簽約</b>（實績）＋<b>短期可追</b>（將實現＋有效報價）＋<b>潛力</b>，長條堆疊看每人手上總量與結構；<b>加權預估</b>＝已簽約＋加權Pipeline。依總量排序，找誰能補缺口。`)}<div class="chart-box" style="height:${Math.max(160,perData.length*30)}px;margin-bottom:12px"><canvas id="warPer"></canvas></div><div class="tbl-wrap"><table><thead><tr><th>業務</th><th>已簽約</th><th>短期可追</th><th>潛力</th><th>加權預估</th><th>合作建案</th><th>客單價</th></tr></thead><tbody>${people.map(persRow).join("")}</tbody></table></div><div class="note">短期可追＝將實現+有效報價；加權預估＝已簽約+加權 Pipeline。</div></div>`+
-    `<div class="grid2"><div class="card"><div class="card-head"><h2>🧩 Q3 房產產品線分佈</h2></div>${cap(`Q3 房產已簽約業績依廣告類型（站內／再行銷／數媒）拆分與占比，看業績結構偏哪種產品。`)}${adRows}</div><div class="card"><div class="card-head"><h2>📅 Q3 月度已簽約（房產）</h2></div>${cap(`Q3 房產已簽約逐月（7/8/9月）金額，括號為占Q3目標%，看單月進度與節奏。`)}<div class="chart-box" style="height:150px;margin-bottom:8px"><canvas id="warMo"></canvas></div>${moRows}</div></div>`+
-    `<div class="card"><div class="card-head"><h2>⏰ 走期結束與續約提醒（房產）</h2></div><div class="kpis" style="margin:0">${kc("Q3 結束走期建案",fmtN(es[7].size+es[8].size+es[9].size)+" 件","7月 "+es[7].size+" / 8月 "+es[8].size+" / 9月 "+es[9].size)}${kc("Q3 後結束（續約池）",fmtN(ea.size)+" 件","走期在 Q3 之後結束，續約追蹤")}</div><div class="note">依房產已簽約案件的走期結束月份（去重建案）統計，用於續約追蹤。</div></div>`+
-    `<div class="card" style="background:#f6faf2;border-color:#dbe8cf"><div class="card-head"><h2>🧭 主管摘要</h2></div><div style="font-size:13.5px;line-height:1.9;color:#1a1d23">${sumTxt}</div></div>`+
-    `<div class="card" style="background:#f6faf2;border-color:#dbe8cf"><div class="note" style="color:#5a6271"><b>ℹ️ 說明：</b>週變化需累積 2 週才顯示（本週已開始存快照，下週起可比）。Pipeline 為每次同步的房產 Q3 快照。走期結束／續約提醒依 DOS 走期日；也可另接你的「到期追蹤表」。</div></div>`;
-  warCharts.forEach(c=>c.destroy()); warCharts=[];
-  const moEl=document.getElementById("warMo");
-  if(moEl&&window.Chart)warCharts.push(new Chart(moEl,{type:"bar",data:{labels:["7月","8月","9月"],datasets:[{data:moData.map(v=>Math.round(v)),backgroundColor:"#263E44",borderRadius:4}]},plugins:[wanLabel],options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:16}},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>"NT$"+fmtN(c.raw)}}},scales:{y:{ticks:{callback:v=>(v/1e6)+"M"}}}}}));
-  const perEl=document.getElementById("warPer");
-  if(perEl&&window.Chart&&perData.length)warCharts.push(new Chart(perEl,{type:"bar",data:{labels:perData.map(x=>x.name),datasets:[{label:"已簽約",data:perData.map(x=>Math.round(x.signed)),backgroundColor:"#263E44"},{label:"短期可追",data:perData.map(x=>Math.round(x.short)),backgroundColor:"#7a9aa1"},{label:"潛力",data:perData.map(x=>Math.round(x.pot)),backgroundColor:"#b5c400"}]},options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"top"},tooltip:{callbacks:{label:c=>c.dataset.label+"：NT$"+fmtN(c.raw)}}},scales:{x:{stacked:true,ticks:{callback:v=>(v/1e6)+"M"}},y:{stacked:true}}}}));
-}
-
-function dl(fn,rows){const csv="﻿"+rows.map(r=>r.map(c=>'"'+String(c==null?"":c).replace(/"/g,'""')+'"').join(",")).join("\r\n");const b=new Blob([csv],{type:"text/csv;charset=utf-8"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=fn;document.body.appendChild(a);a.click();setTimeout(()=>a.remove(),200);}
-</script>
+  <footer>
+    <span>內部系統｜資料依角色授權</span>
+    <span>不在瀏覽器保存客戶或業績明細</span>
+  </footer>
 </body>
 </html>
