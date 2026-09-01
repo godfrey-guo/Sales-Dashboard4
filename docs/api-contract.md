@@ -13,7 +13,18 @@
     "display_name": "目前使用者",
     "role": "manager",
     "role_label": "課長",
-    "scope_label": "所屬業務課"
+    "scope_label": "所屬業務課",
+    "allowed_modules": [
+      "overview",
+      "performance",
+      "projects",
+      "teams",
+      "war-room",
+      "weekly",
+      "targets",
+      "regions",
+      "okr"
+    ]
   }
 }
 ```

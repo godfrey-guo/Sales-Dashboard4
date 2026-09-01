@@ -8,6 +8,7 @@ const elements = {
   accessMessage: $("#access-message"),
   loginLink: $("#login-link"),
   dashboard: $("#dashboard"),
+  moduleNav: $("#module-nav"),
   sessionLabel: $("#session-label"),
   sessionDot: $(".status-dot"),
   logoutButton: $("#logout-button"),
@@ -155,12 +156,39 @@ function renderBars(container, items = [], variant = "trend") {
   }
 }
 
+function activateModule(moduleName) {
+  const allowedButton = elements.moduleNav.querySelector(`[data-module="${moduleName}"]:not([hidden])`);
+  if (!allowedButton) return;
+
+  elements.moduleNav.querySelectorAll("[data-module]").forEach((button) => {
+    const active = button.dataset.module === moduleName;
+    button.classList.toggle("is-active", active);
+    button.setAttribute("aria-current", active ? "page" : "false");
+  });
+  document.querySelectorAll("[data-module-view]").forEach((view) => {
+    view.hidden = view.dataset.moduleView !== moduleName;
+  });
+}
+
+function configureModules(session) {
+  const allowed_modules = Array.isArray(session.user.allowed_modules) && session.user.allowed_modules.length
+    ? session.user.allowed_modules
+    : ["overview"];
+
+  elements.moduleNav.querySelectorAll("[data-module]").forEach((button) => {
+    button.hidden = !allowed_modules.includes(button.dataset.module);
+    button.onclick = () => activateModule(button.dataset.module);
+  });
+  activateModule(allowed_modules.includes("overview") ? "overview" : allowed_modules[0]);
+}
+
 function renderDashboard(session, summary) {
   elements.sessionLabel.textContent = `${session.user.display_name}｜${session.user.role_label}`;
   elements.scopeLabel.textContent = `資料範圍：${session.user.scope_label}`;
   elements.snapshot.textContent = summary.snapshot || "—";
   elements.logoutButton.hidden = false;
   elements.sessionDot.classList.add("is-ready");
+  configureModules(session);
   renderKpis(summary.kpis);
   renderPriorities(summary.priorities);
   renderAlerts(summary.alerts);

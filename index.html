@@ -38,6 +38,19 @@
     </section>
 
     <section id="dashboard" hidden>
+      <nav class="module-nav" id="module-nav" aria-label="功能分頁">
+        <button class="module-tab is-active" type="button" data-module="overview">經營總覽</button>
+        <button class="module-tab" type="button" data-module="performance">業績總覽</button>
+        <button class="module-tab" type="button" data-module="projects">建案分析</button>
+        <button class="module-tab" type="button" data-module="teams">課組戰情</button>
+        <button class="module-tab" type="button" data-module="war-room">業務戰報</button>
+        <button class="module-tab" type="button" data-module="weekly">週會追蹤</button>
+        <button class="module-tab" type="button" data-module="targets">目標中心</button>
+        <button class="module-tab" type="button" data-module="regions">區域歷年戰情</button>
+        <button class="module-tab" type="button" data-module="okr">OKR 考核</button>
+      </nav>
+
+      <div class="module-view" id="module-overview" data-module-view="overview">
       <div class="page-heading">
         <div>
           <p class="eyebrow">經營決策中心</p>
@@ -104,6 +117,40 @@
           </div>
           <div class="mix-list" id="mix-list"></div>
         </article>
+      </section>
+      </div>
+
+      <section class="module-view module-placeholder" data-module-view="performance" hidden>
+        <p class="eyebrow">經營管理</p><h1>業績總覽</h1>
+        <p>保留月度趨勢、站台、產品、產業、區域與業務分布；正式資料由後端依角色範圍彙總。</p>
+      </section>
+      <section class="module-view module-placeholder" data-module-view="projects" hidden>
+        <p class="eyebrow">經營管理</p><h1>建案分析</h1>
+        <p>保留合作建案、在線建案、滲透率、客單價與續約機會，並統一資料快照口徑。</p>
+      </section>
+      <section class="module-view module-placeholder" data-module-view="teams" hidden>
+        <p class="eyebrow">執行管理</p><h1>課組戰情</h1>
+        <p>保留課、組、個人的目標、實績、缺口、跑速與紅燈比較。</p>
+      </section>
+      <section class="module-view module-placeholder" data-module-view="war-room" hidden>
+        <p class="eyebrow">執行管理</p><h1>業務戰報</h1>
+        <p>保留 Commit、Best case、加權 Pipeline、缺口覆蓋與個人責任拆解。</p>
+      </section>
+      <section class="module-view module-placeholder" data-module-view="weekly" hidden>
+        <p class="eyebrow">執行管理</p><h1>週會追蹤</h1>
+        <p>保留上週承諾、三項紅燈、主管決議、負責人、期限與下週驗證。</p>
+      </section>
+      <section class="module-view module-placeholder" data-module-view="targets" hidden>
+        <p class="eyebrow">績效治理</p><h1>目標中心</h1>
+        <p>保留半年、季度、月度目標與版本控管；不再以瀏覽器本機資料作正式目標。</p>
+      </section>
+      <section class="module-view module-placeholder" data-module-view="regions" hidden>
+        <p class="eyebrow">經營管理</p><h1>區域歷年戰情</h1>
+        <p>保留縣市、行政區、同期、YoY 與主力業務分析，並標明截止日與組織口徑。</p>
+      </section>
+      <section class="module-view module-placeholder" data-module-view="okr" hidden>
+        <p class="eyebrow">績效治理</p><h1>OKR 考核</h1>
+        <p>保留個人與團隊 O／KR、權重、進度、證據、卡點、下一步與主管 Review。</p>
       </section>
     </section>
   </main>
