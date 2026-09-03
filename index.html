@@ -4,8 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>數字廣告業績儀表板</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 :root {
@@ -311,6 +309,17 @@ tbody tr:hover { background: #f8fafc; }
       </div>
     </section>
 
+    <section id="page-meet" class="hide">
+      <div class="pagetitle">🗓️ 會議指南 <span style="font-size:12px;color:#9aa3ad;font-weight:400">日／週／月會直接用：這次要看什麼、要問什麼</span></div>
+      <div class="cap" id="meet-scope"></div>
+      <div class="tabs" id="meet-tabs">
+        <div class="tab active" data-cad="day">☀️ 日會</div>
+        <div class="tab" data-cad="week">🗓️ 週會</div>
+        <div class="tab" data-cad="month">📅 月會</div>
+      </div>
+      <div id="meet-body"></div>
+    </section>
+
     <section id="page-goal" class="hide">
       <div class="pagetitle">🎯 目標中心 <span style="font-size:12px;color:#9aa3ad;font-weight:400">主管在 Sheet「目標設定」分頁設每人目標 → 自動算達成/缺口/燈號 · 隨篩選(課/組/員)變 · H2 累計</span></div>
       <div class="card"><div class="card-head"><h2>H2 目標達成總覽</h2><a id="goal-open" href="#" target="_blank" rel="noopener" style="padding:5px 10px;font-size:12px;border:1px solid #263E44;border-radius:8px;color:#263E44;text-decoration:none">✍ 開 Sheet 設目標 ↗</a></div>
@@ -353,8 +362,9 @@ tbody tr:hover { background: #f8fafc; }
     </section>
   </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js"></script>
 <script>
-const PDATA = {"snapshot": "2026/09/01", "growth": {"業務一課 - 業務一組": {"growth": -1.2, "arpu2026": 225671}, "業務一課 - 業務二組": {"growth": -10.6, "arpu2026": 223539}, "業務二課 - 業務三組": {"growth": -18.8, "arpu2026": 148632}, "業務二課 - 業務四組": {"growth": -12.6, "arpu2026": 124484}, "設計課 - 設計組": {"growth": 5.9, "arpu2026": 180463}}, "pipe": {"張淑瑜": {"f": 0, "q": 60984, "p": 326362, "grp": "業務一課"}, "曾方音": {"f": 0, "q": 1019022, "p": 248405, "grp": "業務一課 - 業務二組"}, "曾家羚": {"f": 0, "q": 713933, "p": 92026, "grp": "業務二課 - 業務三組"}, "呂佩宜": {"f": 0, "q": 806919, "p": 157393, "grp": "業務二課 - 業務三組"}, "陳琬臻": {"f": 0, "q": 1646773, "p": 111521, "grp": "業務二課 - 業務三組"}, "簡順隆": {"f": 0, "q": 354482, "p": 242039, "grp": "業務一課 - 業務二組"}, "黃淑萍": {"f": 0, "q": 916181, "p": 650763, "grp": "業務一課 - 業務一組"}, "趙紹亨": {"f": 0, "q": 53882, "p": 170717, "grp": "業務一課 - 業務一組"}, "楊儀菲": {"f": 0, "q": 222198, "p": 52101, "grp": "業務一課 - 業務二組"}, "彭莉芳": {"f": 0, "q": 228780, "p": 89706, "grp": "業務一課 - 業務一組"}, "簡艷華": {"f": 0, "q": 44245, "p": 0, "grp": "業務二課 - 業務四組"}, "姚蘋芸": {"f": 0, "q": 164470, "p": 144146, "grp": "業務二課 - 業務四組"}, "鄧瑋婷": {"f": 0, "q": 68792, "p": 136338, "grp": "業務二課 - 業務四組"}, "許孟瑋": {"f": 0, "q": 0, "p": 70434, "grp": "業務二課"}, "吳子敬": {"f": 0, "q": 0, "p": 187500, "grp": "業務一課 - 業務二組"}, "程湣傑": {"f": 0, "q": 0, "p": 678414, "grp": "媒體產品課 - 站台產品組"}, "李抒姮": {"f": 0, "q": 0, "p": 151238, "grp": "設計課 - 設計組"}, "仲綨柱": {"f": 0, "q": 0, "p": 145059, "grp": "業務一課 - 業務一組"}, "陳文昕": {"f": 0, "q": 0, "p": 973871, "grp": "行銷策略課 - 行銷一組"}, "郭彥孝": {"f": 0, "q": 0, "p": 11, "grp": "業務二課"}, "劉美恩": {"f": 0, "q": 0, "p": 16343, "grp": "資訊技術中心"}, "陳怡雯 Mina": {"f": 0, "q": 0, "p": 87619, "grp": "業務一課 - 業務一組"}, "趙斯蓓": {"f": 0, "q": 0, "p": 314342, "grp": "設計課 - 設計組"}, "李佳隆": {"f": 0, "q": 0, "p": 42858, "grp": "資訊技術中心"}}, "weekly": {"2026-W32": {"date": "2026/08/07", "cls": {"行銷策略課": {"signed": 0, "wpipe": 660266}, "業務二課": {"signed": 29652313, "wpipe": 2998292}, "媒體產品課": {"signed": 0, "wpipe": 1338745}, "設計課": {"signed": 1427191, "wpipe": 329906}, "業務一課": {"signed": 49660573, "wpipe": 4085136}}}, "2026-W33": {"date": "2026/08/13", "cls": {"行銷策略課": {"signed": 0, "wpipe": 589553}, "設計課": {"signed": 1427191, "wpipe": 325906}, "業務二課": {"signed": 29652313, "wpipe": 2856192}, "業務一課": {"signed": 49660573, "wpipe": 4629476}, "媒體產品課": {"signed": 0, "wpipe": 457610}}}, "2026-W34": {"date": "2026/08/23", "cls": {"設計課": {"signed": 1427191, "wpipe": 325906, "perf": 14916356, "rem": 976224}, "業務一課": {"signed": 49660573, "wpipe": 4629476, "perf": 51955607, "rem": 4918454}, "媒體產品課": {"signed": 0, "wpipe": 457610, "perf": 0, "rem": 0}, "業務二課": {"signed": 29652313, "wpipe": 2856192, "perf": 32150758, "rem": 3543194}, "行銷策略課": {"signed": 0, "wpipe": 589553, "perf": 0, "rem": 0}}}, "2026-W35": {"date": "2026/08/26", "cls": {"業務二課": {"signed": 36118329, "wpipe": 2856192, "perf": 44657809, "rem": 4864540}, "媒體產品課": {"signed": 0, "wpipe": 457610, "perf": 0, "rem": 0}, "業務一課": {"signed": 62641412, "wpipe": 4629476, "perf": 70352835, "rem": 6205417}, "行銷策略課": {"signed": 0, "wpipe": 589553, "perf": 0, "rem": 0}, "設計課": {"signed": 1434923, "wpipe": 325906, "perf": 17092215, "rem": 1105264}}}, "2026-W36": {"date": "2026/09/01", "cls": {"設計課": {"signed": 1434923, "wpipe": 325906, "perf": 17092215, "rem": 1105264}, "媒體產品課": {"signed": 0, "wpipe": 474890, "perf": 0, "rem": 0}, "行銷策略課": {"signed": 0, "wpipe": 681710, "perf": 0, "rem": 0}, "業務一課": {"signed": 62641412, "wpipe": 2111296, "perf": 70352835, "rem": 6205417}, "資訊技術中心": {"signed": 0, "wpipe": 41441, "perf": 0, "rem": 0}, "業務二課": {"signed": 36118329, "wpipe": 1187335, "perf": 44657809, "rem": 4864540}}}}};
+const PDATA = {"snapshot":"2026/09/01","growth":{"業務一課 - 業務一組":{"growth":-1.2,"arpu2026":225671},"業務一課 - 業務二組":{"growth":-10.6,"arpu2026":223539},"業務二課 - 業務三組":{"growth":-18.8,"arpu2026":148632},"業務二課 - 業務四組":{"growth":-12.6,"arpu2026":124484},"設計課 - 設計組":{"growth":5.9,"arpu2026":180463}},"pipe":{"張淑瑜":{"f":0,"q":60984,"p":326362,"grp":"業務一課"},"曾方音":{"f":0,"q":1019022,"p":248405,"grp":"業務一課 - 業務二組"},"曾家羚":{"f":0,"q":713933,"p":92026,"grp":"業務二課 - 業務三組"},"呂佩宜":{"f":0,"q":806919,"p":157393,"grp":"業務二課 - 業務三組"},"陳琬臻":{"f":0,"q":1646773,"p":111521,"grp":"業務二課 - 業務三組"},"簡順隆":{"f":0,"q":354482,"p":242039,"grp":"業務一課 - 業務二組"},"黃淑萍":{"f":0,"q":916181,"p":650763,"grp":"業務一課 - 業務一組"},"趙紹亨":{"f":0,"q":53882,"p":170717,"grp":"業務一課 - 業務一組"},"楊儀菲":{"f":0,"q":222198,"p":52101,"grp":"業務一課 - 業務二組"},"彭莉芳":{"f":0,"q":228780,"p":89706,"grp":"業務一課 - 業務一組"},"簡艷華":{"f":0,"q":44245,"p":0,"grp":"業務二課 - 業務四組"},"姚蘋芸":{"f":0,"q":164470,"p":144146,"grp":"業務二課 - 業務四組"},"鄧瑋婷":{"f":0,"q":68792,"p":136338,"grp":"業務二課 - 業務四組"},"許孟瑋":{"f":0,"q":0,"p":70434,"grp":"業務二課"},"吳子敬":{"f":0,"q":0,"p":187500,"grp":"業務一課 - 業務二組"},"程湣傑":{"f":0,"q":0,"p":678414,"grp":"媒體產品課 - 站台產品組"},"李抒姮":{"f":0,"q":0,"p":151238,"grp":"設計課 - 設計組"},"仲綨柱":{"f":0,"q":0,"p":145059,"grp":"業務一課 - 業務一組"},"陳文昕":{"f":0,"q":0,"p":973871,"grp":"行銷策略課 - 行銷一組"},"郭彥孝":{"f":0,"q":0,"p":11,"grp":"業務二課"},"劉美恩":{"f":0,"q":0,"p":16343,"grp":"資訊技術中心"},"陳怡雯 Mina":{"f":0,"q":0,"p":87619,"grp":"業務一課 - 業務一組"},"趙斯蓓":{"f":0,"q":0,"p":314342,"grp":"設計課 - 設計組"},"李佳隆":{"f":0,"q":0,"p":42858,"grp":"資訊技術中心"}},"weekly":{"2026-W32":{"date":"2026/08/07","cls":{"行銷策略課":{"signed":0,"wpipe":660266},"業務二課":{"signed":29652313,"wpipe":2998292},"媒體產品課":{"signed":0,"wpipe":1338745},"設計課":{"signed":1427191,"wpipe":329906},"業務一課":{"signed":49660573,"wpipe":4085136}}},"2026-W33":{"date":"2026/08/13","cls":{"行銷策略課":{"signed":0,"wpipe":589553},"設計課":{"signed":1427191,"wpipe":325906},"業務二課":{"signed":29652313,"wpipe":2856192},"業務一課":{"signed":49660573,"wpipe":4629476},"媒體產品課":{"signed":0,"wpipe":457610}}},"2026-W34":{"date":"2026/08/23","cls":{"設計課":{"signed":1427191,"wpipe":325906,"perf":14916356,"rem":976224},"業務一課":{"signed":49660573,"wpipe":4629476,"perf":51955607,"rem":4918454},"媒體產品課":{"signed":0,"wpipe":457610,"perf":0,"rem":0},"業務二課":{"signed":29652313,"wpipe":2856192,"perf":32150758,"rem":3543194},"行銷策略課":{"signed":0,"wpipe":589553,"perf":0,"rem":0}}},"2026-W35":{"date":"2026/08/26","cls":{"業務二課":{"signed":36118329,"wpipe":2856192,"perf":44657809,"rem":4864540},"媒體產品課":{"signed":0,"wpipe":457610,"perf":0,"rem":0},"業務一課":{"signed":62641412,"wpipe":4629476,"perf":70352835,"rem":6205417},"行銷策略課":{"signed":0,"wpipe":589553,"perf":0,"rem":0},"設計課":{"signed":1434923,"wpipe":325906,"perf":17092215,"rem":1105264}}},"2026-W36":{"date":"2026/09/01","cls":{"設計課":{"signed":1434923,"wpipe":325906,"perf":17092215,"rem":1105264},"媒體產品課":{"signed":0,"wpipe":474890,"perf":0,"rem":0},"行銷策略課":{"signed":0,"wpipe":681710,"perf":0,"rem":0},"業務一課":{"signed":62641412,"wpipe":2111296,"perf":70352835,"rem":6205417},"資訊技術中心":{"signed":0,"wpipe":41441,"perf":0,"rem":0},"業務二課":{"signed":36118329,"wpipe":1187335,"perf":44657809,"rem":4864540}}}}};
 const fmtN=n=>Math.round(n).toLocaleString("en-US");
 const fmtWan=n=>{const x=Math.round(n);if(Math.abs(x)>=1e8)return (x/1e8).toLocaleString("en-US",{maximumFractionDigits:2})+"億";if(Math.abs(x)>=1e4)return (x/1e4).toLocaleString("en-US",{maximumFractionDigits:1})+"萬";return x.toLocaleString("en-US");};
 const fmtBoth=n=>`${fmtWan(n)}<span style="display:block;font-size:10px;color:#9aa3ad;font-weight:400">${fmtN(n)}</span>`;
@@ -364,31 +374,52 @@ document.getElementById("snap").textContent="資料快照："+PDATA.snapshot;
 const wanLabel={id:"wanLabel",afterDatasetsDraw(c){const t=c.config.type,x=c.ctx;c.data.datasets.forEach((ds,di)=>{c.getDatasetMeta(di).data.forEach((el,i)=>{const v=ds.data[i];if(!v)return;x.save();x.font="bold 11px sans-serif";x.textAlign="center";x.textBaseline="middle";if(t==="bar"){x.fillStyle="#263E44";x.fillText(fmtWan(v),el.x,el.y-8);}else{const p=el.tooltipPosition();x.lineWidth=3;x.strokeStyle="rgba(0,0,0,.4)";x.strokeText(fmtWan(v),p.x,p.y);x.fillStyle="#fff";x.fillText(fmtWan(v),p.x,p.y);}x.restore();});});}};
 
 let ROWS=[], HOUSE=[], ONLINE=[], YOY=[], curDim="cls", projDim="grp", rgLevel="city", rgYear="yoy", YTD=7, trendChart, chChart, rgChart, warCharts=[];
-let INSDET={}; fetch("./ins_detail.json").then(r=>r.json()).then(j=>{INSDET=j||{};if(typeof PDKEY!=="undefined"&&(PDKEY==="ins"||PDKEY==="cust"))renderPerfDetail(PDKEY);}).catch(()=>{});
+let INSDET={}, meetCad="day";
 const selSales=new Set(), selRegion=new Set(), selOkr=new Set(), selAd=new Set(); // 空=全部
 
-Promise.all([fetch("./data.json").then(r=>r.json()), fetch("./proj_rows.json").then(r=>r.json()), fetch("./yoy.json").then(r=>r.json()).catch(()=>({cols:[],dicts:{},rows:[]}))]).then(([d,pr,yy])=>{
-  if(yy&&yy.rows&&yy.rows.length){const c=yy.cols,gy=n=>c.indexOf(n),FF=['region','section','cls','grp','sales','ch','ad'];YOY=yy.rows.map(r=>{const o={y:r[gy('y')],m:r[gy('m')],sale:r[gy('sale')]};FF.forEach(f=>o[f]=yy.dicts[f][r[gy(f)]]);return o;});}
-  const gi=n=>d.cols.indexOf(n), F=['ins','ad','ch','cls','grp','sales','region','section','customer','industry','slot'];
-  ROWS=d.rows.map(r=>{const o={m:r[gi('m')],sale:r[gi('sale')],cust:r[gi('cust')]};F.forEach(f=>o[f]=d.dicts[f][r[gi(f)]]);return o;});
-  const hc=pr.house_cols, oc=pr.online_cols;
-  HOUSE=pr.house.map(r=>{const o={};hc.forEach((c,i)=>o[c]=r[i]);return o;});
-  ONLINE=pr.online.map(r=>{const o={};oc.forEach((c,i)=>o[c]=r[i]);return o;});
-  // 下拉
-  fill("f-month",[...Array(12)].map((_,i)=>[String(i+1),(i+1)+"月"]));
-  fill("f-ch",[...new Set(ROWS.map(r=>r.ch))].filter(x=>x).sort().map(v=>[v,v]));
-  buildSalesTree(); buildRegionTree(); buildOkrScope(); buildAdTree(); buildWar(); buildRegion();
-  document.getElementById("loading").classList.add("hide");
-  document.getElementById("f-month").addEventListener("change",()=>{if(val("f-month"))document.getElementById("f-quarter").value="";renderAll();});
-  document.getElementById("f-quarter").addEventListener("change",()=>{if(val("f-quarter"))document.getElementById("f-month").value="";renderAll();});
-  document.getElementById("f-ch").addEventListener("change",renderAll);
-  document.querySelectorAll("#dimtabs .tab").forEach(t=>t.addEventListener("click",()=>{sw("#dimtabs",t);curDim=t.dataset.dim;renderPerf();}));
-  document.querySelectorAll("#proj-tabs .tab").forEach(t=>t.addEventListener("click",()=>{sw("#proj-tabs",t);projDim=t.dataset.dim;renderProj();}));
-  renderAll();
-  gateAuth();
-}).catch(e=>{document.getElementById("loading").classList.add("hide");gateAuth();});
+// 資料一律要先知道「誰在問」才能拿到（Worker 依角色裁切後才回傳）；本機預覽（localhost/file:// 且未登入）
+// 才允許直接讀本機靜態 json，方便沒有 Worker 也能開發，正式網域一律走 Worker API。
+function apiBase(){return localStorage.getItem("dm_worker_base")||"https://dm-dashboard-api.cash0727.workers.dev";}
+let _dataInited=false;
+function loadDataThen(sess,onOk,onFail){
+  const ld=document.getElementById("loading");
+  ld.classList.remove("hide"); ld.textContent="載入資料中…（首次約 1–2 秒）";
+  const local=isLocalOrigin()&&!sess.token;
+  const hdr=sess.token?{Authorization:"Bearer "+sess.token}:{};
+  const p=local?{data:"./data.json",proj:"./proj_rows.json",yoy:"./yoy.json",ins:"./ins_detail.json"}
+               :{data:apiBase()+"/api/data",proj:apiBase()+"/api/proj_rows",yoy:apiBase()+"/api/yoy",ins:apiBase()+"/api/ins_detail"};
+  const get=u=>fetch(u,{headers:hdr}).then(r=>{if(r.status===401)throw new Error("401");return r.json();});
+  Promise.all([get(p.data), get(p.proj), get(p.yoy).catch(()=>({cols:[],dicts:{},rows:[]}))]).then(([d,pr,yy])=>{
+    get(p.ins).then(j=>{INSDET=j||{};if(typeof PDKEY!=="undefined"&&(PDKEY==="ins"||PDKEY==="cust"))renderPerfDetail(PDKEY);}).catch(()=>{});
+    if(yy&&yy.rows&&yy.rows.length){const c=yy.cols,gy=n=>c.indexOf(n),FF=['region','section','cls','grp','sales','ch','ad'];YOY=yy.rows.map(r=>{const o={y:r[gy('y')],m:r[gy('m')],sale:r[gy('sale')]};FF.forEach(f=>o[f]=yy.dicts[f][r[gy(f)]]);return o;});}
+    const gi=n=>d.cols.indexOf(n), F=['ins','ad','ch','cls','grp','sales','region','section','customer','industry','slot'];
+    ROWS=d.rows.map(r=>{const o={m:r[gi('m')],sale:r[gi('sale')],cust:r[gi('cust')]};F.forEach(f=>o[f]=d.dicts[f][r[gi(f)]]);return o;});
+    const hc=pr.house_cols, oc=pr.online_cols;
+    HOUSE=pr.house.map(r=>{const o={};hc.forEach((c,i)=>o[c]=r[i]);return o;});
+    ONLINE=pr.online.map(r=>{const o={};oc.forEach((c,i)=>o[c]=r[i]);return o;});
+    buildSalesTree(); buildRegionTree(); buildOkrScope(); buildAdTree(); buildWar(); buildRegion();
+    if(!_dataInited){
+      _dataInited=true;
+      fill("f-month",[...Array(12)].map((_,i)=>[String(i+1),(i+1)+"月"]));
+      fill("f-ch",[...new Set(ROWS.map(r=>r.ch))].filter(x=>x).sort().map(v=>[v,v]));
+      buildMeetTabs();
+      document.getElementById("f-month").addEventListener("change",()=>{if(val("f-month"))document.getElementById("f-quarter").value="";renderAll();});
+      document.getElementById("f-quarter").addEventListener("change",()=>{if(val("f-quarter"))document.getElementById("f-month").value="";renderAll();});
+      document.getElementById("f-ch").addEventListener("change",renderAll);
+      document.querySelectorAll("#dimtabs .tab").forEach(t=>t.addEventListener("click",()=>{sw("#dimtabs",t);curDim=t.dataset.dim;renderPerf();}));
+      document.querySelectorAll("#proj-tabs .tab").forEach(t=>t.addEventListener("click",()=>{sw("#proj-tabs",t);projDim=t.dataset.dim;renderProj();}));
+    }else{
+      fill("f-ch",[...new Set(ROWS.map(r=>r.ch))].filter(x=>x).sort().map(v=>[v,v])); // 換帳號重登：站台清單可能不同，重建一次
+    }
+    ld.classList.add("hide");
+    onOk();
+  }).catch(e=>{
+    ld.classList.add("hide");
+    if(onFail)onFail(); else {clearSession();showLogin();}
+  });
+}
 
-function fill(id,pairs){const s=document.getElementById(id);pairs.forEach(([v,t])=>{const o=document.createElement("option");o.value=v;o.textContent=t;s.appendChild(o);});}
+function fill(id,pairs){const s=document.getElementById(id);const el=document.getElementById(id);el.querySelectorAll("option[data-dyn]").forEach(o=>o.remove());pairs.forEach(([v,t])=>{const o=document.createElement("option");o.value=v;o.textContent=t;o.dataset.dyn="1";s.appendChild(o);});}
 function val(id){return document.getElementById(id).value;}
 function sw(sel,t){document.querySelectorAll(sel+" .tab").forEach(x=>x.classList.remove("active"));t.classList.add("active");}
 
@@ -481,12 +512,13 @@ function buildExpandable(tbody,tree){
 function exToggle(tb,tr){const id=tr.dataset.id,exp=tr.querySelector(".exp");if(!exp)return;const open=exp.textContent==="▾";exp.textContent=open?"▸":"▾";if(open){exHide(tb,id);}else{[...tb.querySelectorAll('.exrow[data-pid="'+id+'"]')].forEach(k=>k.style.display="");}}
 function exHide(tb,id){[...tb.querySelectorAll('.exrow[data-pid="'+id+'"]')].forEach(k=>{k.style.display="none";const e=k.querySelector(".exp");if(e)e.textContent="▸";exHide(tb,k.dataset.id);});}
 
-function renderAll(){ document.getElementById("status").textContent=curLabel()+" · "+fmtN(fRows().length)+" 筆"; renderPerf(); renderProj(); renderTeam(); renderWeek(); renderGoal(); if(YOY.length)renderRegion(); }
-document.getElementById("pageSel").addEventListener("change",e=>{const p=e.target.value;["overview","perf","proj","team","okr","region","war","week","goal","admin"].forEach(x=>document.getElementById("page-"+x).classList.toggle("hide",x!==p));document.querySelector("#app > .bar").style.display=((p==="okr"||p==="war"||p==="admin"||p==="overview")?"none":"");if(p==="overview")renderOverview((PREVIEW_ROLE||SESSION.role),SESSION);if(p==="okr")renderOKR();if(p==="region")renderRegion();if(p==="war")renderWar();if(p==="week")renderWeek();if(p==="goal")renderGoal();if(p==="admin")renderAdmin();});
+function renderAll(){ document.getElementById("status").textContent=curLabel()+" · "+fmtN(fRows().length)+" 筆"; renderPerf(); renderProj(); renderTeam(); renderWeek(); renderGoal(); if(YOY.length)renderRegion(); const mp=document.getElementById("page-meet"); if(mp&&!mp.classList.contains("hide"))renderMeet(); }
+document.getElementById("pageSel").addEventListener("change",e=>{const p=e.target.value;["overview","perf","proj","team","okr","region","war","week","goal","admin","meet"].forEach(x=>document.getElementById("page-"+x).classList.toggle("hide",x!==p));document.querySelector("#app > .bar").style.display=((p==="okr"||p==="war"||p==="admin"||p==="overview")?"none":"");if(p==="overview")renderOverview((PREVIEW_ROLE||SESSION.role),SESSION);if(p==="okr")renderOKR();if(p==="region")renderRegion();if(p==="war")renderWar();if(p==="week")renderWeek();if(p==="goal")renderGoal();if(p==="admin")renderAdmin();if(p==="meet")renderMeet();});
 
-/* ══════════ V0.1 登入／角色／資料範圍（前端示範，真驗證需後端） ══════════ */
+/* ══════════ 登入／角色／資料範圍：角色與範圍一律由 Worker 驗證 Google token 後回傳，
+   前端不再自己判定角色，localStorage 也改不了自己的權限 ══════════ */
 const ROLE_LABEL={sales:"業務",team_leader:"組長",manager:"課長",admin:"管理者"};
-// 內部角色／組織對照表（僅供前端示範用途；姓名需對得上資料裡的業務名，資料範圍才會真的變；登入一律走 Google 帳號驗證）
+// 本機預覽名單：只在 localhost/file:// 顯示，繞過登入方便開發/截圖核對各角色畫面；正式網域不會出現
 const DEMO_USERS=[
   {acc:"godfrey",                  name:"郭彥孝",role:"admin",     cls:"",     grp:""},
   {acc:"mgr1@digitm.com.tw",       name:"（業務一課 課長）",role:"manager",cls:"業務一課",grp:""},
@@ -494,11 +526,8 @@ const DEMO_USERS=[
   {acc:"pennyhuang@digitm.com.tw", name:"黃淑萍",role:"sales",     cls:"業務一課",grp:"業務一課 - 業務一組"}
 ];
 let SESSION=null;
-/* ── Google 登入（公司信箱→角色→資料範圍） ── */
 const DOMAIN="digitm.com.tw";
 let GOOGLE_CLIENT_ID=localStorage.getItem("dm_gid")||"402828273314-ksole88krq46gul2659pd2a8rcoac1g3.apps.googleusercontent.com";   // DigitM OAuth 用戶端（可公開）
-const ADMIN_EMAILS=(localStorage.getItem("dm_admins")||"godfrey_guo@digitm.com.tw").split(",").map(s=>s.trim().toLowerCase()).filter(Boolean); // 管理者信箱（預設 Godfrey；可用 localStorage dm_admins 覆蓋，逗號分隔）
-const EMAIL_USERS={"vivi@digitm.com.tw":{name:"彭莉芳",role:"sales",cls:"業務一課",grp:"業務一課 - 業務一組"},"pennyhuang@digitm.com.tw":{name:"黃淑萍",role:"sales",cls:"業務一課",grp:"業務一課 - 業務一組"},"miachao@digitm.com.tw":{name:"趙紹亨",role:"sales",cls:"業務一課",grp:"業務一課 - 業務一組"},"rebichung@digitm.com.tw":{name:"仲綨柱",role:"sales",cls:"業務一課",grp:"業務一課 - 業務一組"},"ivy.tseng@digitm.com.tw":{name:"曾方音",role:"sales",cls:"業務一課",grp:"業務一課 - 業務二組"},"dirochien@digitm.com.tw":{name:"簡順隆",role:"sales",cls:"業務一課",grp:"業務一課 - 業務二組"},"fifiyang@digitm.com.tw":{name:"楊儀菲",role:"sales",cls:"業務一課",grp:"業務一課 - 業務二組"},"vanessachen@digitm.com.tw":{name:"陳怡雯",role:"team_leader",cls:"業務一課",grp:"業務一課 - 業務一組"},"aviis_tseng@digitm.com.tw":{name:"曾家羚",role:"sales",cls:"業務二課",grp:"業務二課 - 業務三組"},"j77725@digitm.com.tw":{name:"陳琬臻",role:"sales",cls:"業務二課",grp:"業務二課 - 業務三組"},"unalu@digitm.com.tw":{name:"呂佩宜",role:"sales",cls:"業務二課",grp:"業務二課 - 業務三組"},"jennyjian@digitm.com.tw":{name:"簡艷華",role:"sales",cls:"業務二課",grp:"業務二課 - 業務四組"},"wendyteng@digitm.com.tw":{name:"鄧瑋婷",role:"sales",cls:"業務二課",grp:"業務二課 - 業務四組"},"appleyao@digitm.com.tw":{name:"姚蘋芸",role:"sales",cls:"業務二課",grp:"業務二課 - 業務四組"},"kellychao@digitm.com.tw":{name:"趙斯蓓",role:"sales",cls:"設計課",grp:"設計課 - 設計組"},"aprilchang@digitm.com.tw":{name:"張瑋秦",role:"sales",cls:"設計課",grp:"設計課 - 設計組"},"yuralee@digitm.com.tw":{name:"李抒姮",role:"sales",cls:"設計課",grp:"設計課 - 設計組"},"erinkuo@digitm.com.tw":{name:"郭宴菱",role:"sales",cls:"設計課",grp:"設計課 - 設計組"}};
 function initGoogle(){
   const wrap=document.getElementById("gwrap");if(!wrap)return;
   if(!GOOGLE_CLIENT_ID){wrap.innerHTML='<div class="note" style="text-align:center;line-height:1.7">尚未啟用 Google 登入。<br><a class="u" style="cursor:pointer;color:#263E44;text-decoration:underline" onclick="setGid()">管理者點此貼上 Client ID 啟用</a></div>';return;}
@@ -508,21 +537,15 @@ function initGoogle(){
     google.accounts.id.renderButton(document.getElementById("gbtn"),{theme:"filled_blue",size:"large",text:"signin_with",shape:"pill",locale:"zh_TW"});
   }catch(e){wrap.innerHTML='<div class="note" style="text-align:center;color:#b53b65">Google 登入初始化失敗：'+e.message+'　<a class="u" style="cursor:pointer" onclick="setGid()">重設 Client ID</a></div>';}
 }
-function setGid(){const v=prompt("貼上 Google OAuth Client ID（結尾 .apps.googleusercontent.com）：",GOOGLE_CLIENT_ID||"");if(v!==null){localStorage.setItem("dm_gid",v.trim());const a=prompt("（選填）管理者信箱，多個用逗號分隔，例：boss@digitm.com.tw",localStorage.getItem("dm_admins")||"");if(a!==null)localStorage.setItem("dm_admins",a.trim());location.reload();}}
-function b64u(s){s=s.replace(/-/g,"+").replace(/_/g,"/");while(s.length%4)s+="=";return decodeURIComponent(escape(atob(s)));}
+function setGid(){const v=prompt("貼上 Google OAuth Client ID（結尾 .apps.googleusercontent.com）：",GOOGLE_CLIENT_ID||"");if(v!==null){localStorage.setItem("dm_gid",v.trim());location.reload();}}
 function onGoogle(resp){
-  try{
-    const p=JSON.parse(b64u((resp.credential||"").split(".")[1]||""));
-    const email=(p.email||"").toLowerCase(),name=p.name||email;
-    if(!email.endsWith("@"+DOMAIN)){document.getElementById("lg-err").textContent="請用公司信箱（@"+DOMAIN+"）登入，此帳號為 "+email;return;}
-    let u=EMAIL_USERS[email];
-    if(ADMIN_EMAILS.includes(email))u={name:(u&&u.name)||name,role:"admin",cls:"",grp:""};
-    if(!u)u={name:name,role:"sales",cls:"",grp:""}; // 網域內但不在名單：暫給業務、以姓名對範圍
-    u=Object.assign({acc:email,gmail:true},u);
-    localStorage.setItem("dm_session",JSON.stringify(u));applySession(u);
-  }catch(e){document.getElementById("lg-err").textContent="Google 登入解析失敗："+e.message;}
+  const errEl=document.getElementById("lg-err");errEl.textContent="";
+  fetch(apiBase()+"/api/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({credential:resp.credential})})
+    .then(async r=>{const body=await r.json().catch(()=>({}));if(!r.ok)throw new Error(body.error||("登入失敗（"+r.status+"）"));return body;})
+    .then(u=>{localStorage.setItem("dm_session",JSON.stringify(u));document.getElementById("login").style.display="none";loadDataThen(u,()=>applySession(u));})
+    .catch(e=>{errEl.textContent=e.message;});
 }
-// 由 ROWS 推每位業務所屬 課／組
+// 由已拿到的（已裁切過的）ROWS 推每位業務所屬 課／組，純粹拿來顯示範圍文字，不是權限依據
 function orgMap(){const m={};ROWS.forEach(r=>{if(r.sales)m[r.sales]={cls:r.cls,grp:r.grp};});return m;}
 function scopeSales(u){const om=orgMap();const all=Object.keys(om);
   if(u.role==="admin")return null;                                   // null = 全部
@@ -531,11 +554,12 @@ function scopeSales(u){const om=orgMap();const all=Object.keys(om);
   return [u.name];                                                    // 業務：只有自己
 }
 function scopeText(u){if(u.role==="admin")return"全台所有業務";if(u.role==="manager")return u.cls+"（全部組別）";if(u.role==="team_leader")return u.grp.split(" - ").pop()+"（本組）";return"僅本人（"+u.name+"）";}
-function logout(){localStorage.removeItem("dm_session");SESSION=null;location.reload();}
-function localPreviewLogin(acc){const u=DEMO_USERS.find(x=>x.acc===acc);if(!u)return;localStorage.setItem("dm_session",JSON.stringify(u));applySession(u);}
+function clearSession(){localStorage.removeItem("dm_session");SESSION=null;}
+function logout(){clearSession();location.reload();}
+function localPreviewLogin(acc){const u=DEMO_USERS.find(x=>x.acc===acc);if(!u)return;localStorage.setItem("dm_session",JSON.stringify(u));document.getElementById("login").style.display="none";loadDataThen(u,()=>applySession(u));}
 function isLocalOrigin(){return location.protocol==="file:"||["localhost","127.0.0.1"].includes(location.hostname);}
-function gateAuth(){
-  const s=localStorage.getItem("dm_session");if(s){try{applySession(JSON.parse(s));return;}catch(e){}}
+function showLogin(){
+  document.getElementById("loading").classList.add("hide");
   document.getElementById("login").style.display="flex";initGoogle();
   // 本機預覽：只在 localhost／file:// 顯示，正式網域（github.io）不會出現，避免公開頁面出現可跳過登入的按鈕
   if(isLocalOrigin()){
@@ -544,10 +568,21 @@ function gateAuth(){
     btns.innerHTML=DEMO_USERS.map(u=>'<button class="treebtn" onclick="localPreviewLogin(\''+u.acc+'\')" style="text-align:left">'+ROLE_LABEL[u.role]+' － '+(u.name.startsWith("（")?u.name:u.name+"（"+u.acc+"）")+'</button>').join("");
   }
 }
+function gateAuth(){
+  let s=null; try{s=JSON.parse(localStorage.getItem("dm_session")||"null");}catch(e){}
+  if(s&&s.name&&(!s.exp||s.exp>Date.now())){
+    document.getElementById("login").style.display="none";
+    loadDataThen(s,()=>applySession(s),()=>{clearSession();showLogin();});
+    return;
+  }
+  clearSession();
+  showLogin();
+}
+gateAuth();
 // 依角色決定可見頁面：業務只留 我的業績／我的週會／我的目標；主管以上看完整管理視角
 function allowedPages(role){
   if(role==="sales")return[["overview","🧭 經營總覽"],["perf","📈 我的業績"],["week","🗓️ 我的週會"],["goal","🎯 我的目標"],["okr","🏅 我的 OKR"]];
-  const base=[["overview","🧭 經營總覽"],["perf","📈 業績總覽"],["proj","🏗️ 建案分析"],["team","🎯 課組戰情"],["war","📋 業務戰報"],["week","🗓️ 週會追蹤"],["goal","🎯 目標中心"],["region","🗺️ 區域歷年戰情"],["okr","🏅 OKR 考核"]];
+  const base=[["overview","🧭 經營總覽"],["perf","📈 業績總覽"],["proj","🏗️ 建案分析"],["team","🎯 課組戰情"],["war","📋 業務戰報"],["week","🗓️ 週會追蹤"],["meet","🗓️ 會議指南"],["goal","🎯 目標中心"],["region","🗺️ 區域歷年戰情"],["okr","🏅 OKR 考核"]];
   if(role==="admin")base.push(["admin","🔐 使用者權限管理"]);
   return base;
 }
@@ -626,9 +661,10 @@ function renderOverview(navRole,u){
       ];
     }
   }else{
+    const gap=hasTgt&&tgt!=null?Math.max(0,tgt-a.sale):null;
     kpis=[
       {k:"本期業績",v:fmtWan(a.sale)+"元",n:curLabel(),status:"neutral"},
-      {k:"達成率",v:rate!=null?rate.toFixed(1)+"%":"—",n:hasTgt?"目標 "+fmtWan(tgt)+"元":"此範圍無目標可比對",status:rate!=null?(rate>=100?"success":rate>=85?"warning":"danger"):"neutral"},
+      {k:"達成率",v:rate!=null?rate.toFixed(1)+"%":"—",n:hasTgt?"目標 "+fmtWan(tgt)+"元・缺口 "+fmtWan(gap)+"元":"此範圍無目標可比對",status:rate!=null?(rate>=100?"success":rate>=85?"warning":"danger"):"neutral"},
       {k:"客戶數",v:fmtN(a.cust),n:"本期範圍內、去重",status:"neutral"},
       {k:"委刊單數",v:fmtN(a.ins),n:"本期範圍內、去重",status:"neutral"}
     ];
@@ -640,29 +676,33 @@ function renderOverview(navRole,u){
   const cmp=document.getElementById("ov-compare");
   if(cmp){
     const rateCell=(s,t)=>{const r2=t?(s/t*100):null;const c=r2!=null?(r2>=100?statColor.success:r2>=85?statColor.warning:statColor.danger):"#9aa3ad";return '<td style="font-weight:700;color:'+c+'">'+(r2!=null?r2.toFixed(1)+"%":"—")+'</td>';};
-    let title="",head="",body="";
+    const remOf=rs=>rs.reduce((s,r)=>(r.ad==="remarketing"||r.ad==="agent")?s+r.sale:s,0);
+    let title="",head="",body="",note="";
     if(demoU.role==="admin"){
-      title="各課比較";head="<th>課別</th><th>業績</th><th>目標</th><th>達成率</th>";
+      title="各課比較";head="<th>課別</th><th>業績</th><th>目標</th><th>達成率</th><th>再行銷</th><th>再行銷占比</th>";
+      note="重點看課與課之間有沒有失衡（某課業績或再行銷明顯偏低），個別業務層級的問題交給課長/組長在自己的會議處理。";
       const courses=[...new Set(ORDER.map(g=>g.split(" - ")[0]))];
-      body=courses.map(c=>{const ca=agg((demoU.demo?allRows:rows).filter(r=>r.cls===c));const cg=ORDER.filter(g=>g.startsWith(c));const ct=cg.reduce((s,g)=>s+(periodTarget(g)||0),0)||null;
-        return '<tr><td>'+c+'</td><td>'+fmtWan(ca.sale)+'元</td><td>'+(ct?fmtWan(ct)+'元':'<span style="color:#98a2b3">未設</span>')+'</td>'+rateCell(ca.sale,ct)+'</tr>';}).join("");
+      body=courses.map(c=>{const crs=(demoU.demo?allRows:rows).filter(r=>r.cls===c);const ca=agg(crs);const rem=remOf(crs);const cg=ORDER.filter(g=>g.startsWith(c));const ct=cg.reduce((s,g)=>s+(periodTarget(g)||0),0)||null;
+        return '<tr><td>'+c+'</td><td>'+fmtWan(ca.sale)+'元</td><td>'+(ct?fmtWan(ct)+'元':'<span style="color:#98a2b3">未設</span>')+'</td>'+rateCell(ca.sale,ct)+'<td>'+fmtWan(rem)+'元</td><td>'+(ca.sale?(rem/ca.sale*100).toFixed(0)+"%":"—")+'</td></tr>';}).join("");
     }else if(demoU.role==="manager"){
-      title="本課各組比較";head="<th>組別</th><th>業績</th><th>目標</th><th>達成率</th>";
+      title="本課各組比較";head="<th>組別</th><th>業績</th><th>目標</th><th>達成率</th><th>再行銷</th><th>再行銷占比</th>";
+      note="重點看哪個組落後、要不要跨組支援；再行銷占比明顯偏低的組，週會該問一下產品結構。";
       const gs=ORDER.filter(g=>g.startsWith(demoU.cls));
-      body=gs.map(g=>{const ga=agg(allRows.filter(r=>r.grp===g));const gt=periodTarget(g);
-        return '<tr><td>'+g.split(" - ").pop()+'</td><td>'+fmtWan(ga.sale)+'元</td><td>'+(gt?fmtWan(gt)+'元':'<span style="color:#98a2b3">未設</span>')+'</td>'+rateCell(ga.sale,gt)+'</tr>';}).join("");
+      body=gs.map(g=>{const grs=allRows.filter(r=>r.grp===g);const ga=agg(grs);const rem=remOf(grs);const gt=periodTarget(g);
+        return '<tr><td>'+g.split(" - ").pop()+'</td><td>'+fmtWan(ga.sale)+'元</td><td>'+(gt?fmtWan(gt)+'元':'<span style="color:#98a2b3">未設</span>')+'</td>'+rateCell(ga.sale,gt)+'<td>'+fmtWan(rem)+'元</td><td>'+(ga.sale?(rem/ga.sale*100).toFixed(0)+"%":"—")+'</td></tr>';}).join("");
     }else if(demoU.role==="team_leader"){
-      title="組內業務排行";head="<th>名次</th><th>業務</th><th>業績</th><th>客戶數</th>";
+      title="組內業務排行";head="<th>名次</th><th>業務</th><th>業績</th><th>再行銷</th><th>客戶數</th>";
+      note="重點看誰的紅燈要當面盯進度；名次是給你看誰需要協助，不是拿來公開比較用。";
       const grows=allRows.filter(r=>r.grp===demoU.grp);
       const by={};grows.forEach(r=>{(by[r.sales]=by[r.sales]||[]).push(r);});
-      const arr=Object.entries(by).map(([n,rs])=>({n,a:agg(rs)})).sort((x,y)=>y.a.sale-x.a.sale);
-      body=arr.map((x,i)=>'<tr><td>'+(i+1)+'</td><td>'+x.n+'</td><td>'+fmtWan(x.a.sale)+'元</td><td>'+fmtN(x.a.cust)+'</td></tr>').join("");
+      const arr=Object.entries(by).map(([n,rs])=>({n,a:agg(rs),rem:remOf(rs)})).sort((x,y)=>y.a.sale-x.a.sale);
+      body=arr.map((x,i)=>'<tr><td>'+(i+1)+'</td><td>'+x.n+'</td><td>'+fmtWan(x.a.sale)+'元</td><td>'+fmtWan(x.rem)+'元</td><td>'+fmtN(x.a.cust)+'</td></tr>').join("");
     }
-    cmp.innerHTML=title?('<div class="card"><div class="card-head"><h2>'+title+'</h2></div><div class="tbl-wrap"><table><thead><tr>'+head+'</tr></thead><tbody>'+(body||'<tr><td colspan="4" class="note">尚無資料</td></tr>')+'</tbody></table></div></div>'):"";
+    cmp.innerHTML=title?('<div class="card"><div class="card-head"><h2>'+title+'</h2></div><div class="cap">'+note+'</div><div class="tbl-wrap"><table><thead><tr>'+head+'</tr></thead><tbody>'+(body||'<tr><td colspan="6" class="note">尚無資料</td></tr>')+'</tbody></table></div></div>'):"";
   }
 
   const pages=allowedPages(navRole).filter(p=>p[0]!=="overview");
-  const desc={perf:"月度趨勢、站台、產品、產業、區域與業務分布",proj:"合作建案、在線建案、滲透率與客單價",team:"課、組、個人的目標與達成狀況",war:"Pipeline、預估、缺口與個人責任",week:"上週承諾、紅燈、主管決議與行動",goal:"半年、季度與月度目標設定",region:"縣市、行政區、同期與 YoY",okr:"O／KR、權重、進度、卡點與 Review",admin:"帳號、角色與資料範圍（僅管理者）"};
+  const desc={perf:"月度趨勢、站台、產品、產業、區域與業務分布",proj:"合作建案、在線建案、滲透率與客單價",team:"課、組、個人的目標與達成狀況",war:"Pipeline、預估、缺口與個人責任",week:"上週承諾、紅燈、主管決議與行動",meet:"日／週／月會直接拿來用：這次要看什麼、問什麼",goal:"半年、季度與月度目標設定",region:"縣市、行政區、同期與 YoY",okr:"O／KR、權重、進度、卡點與 Review",admin:"帳號、角色與資料範圍（僅管理者）"};
   const links=document.getElementById("ov-links");if(!links)return;
   links.innerHTML=pages.map(p=>'<a class="ov-link" onclick="document.getElementById(\'pageSel\').value=\''+p[0]+'\';document.getElementById(\'pageSel\').dispatchEvent(new Event(\'change\'))"><div class="t">'+p[1]+'</div><div class="d">'+(desc[p[0]]||"")+'</div></a>').join("");
 }
@@ -1115,6 +1155,94 @@ function dlWeekProd(){const R=weekRows(),byS={};R.forEach(r=>{const s=r.sales||"
   const out=Object.entries(byS).map(([s,d])=>[s,d.on,d.re,d.dm,d.da,d.on+d.re+d.dm+d.da]).sort((a,b)=>b[5]-a[5]);
   dl("個人產品結構_H2.csv",[["業務","站內","再行銷","數媒站內","數媒再行銷","總計"],...out]);}
 
+// ---------- 會議指南（日／週／月會該看什麼、問什麼） ----------
+function buildMeetTabs(){
+  document.querySelectorAll("#meet-tabs .tab").forEach(t=>t.addEventListener("click",()=>{sw("#meet-tabs",t);meetCad=t.dataset.cad;renderMeet();}));
+}
+function meetByPerson(rows){
+  const by={};
+  rows.forEach(r=>{const s=r.sales||"(未填)";const d=by[s]=by[s]||{on:0,re:0,dm:0,tot:0,cust:new Set()};
+    d.tot+=r.sale; if(r.cust!=-1)d.cust.add(r.cust);
+    if(r.ad==="on-site")d.on+=r.sale; else if(r.ad==="remarketing"||r.ad==="agent")d.re+=r.sale; else if(r.ad==="digitm")d.dm+=r.sale;
+  });
+  return Object.entries(by).map(([s,d])=>({s,on:d.on,re:d.re,dm:d.dm,tot:d.tot,cust:d.cust.size}));
+}
+function renderMeet(){
+  const navRole=PREVIEW_ROLE||SESSION.role;
+  const demoU=overviewDemoTarget(navRole,SESSION);
+  const allRows=fRows();
+  const rows=demoU.demo?scopedRowsFor(demoU,allRows):allRows;
+  const levelNote={
+    admin:"你在看全公司節奏，重點是課與課之間有沒有失衡；個別業務的問題留給課長/組長在自己的會議處理。",
+    manager:"你在看「"+(demoU.cls||"本課")+"」全課，重點是哪個組落後、要不要跨組支援，不用逐一盯每個人的細節。",
+    team_leader:"你在看「"+((demoU.grp||"").split(" - ").pop()||"本組")+"」整組，重點是誰的紅燈要當面盯進度、誰的產品結構需要調整。",
+    sales:"這是你個人的節奏檢查，拿來準備跟主管報告用，不是拿來跟同事比較。"
+  };
+  document.getElementById("meet-scope").innerHTML="期間「"+curLabel()+"」・範圍「"+scopeText(demoU)+"」"+(demoU.demo?"　🔎 預覽示範中":"")+"<br><b>"+(levelNote[demoU.role]||"")+"</b>"+(meetCad==="month"?"　<span style=\"color:#9aa3ad\">（想看單月數字，上方篩選先選一個月份）</span>":"");
+  renderMeetBody(meetCad,demoU,rows);
+}
+function renderMeetBody(cad,demoU,rows){
+  const body=document.getElementById("meet-body");
+  const people=meetByPerson(rows).sort((a,b)=>b.tot-a.tot);
+  const totalSale=rows.reduce((s,r)=>s+r.sale,0);
+  const totalRem=rows.reduce((s,r)=>(r.ad==="remarketing"||r.ad==="agent")?s+r.sale:s,0);
+  const groupLevel=demoU.role==="admin"||demoU.role==="manager";
+  const groups=demoU.role==="admin"?[...new Set(ORDER.map(g=>g.split(" - ")[0]))]:demoU.role==="manager"?ORDER.filter(g=>g.startsWith(demoU.cls)):[];
+  const gapTbl=()=>{
+    if(!groupLevel)return "";
+    const rowsHtml=groups.map(g=>{
+      const ga=agg(rows.filter(r=>(demoU.role==="admin"?r.cls:r.grp)===g));
+      const gt=periodTarget(g);const gap=gt!=null?Math.max(0,gt-ga.sale):null;
+      const label=demoU.role==="admin"?g:g.split(" - ").pop();
+      return `<tr><td>${label}</td><td>${fmtWan(ga.sale)}</td><td>${gt!=null?fmtWan(gt):'<span style="color:#98a2b3">未設</span>'}</td><td style="font-weight:700;color:${gap>0?'#b53b65':'#1f7a4d'}">${gap!=null?fmtWan(gap):"—"}</td></tr>`;
+    }).join("");
+    return `<div class="card"><div class="card-head"><h2>🎯 目標缺口（依${demoU.role==="admin"?"課":"組"}彙總）</h2></div>
+      <div class="tbl-wrap"><table><thead><tr><th>${demoU.role==="admin"?"課別":"組別"}</th><th>業績</th><th>目標</th><th>缺口</th></tr></thead><tbody>${rowsHtml||'<tr><td colspan="4" class="note">尚無資料</td></tr>'}</tbody></table></div>
+    </div>`;
+  };
+  const peopleTbl=(sortAsc,limit)=>{
+    const arr=[...people].sort((a,b)=>sortAsc?a.tot-b.tot:b.tot-a.tot).slice(0,limit||99);
+    return `<div class="tbl-wrap"><table><thead><tr><th>業務</th><th>業績</th><th>再行銷</th><th>客戶數</th></tr></thead><tbody>${arr.map(p=>`<tr><td>${p.s}</td><td>${fmtWan(p.tot)}</td><td>${fmtWan(p.re)}</td><td>${p.cust}</td></tr>`).join("")||'<tr><td colspan="4" class="note">尚無資料</td></tr>'}</tbody></table></div>`;
+  };
+  if(cad==="day"){
+    body.innerHTML=`
+      <div class="card"><div class="card-head"><h2>☀️ 今天的會，帶著這 3 個問題進去</h2></div>
+        <ol style="margin:0 0 0 18px;font-size:13.5px;line-height:2;color:#1a1d23">
+          <li>累計到現在 ${fmtWan(totalSale)}，跟該有的進度比，下面「優先關注」墊底的幾位是誰？先問卡在哪。</li>
+          <li>有沒有委刊單卡在審核／等客戶回覆超過 2 天？系統沒自動判斷，直接口頭問一輪。</li>
+          <li>今天／明天有誰要簽約、需要主管幫忙站台的？別等到週會才知道。</li>
+        </ol>
+      </div>
+      <div class="card"><div class="card-head"><h2>優先關注（本期業績由低到高，前 5 位）</h2></div>${peopleTbl(true,5)}</div>`;
+  }else if(cad==="week"){
+    const flags=people.map(p=>{const o=p.on/(p.tot||1),re=p.re/(p.tot||1),dm=p.dm/(p.tot||1),w=[];
+      if(o>.7)w.push("站內過重");if(re<.10)w.push("再行銷偏弱");if(dm<.10)w.push("數媒偏弱");
+      return w.length?{s:p.s,w}:null;}).filter(Boolean);
+    body.innerHTML=`
+      <div class="card"><div class="card-head"><h2>🗓️ 這次週會要討論的重點</h2></div>
+        <ol style="margin:0 0 0 18px;font-size:13.5px;line-height:2;color:#1a1d23">
+          <li>本期業績 ${fmtWan(totalSale)}，再行銷 ${fmtWan(totalRem)}（占 ${totalSale?((totalRem/totalSale)*100).toFixed(0):0}%）——跟目標比缺口多少？見下方「目標缺口」。</li>
+          <li>產品結構偏斜的人要當面問怎麼調整：見下方「結構警示」名單。</li>
+          <li>逐一過一輪：手上 pipeline 夠不夠補上本期缺口？（詳細數字到「週會追蹤」頁 ⑥ Pipeline 戰情看）</li>
+        </ol>
+      </div>
+      <div class="card" style="background:#fff4f4;border-color:#f2c7c7"><div class="card-head"><h2>🚨 結構警示（誰該當面聊）</h2></div>
+        <div style="font-size:13px;line-height:1.9">${flags.length?flags.map(f=>`· <b>${f.s}</b>：${f.w.join("、")}`).join("<br>"):"🟢 目前結構都健康"}</div>
+      </div>
+      ${groupLevel?gapTbl():'<div class="card"><div class="card-head"><h2>本組排行（由低到高）</h2></div>'+peopleTbl(true)+'</div>'}`;
+  }else{ // month
+    body.innerHTML=`
+      <div class="card"><div class="card-head"><h2>📅 這次月會要討論的重點</h2></div>
+        <ol style="margin:0 0 0 18px;font-size:13.5px;line-height:2;color:#1a1d23">
+          <li>本期業績 ${fmtWan(totalSale)} vs 目標，缺口在哪個${groupLevel?(demoU.role==="admin"?"課":"組"):"人"}身上？見下方明細。</li>
+          <li>再行銷本期 ${fmtWan(totalRem)}（占 ${totalSale?((totalRem/totalSale)*100).toFixed(0):0}%）——是否符合 H2 回補目標的節奏？</li>
+          <li>下個月的 pipeline 覆蓋率夠不夠補上這個月沒達標的部分？（到「業務戰報」頁看 Pipeline 明細）</li>
+        </ol>
+      </div>
+      ${groupLevel?gapTbl():'<div class="card"><div class="card-head"><h2>本組本期排行</h2></div>'+peopleTbl(false)+'</div>'}`;
+  }
+}
+
 // ---------- 目標中心 ----------
 function renderGoal(){
   if(SHEETDATA.tgt===null&&localStorage.getItem("dm_sheet_edit"))wkFetchSheets(false);
@@ -1369,7 +1497,23 @@ function gtVal(g,k){const gt=GRP_TARGETS[g]||{};
   if(k==="q4"){const v=getQ(g,4);return v!=null?Math.round(v/1e4):(gt.q4||0);}
   if(k==="h2"){const a=getQ(g,3),b=getQ(g,4);if(a!=null||b!=null)return Math.round(((a||0)+(b||0))/1e4);return gt.h2||0;}
   return gt[k]||0;}
-function buildWar(){const s=document.getElementById("war-cls");s.innerHTML="";[...new Set(ROWS.map(r=>r.cls))].filter(x=>x&&x!=="(其他)").sort().forEach(c=>{const o=document.createElement("option");o.value=c;o.textContent=c;if(c==="業務二課")o.selected=true;s.appendChild(o);});s.addEventListener("change",renderWar);const pb=document.getElementById("war-pdf");if(pb)pb.addEventListener("click",()=>{const cls=document.getElementById("war-cls").value;pb.textContent="產生中…";html2pdf().set({margin:[8,8,10,8],filename:`業務戰報_${cls}_${(PDATA.snapshot||"").replace(/\//g,"")}.pdf`,image:{type:"jpeg",quality:0.95},html2canvas:{scale:2,useCORS:true,backgroundColor:"#f7f8fa"},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},pagebreak:{mode:["css","legacy"]}}).from(document.getElementById("war-body")).save().then(()=>{pb.textContent="🖨️ 下載 PDF";});});}
+function buildWar(){const s=document.getElementById("war-cls");s.innerHTML="";[...new Set(ROWS.map(r=>r.cls))].filter(x=>x&&x!=="(其他)").sort().forEach(c=>{const o=document.createElement("option");o.value=c;o.textContent=c;if(c==="業務二課")o.selected=true;s.appendChild(o);});s.addEventListener("change",renderWar);const pb=document.getElementById("war-pdf");if(pb)pb.addEventListener("click",async()=>{const cls=document.getElementById("war-cls").value;pb.textContent="準備中…";
+  try{await loadHtml2Pdf();}catch(e){pb.textContent="🖨️ 下載 PDF";alert("PDF 元件載入失敗，請檢查網路後重試");return;}
+  pb.textContent="產生中…";
+  html2pdf().set({margin:[8,8,10,8],filename:`業務戰報_${cls}_${(PDATA.snapshot||"").replace(/\//g,"")}.pdf`,image:{type:"jpeg",quality:0.95},html2canvas:{scale:2,useCORS:true,backgroundColor:"#f7f8fa"},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},pagebreak:{mode:["css","legacy"]}}).from(document.getElementById("war-body")).save().then(()=>{pb.textContent="🖨️ 下載 PDF";});});}
+// html2pdf(~1MB，含 jsPDF+html2canvas) 只有按下載 PDF 才需要，不要每次進站都載入
+let _html2pdfPromise=null;
+function loadHtml2Pdf(){
+  if(window.html2pdf)return Promise.resolve();
+  if(_html2pdfPromise)return _html2pdfPromise;
+  _html2pdfPromise=new Promise((resolve,reject)=>{
+    const s=document.createElement("script");
+    s.src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js";
+    s.onload=()=>resolve(); s.onerror=()=>{_html2pdfPromise=null;reject(new Error("load failed"));};
+    document.head.appendChild(s);
+  });
+  return _html2pdfPromise;
+}
 function wSum(rows,ms,f){return rows.filter(r=>ms.includes(r.m)&&(!f||f(r))).reduce((s,r)=>s+r.sale,0);}
 function wHouse(hrows,ms){const pid=new Set(),cu=new Set();let sale=0;hrows.forEach(r=>{if(ms.includes(r.m)){sale+=r.sale;if(r.cust!=-1)cu.add(r.cust);if(r.region&&r.section)pid.add(r.pid);}});return{sale,coop:pid.size,cust:cu.size,arpu:cu.size?sale/cu.size:0,arpuP:pid.size?sale/pid.size:0};}
 function warYoY(cls,ms){if(!YOY.length)return null;let a=0,b=0;YOY.forEach(r=>{if(r.cls===cls&&ms.includes(r.m)){if(r.y===26)a+=r.sale;else b+=r.sale;}});return b?(a-b)/b*100:null;}
