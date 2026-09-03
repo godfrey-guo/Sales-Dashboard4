@@ -733,7 +733,18 @@ function refreshPersonPreview(){
   const people=Object.keys(om).filter(n=>scope.grp?om[n].grp===scope.grp:om[n].cls===scope.cls).sort();
   if(!people.length){pp.style.display="none";return;}
   pp.style.display="";
-  pp.innerHTML='<option value="">－挑一位業務確認畫面－</option>'+people.map(n=>'<option value="'+n+'"'+(n===PREVIEW_PERSON?" selected":"")+'>業務：'+n+'</option>').join("");
+  const opt=n=>'<option value="'+n+'"'+(n===PREVIEW_PERSON?" selected":"")+'>業務：'+n+'</option>';
+  let html='<option value="">－挑一位業務確認畫面－</option>';
+  if(scope.grp){
+    // 已經是組級範圍（組長預覽），人是最底層，不用再分層
+    html+=people.map(opt).join("");
+  }else{
+    // 課級範圍（課長預覽）：管理層級由上而下——課 > 組 > 人，依組分 optgroup，不要把整課的人混成一串平的清單
+    const byGrp={};
+    people.forEach(n=>{const g=om[n].grp||"(未分組)";(byGrp[g]=byGrp[g]||[]).push(n);});
+    html+=Object.keys(byGrp).sort().map(g=>'<optgroup label="'+g.split(" - ").pop()+'">'+byGrp[g].map(opt).join("")+'</optgroup>').join("");
+  }
+  pp.innerHTML=html;
   pp.onchange=e=>setPreviewPerson(e.target.value);
 }
 function setPreviewRole(role){
