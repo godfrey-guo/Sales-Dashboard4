@@ -168,6 +168,7 @@ tbody tr:hover { background: #f8fafc; }
     <select id="pageSel"><option value="overview">🧭 經營總覽</option><option value="perf">📈 業績總覽</option><option value="proj">🏗️ 建案分析</option><option value="team">🎯 課組戰情</option><option value="war">📋 業務戰報</option><option value="week">🗓️ 週會追蹤</option><option value="goal">🎯 目標中心</option><option value="region">🗺️ 區域歷年戰情</option><option value="okr">🏅 OKR 考核</option></select>
     <span class="who" id="whoami"></span>
     <select class="role-preview" id="rolePreview" style="display:none" title="以角色預覽（僅供你自己檢視，不影響實際權限）"></select>
+    <select class="role-preview" id="orgPreview" style="display:none" title="課長預覽要選課、組長預覽要選組——由上而下，跟真實管理層級一樣"></select>
     <select class="role-preview" id="personPreview" style="display:none" title="挑一位下屬業務，確認他登入後看到的畫面"></select>
     <span class="preview-flag" id="previewFlag">🔎 預覽中</span>
     <button class="lo" id="logout" onclick="logout()" style="display:none">登出</button>
@@ -364,7 +365,7 @@ tbody tr:hover { background: #f8fafc; }
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js"></script>
 <script>
-const PDATA = {"snapshot": "2026/09/04", "growth": {"業務一課 - 業務一組": {"growth": -1.2, "arpu2026": 225671}, "業務一課 - 業務二組": {"growth": -10.6, "arpu2026": 223539}, "業務二課 - 業務三組": {"growth": -18.8, "arpu2026": 148632}, "業務二課 - 業務四組": {"growth": -12.6, "arpu2026": 124484}, "設計課 - 設計組": {"growth": 5.9, "arpu2026": 180463}}, "pipe": {"張淑瑜": {"f": 0, "q": 60984, "p": 326362, "grp": "業務一課"}, "曾方音": {"f": 0, "q": 1019022, "p": 248405, "grp": "業務一課 - 業務二組"}, "曾家羚": {"f": 0, "q": 713933, "p": 92026, "grp": "業務二課 - 業務三組"}, "呂佩宜": {"f": 0, "q": 806919, "p": 157393, "grp": "業務二課 - 業務三組"}, "陳琬臻": {"f": 0, "q": 1646773, "p": 111521, "grp": "業務二課 - 業務三組"}, "簡順隆": {"f": 0, "q": 354482, "p": 242039, "grp": "業務一課 - 業務二組"}, "黃淑萍": {"f": 0, "q": 916181, "p": 650763, "grp": "業務一課 - 業務一組"}, "趙紹亨": {"f": 0, "q": 53882, "p": 170717, "grp": "業務一課 - 業務一組"}, "楊儀菲": {"f": 0, "q": 222198, "p": 52101, "grp": "業務一課 - 業務二組"}, "彭莉芳": {"f": 0, "q": 228780, "p": 89706, "grp": "業務一課 - 業務一組"}, "簡艷華": {"f": 0, "q": 44245, "p": 0, "grp": "業務二課 - 業務四組"}, "姚蘋芸": {"f": 0, "q": 164470, "p": 144146, "grp": "業務二課 - 業務四組"}, "鄧瑋婷": {"f": 0, "q": 68792, "p": 136338, "grp": "業務二課 - 業務四組"}, "許孟瑋": {"f": 0, "q": 0, "p": 70434, "grp": "業務二課"}, "吳子敬": {"f": 0, "q": 0, "p": 187500, "grp": "業務一課 - 業務二組"}, "程湣傑": {"f": 0, "q": 0, "p": 678414, "grp": "媒體產品課 - 站台產品組"}, "李抒姮": {"f": 0, "q": 0, "p": 151238, "grp": "設計課 - 設計組"}, "仲綨柱": {"f": 0, "q": 0, "p": 145059, "grp": "業務一課 - 業務一組"}, "陳文昕": {"f": 0, "q": 0, "p": 973871, "grp": "行銷策略課 - 行銷一組"}, "郭彥孝": {"f": 0, "q": 0, "p": 11, "grp": "業務二課"}, "劉美恩": {"f": 0, "q": 0, "p": 16343, "grp": "資訊技術中心"}, "陳怡雯 Mina": {"f": 0, "q": 0, "p": 87619, "grp": "業務一課 - 業務一組"}, "趙斯蓓": {"f": 0, "q": 0, "p": 314342, "grp": "設計課 - 設計組"}, "李佳隆": {"f": 0, "q": 0, "p": 42858, "grp": "資訊技術中心"}}, "weekly": {"2026-W32": {"date": "2026/08/07", "cls": {"行銷策略課": {"signed": 0, "wpipe": 660266}, "業務二課": {"signed": 29652313, "wpipe": 2998292}, "媒體產品課": {"signed": 0, "wpipe": 1338745}, "設計課": {"signed": 1427191, "wpipe": 329906}, "業務一課": {"signed": 49660573, "wpipe": 4085136}}}, "2026-W33": {"date": "2026/08/13", "cls": {"行銷策略課": {"signed": 0, "wpipe": 589553}, "設計課": {"signed": 1427191, "wpipe": 325906}, "業務二課": {"signed": 29652313, "wpipe": 2856192}, "業務一課": {"signed": 49660573, "wpipe": 4629476}, "媒體產品課": {"signed": 0, "wpipe": 457610}}}, "2026-W34": {"date": "2026/08/23", "cls": {"設計課": {"signed": 1427191, "wpipe": 325906, "perf": 14916356, "rem": 976224}, "業務一課": {"signed": 49660573, "wpipe": 4629476, "perf": 51955607, "rem": 4918454}, "媒體產品課": {"signed": 0, "wpipe": 457610, "perf": 0, "rem": 0}, "業務二課": {"signed": 29652313, "wpipe": 2856192, "perf": 32150758, "rem": 3543194}, "行銷策略課": {"signed": 0, "wpipe": 589553, "perf": 0, "rem": 0}}}, "2026-W35": {"date": "2026/08/26", "cls": {"業務二課": {"signed": 36118329, "wpipe": 2856192, "perf": 44657809, "rem": 4864540}, "媒體產品課": {"signed": 0, "wpipe": 457610, "perf": 0, "rem": 0}, "業務一課": {"signed": 62641412, "wpipe": 4629476, "perf": 70352835, "rem": 6205417}, "行銷策略課": {"signed": 0, "wpipe": 589553, "perf": 0, "rem": 0}, "設計課": {"signed": 1434923, "wpipe": 325906, "perf": 17092215, "rem": 1105264}}}, "2026-W36": {"date": "2026/09/04", "cls": {"行銷策略課": {"signed": 0, "wpipe": 681710, "perf": 0, "rem": 0}, "業務二課": {"signed": 36118329, "wpipe": 1187335, "perf": 44657809, "rem": 4864540}, "設計課": {"signed": 1434923, "wpipe": 325906, "perf": 17092215, "rem": 1105264}, "業務一課": {"signed": 62641412, "wpipe": 2111296, "perf": 70352835, "rem": 6205417}, "資訊技術中心": {"signed": 0, "wpipe": 41441, "perf": 0, "rem": 0}, "媒體產品課": {"signed": 0, "wpipe": 474890, "perf": 0, "rem": 0}}}}};
+const PDATA = {"snapshot":"2026/09/04","growth":{"業務一課 - 業務一組":{"growth":-1.2,"arpu2026":225671},"業務一課 - 業務二組":{"growth":-10.6,"arpu2026":223539},"業務二課 - 業務三組":{"growth":-18.8,"arpu2026":148632},"業務二課 - 業務四組":{"growth":-12.6,"arpu2026":124484},"設計課 - 設計組":{"growth":5.9,"arpu2026":180463}},"pipe":{"張淑瑜":{"f":0,"q":60984,"p":326362,"grp":"業務一課"},"曾方音":{"f":0,"q":1019022,"p":248405,"grp":"業務一課 - 業務二組"},"曾家羚":{"f":0,"q":713933,"p":92026,"grp":"業務二課 - 業務三組"},"呂佩宜":{"f":0,"q":806919,"p":157393,"grp":"業務二課 - 業務三組"},"陳琬臻":{"f":0,"q":1646773,"p":111521,"grp":"業務二課 - 業務三組"},"簡順隆":{"f":0,"q":354482,"p":242039,"grp":"業務一課 - 業務二組"},"黃淑萍":{"f":0,"q":916181,"p":650763,"grp":"業務一課 - 業務一組"},"趙紹亨":{"f":0,"q":53882,"p":170717,"grp":"業務一課 - 業務一組"},"楊儀菲":{"f":0,"q":222198,"p":52101,"grp":"業務一課 - 業務二組"},"彭莉芳":{"f":0,"q":228780,"p":89706,"grp":"業務一課 - 業務一組"},"簡艷華":{"f":0,"q":44245,"p":0,"grp":"業務二課 - 業務四組"},"姚蘋芸":{"f":0,"q":164470,"p":144146,"grp":"業務二課 - 業務四組"},"鄧瑋婷":{"f":0,"q":68792,"p":136338,"grp":"業務二課 - 業務四組"},"許孟瑋":{"f":0,"q":0,"p":70434,"grp":"業務二課"},"吳子敬":{"f":0,"q":0,"p":187500,"grp":"業務一課 - 業務二組"},"程湣傑":{"f":0,"q":0,"p":678414,"grp":"媒體產品課 - 站台產品組"},"李抒姮":{"f":0,"q":0,"p":151238,"grp":"設計課 - 設計組"},"仲綨柱":{"f":0,"q":0,"p":145059,"grp":"業務一課 - 業務一組"},"陳文昕":{"f":0,"q":0,"p":973871,"grp":"行銷策略課 - 行銷一組"},"郭彥孝":{"f":0,"q":0,"p":11,"grp":"業務二課"},"劉美恩":{"f":0,"q":0,"p":16343,"grp":"資訊技術中心"},"陳怡雯 Mina":{"f":0,"q":0,"p":87619,"grp":"業務一課 - 業務一組"},"趙斯蓓":{"f":0,"q":0,"p":314342,"grp":"設計課 - 設計組"},"李佳隆":{"f":0,"q":0,"p":42858,"grp":"資訊技術中心"}},"weekly":{"2026-W32":{"date":"2026/08/07","cls":{"行銷策略課":{"signed":0,"wpipe":660266},"業務二課":{"signed":29652313,"wpipe":2998292},"媒體產品課":{"signed":0,"wpipe":1338745},"設計課":{"signed":1427191,"wpipe":329906},"業務一課":{"signed":49660573,"wpipe":4085136}}},"2026-W33":{"date":"2026/08/13","cls":{"行銷策略課":{"signed":0,"wpipe":589553},"設計課":{"signed":1427191,"wpipe":325906},"業務二課":{"signed":29652313,"wpipe":2856192},"業務一課":{"signed":49660573,"wpipe":4629476},"媒體產品課":{"signed":0,"wpipe":457610}}},"2026-W34":{"date":"2026/08/23","cls":{"設計課":{"signed":1427191,"wpipe":325906,"perf":14916356,"rem":976224},"業務一課":{"signed":49660573,"wpipe":4629476,"perf":51955607,"rem":4918454},"媒體產品課":{"signed":0,"wpipe":457610,"perf":0,"rem":0},"業務二課":{"signed":29652313,"wpipe":2856192,"perf":32150758,"rem":3543194},"行銷策略課":{"signed":0,"wpipe":589553,"perf":0,"rem":0}}},"2026-W35":{"date":"2026/08/26","cls":{"業務二課":{"signed":36118329,"wpipe":2856192,"perf":44657809,"rem":4864540},"媒體產品課":{"signed":0,"wpipe":457610,"perf":0,"rem":0},"業務一課":{"signed":62641412,"wpipe":4629476,"perf":70352835,"rem":6205417},"行銷策略課":{"signed":0,"wpipe":589553,"perf":0,"rem":0},"設計課":{"signed":1434923,"wpipe":325906,"perf":17092215,"rem":1105264}}},"2026-W36":{"date":"2026/09/04","cls":{"行銷策略課":{"signed":0,"wpipe":681710,"perf":0,"rem":0},"業務二課":{"signed":36118329,"wpipe":1187335,"perf":44657809,"rem":4864540},"設計課":{"signed":1434923,"wpipe":325906,"perf":17092215,"rem":1105264},"業務一課":{"signed":62641412,"wpipe":2111296,"perf":70352835,"rem":6205417},"資訊技術中心":{"signed":0,"wpipe":41441,"perf":0,"rem":0},"媒體產品課":{"signed":0,"wpipe":474890,"perf":0,"rem":0}}}}};
 const fmtN=n=>Math.round(n).toLocaleString("en-US");
 const fmtWan=n=>{const x=Math.round(n);if(Math.abs(x)>=1e8)return (x/1e8).toLocaleString("en-US",{maximumFractionDigits:2})+"億";if(Math.abs(x)>=1e4)return (x/1e4).toLocaleString("en-US",{maximumFractionDigits:1})+"萬";return x.toLocaleString("en-US");};
 const fmtBoth=n=>`${fmtWan(n)}<span style="display:block;font-size:10px;color:#9aa3ad;font-weight:400">${fmtN(n)}</span>`;
@@ -614,8 +615,8 @@ function overviewDemoTarget(navRole,realU){
     return {role:"sales",cls:info.cls||realU.cls||"",grp:info.grp||realU.grp||"",name:PREVIEW_PERSON,demo:true};
   }
   if(navRole===realU.role)return realU;
-  if(navRole==="manager"){const cls=[...new Set(ORDER.map(g=>g.split(" - ")[0]))][0]||"業務一課";return {role:"manager",cls,grp:"",name:"（示範）"+cls+" 課長",demo:true};}
-  if(navRole==="team_leader"){const grp=ORDER[0];return {role:"team_leader",cls:grp.split(" - ")[0],grp,name:"（示範）"+grp.split(" - ").pop()+" 組長",demo:true};}
+  if(navRole==="manager"){const cls=PREVIEW_CLS||[...new Set(ORDER.map(g=>g.split(" - ")[0]))][0]||"業務一課";return {role:"manager",cls,grp:"",name:"（示範）"+cls+" 課長",demo:true};}
+  if(navRole==="team_leader"){const grp=PREVIEW_GRP||ORDER[0];return {role:"team_leader",cls:grp.split(" - ")[0],grp,name:"（示範）"+grp.split(" - ").pop()+" 組長",demo:true};}
   if(navRole==="sales"){
     const by={};baseRows.forEach(r=>{by[r.sales]=(by[r.sales]||0)+r.sale;});
     const top=Object.entries(by).sort((a,b)=>b[1]-a[1])[0];
@@ -706,7 +707,7 @@ function renderOverview(navRole,u){
   const links=document.getElementById("ov-links");if(!links)return;
   links.innerHTML=pages.map(p=>'<a class="ov-link" onclick="document.getElementById(\'pageSel\').value=\''+p[0]+'\';document.getElementById(\'pageSel\').dispatchEvent(new Event(\'change\'))"><div class="t">'+p[1]+'</div><div class="d">'+(desc[p[0]]||"")+'</div></a>').join("");
 }
-let PREVIEW_ROLE=null,PREVIEW_PERSON=null;
+let PREVIEW_ROLE=null,PREVIEW_PERSON=null,PREVIEW_CLS=null,PREVIEW_GRP=null;
 function buildPageMenu(role){
   const sel=document.getElementById("pageSel");const opts=allowedPages(role);
   sel.innerHTML=opts.map(o=>'<option value="'+o[0]+'">'+o[1]+'</option>').join("");
@@ -717,11 +718,11 @@ function currentPreviewScope(){
   const eff=PREVIEW_ROLE||SESSION.role;
   if(eff==="manager"){
     if(SESSION.role==="manager")return {cls:SESSION.cls};
-    return {cls:[...new Set(ORDER.map(g=>g.split(" - ")[0]))][0]||"業務一課"};
+    return {cls:PREVIEW_CLS||[...new Set(ORDER.map(g=>g.split(" - ")[0]))][0]||"業務一課"};
   }
   if(eff==="team_leader"){
     if(SESSION.role==="team_leader")return {grp:SESSION.grp};
-    const grp=ORDER[0];return {cls:grp.split(" - ")[0],grp};
+    const grp=PREVIEW_GRP||ORDER[0];return {cls:grp.split(" - ")[0],grp};
   }
   return null;
 }
@@ -750,14 +751,40 @@ function refreshPersonPreview(){
 function setPreviewRole(role){
   PREVIEW_PERSON=null;
   PREVIEW_ROLE=(role===SESSION.role)?null:role;
+  PREVIEW_CLS=null;PREVIEW_GRP=null; // 換角色重新預覽，課/組選單回到預設（各自第一個），避免殘留上次選的
   document.getElementById("previewFlag").classList.toggle("on",!!PREVIEW_ROLE);
+  refreshOrgPreview(); // 先把 PREVIEW_CLS/PREVIEW_GRP 定出預設值，畫面才會跟著對
   buildPageMenu(PREVIEW_ROLE||SESSION.role);
   refreshPersonPreview();
+}
+// 管理層級由上而下：admin 預覽「課長」要先選是哪一課，預覽「組長」要先選是哪一組，
+// 跟真正登入的課長/組長本來就只看得到自己那課/組是同一個道理
+function refreshOrgPreview(){
+  const op=document.getElementById("orgPreview");if(!op)return;
+  const eff=PREVIEW_ROLE;
+  if(SESSION.role!=="admin"||!eff||PREVIEW_PERSON||(eff!=="manager"&&eff!=="team_leader")){op.style.display="none";op.innerHTML="";return;}
+  if(eff==="manager"){
+    const courses=[...new Set(ORDER.map(g=>g.split(" - ")[0]))];
+    if(!PREVIEW_CLS||!courses.includes(PREVIEW_CLS))PREVIEW_CLS=courses[0];
+    op.innerHTML=courses.map(c=>'<option value="'+c+'"'+(c===PREVIEW_CLS?" selected":"")+'>預覽：'+c+'</option>').join("");
+  }else{
+    if(!PREVIEW_GRP||!ORDER.includes(PREVIEW_GRP))PREVIEW_GRP=ORDER[0];
+    op.innerHTML=ORDER.map(g=>'<option value="'+g+'"'+(g===PREVIEW_GRP?" selected":"")+'>預覽：'+g.split(" - ")[0]+" "+g.split(" - ").pop()+'</option>').join("");
+  }
+  op.style.display="";
+  op.onchange=e=>setPreviewOrg(e.target.value);
+}
+function setPreviewOrg(v){
+  if(PREVIEW_ROLE==="manager")PREVIEW_CLS=v;
+  else if(PREVIEW_ROLE==="team_leader"){PREVIEW_GRP=v;PREVIEW_CLS=v.split(" - ")[0];}
+  refreshPersonPreview(); // 換課/組後，「挑一位業務」清單也要跟著換
+  const sel=document.getElementById("pageSel");if(sel)sel.dispatchEvent(new Event("change"));
 }
 function setPreviewPerson(name){
   PREVIEW_PERSON=name||null;
   PREVIEW_ROLE=PREVIEW_PERSON?"sales":(SESSION.role==="manager"||SESSION.role==="team_leader"?null:PREVIEW_ROLE);
   document.getElementById("previewFlag").classList.toggle("on",!!PREVIEW_PERSON);
+  refreshOrgPreview();
   buildPageMenu(PREVIEW_ROLE||SESSION.role);
 }
 function applySession(u){SESSION=u;PREVIEW_ROLE=null;PREVIEW_PERSON=null;
@@ -775,6 +802,7 @@ function applySession(u){SESSION=u;PREVIEW_ROLE=null;PREVIEW_PERSON=null;
     rp.innerHTML=Object.keys(ROLE_LABEL).map(r=>'<option value="'+r+'"'+(r===u.role?" selected":"")+'>預覽：'+ROLE_LABEL[r]+(r===u.role?"（本人）":"")+'</option>').join("");
     rp.onchange=e=>setPreviewRole(e.target.value);
   }else{rp.style.display="none";}
+  refreshOrgPreview();
   refreshPersonPreview();
   document.getElementById("previewFlag").classList.remove("on");
   // 依角色設定可見頁面（業務只看自己的三頁；主管以上完整）
