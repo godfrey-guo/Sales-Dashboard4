@@ -235,6 +235,9 @@ tbody tr:hover { background: #f8fafc; }
       <details style="margin-bottom:12px"><summary style="cursor:pointer;font-weight:700;color:#263E44;padding:8px 0">⚙️ 設定各季目標（Q1–Q4，單位：元）</summary>
         <div class="card" style="margin-top:8px"><div class="tbl-wrap"><table id="qtgt-tbl"><thead><tr><th>組別</th><th>Q1</th><th>Q2</th><th>Q3</th><th>Q4</th><th>全年合計</th></tr></thead><tbody></tbody></table></div></div>
       </details>
+      <details style="margin-bottom:12px"><summary style="cursor:pointer;font-weight:700;color:#263E44;padding:8px 0">⚙️ 設定再行銷／合作建案 Q3–Q4 目標（給「業務戰報」季度節奏拆解用；再行銷單位：萬，合作建案單位：家）</summary>
+        <div class="card" style="margin-top:8px"><div class="note" style="margin-bottom:8px">留空＝沿用內建預設值；填了就以這裡為準。目前只有「業務戰報」的季度節奏拆解會用到 Q3／Q4，所以沒有 Q1／Q2 欄位。</div><div class="tbl-wrap"><table id="qtgt-ext-tbl"><thead><tr><th>組別</th><th>再行銷 Q3</th><th>再行銷 Q4</th><th>合作建案 Q3</th><th>合作建案 Q4</th></tr></thead><tbody></tbody></table></div></div>
+      </details>
       <div class="card"><div class="card-head"><h2>🎯 各課組達成戰情</h2><button onclick="dlTeam()">⬇ 下載 CSV</button></div>
         <div class="cap" id="cap-team"></div>
         <div class="tbl-wrap"><table id="team-tbl"><thead><tr><th>課組</th><th>業績總額</th><th>目標</th><th>達成率</th><th>客單價</th><th>客單價成長率</th><th>滲透率</th><th>有價值合作</th><th>無價值合作</th><th>站內占比</th><th>再行銷占比</th></tr></thead><tbody></tbody></table></div>
@@ -365,7 +368,7 @@ tbody tr:hover { background: #f8fafc; }
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js"></script>
 <script>
-const PDATA = {"snapshot": "2026/09/07", "growth": {"業務一課 - 業務一組": {"growth": -1.2, "arpu2026": 225671}, "業務一課 - 業務二組": {"growth": -10.6, "arpu2026": 223539}, "業務二課 - 業務三組": {"growth": -18.8, "arpu2026": 148632}, "業務二課 - 業務四組": {"growth": -12.6, "arpu2026": 124484}, "設計課 - 設計組": {"growth": 5.9, "arpu2026": 180463}}, "pipe": {"曾方音": {"f": 0, "q": 981176, "p": 149039, "grp": "業務一課 - 業務二組"}, "曾家羚": {"f": 17000, "q": 600555, "p": 216894, "grp": "業務二課 - 業務三組"}, "黃淑萍": {"f": 26381, "q": 651305, "p": 597400, "grp": "業務一課 - 業務一組"}, "楊儀菲": {"f": 0, "q": 212367, "p": 0, "grp": "業務一課 - 業務二組"}, "彭莉芳": {"f": 1696, "q": 246675, "p": 83307, "grp": "業務一課 - 業務一組"}, "呂佩宜": {"f": 0, "q": 592694, "p": 26821, "grp": "業務二課 - 業務三組"}, "王振豪": {"f": 0, "q": 8258, "p": 0, "grp": "設計課 - 設計組"}, "簡艷華": {"f": 12143, "q": 51384, "p": 25257, "grp": "業務二課 - 業務四組"}, "陳琬臻": {"f": 0, "q": 1614540, "p": 97551, "grp": "業務二課 - 業務三組"}, "簡順隆": {"f": 0, "q": 138957, "p": 44898, "grp": "業務一課 - 業務二組"}, "姚蘋芸": {"f": 10654, "q": 73890, "p": 9260, "grp": "業務二課 - 業務四組"}, "鄧瑋婷": {"f": 51908, "q": 45314, "p": 0, "grp": "業務二課 - 業務四組"}, "趙紹亨": {"f": 37007, "q": 59734, "p": 254619, "grp": "業務一課 - 業務一組"}, "張淑瑜": {"f": 0, "q": 0, "p": 326362, "grp": "業務一課"}, "許孟瑋": {"f": 0, "q": 0, "p": 70434, "grp": "業務二課"}, "吳子敬": {"f": 0, "q": 0, "p": 187500, "grp": "業務一課 - 業務二組"}, "程湣傑": {"f": 0, "q": 0, "p": 678414, "grp": "媒體產品課 - 站台產品組"}, "李抒姮": {"f": 0, "q": 0, "p": 151238, "grp": "設計課 - 設計組"}, "仲綨柱": {"f": 81694, "q": 0, "p": 90412, "grp": "業務一課 - 業務一組"}, "陳文昕": {"f": 0, "q": 0, "p": 976871, "grp": "行銷策略課 - 行銷一組"}, "郭彥孝": {"f": 0, "q": 0, "p": 11, "grp": "業務二課"}, "劉美恩": {"f": 0, "q": 0, "p": 16343, "grp": "資訊技術中心"}, "陳怡雯 Mina": {"f": 0, "q": 0, "p": 87619, "grp": "業務一課 - 業務一組"}, "趙斯蓓": {"f": 0, "q": 0, "p": 314342, "grp": "設計課 - 設計組"}, "李佳隆": {"f": 0, "q": 0, "p": 42858, "grp": "資訊技術中心"}, "陳怡雯": {"f": 0, "q": 0, "p": 91991, "grp": "業務一課 - 業務二組"}, "邱佳鈴": {"f": 6000, "q": 0, "p": 4371, "grp": "業務二課 - 業務四組"}}, "weekly": {"2026-W32": {"date": "2026/08/07", "cls": {"行銷策略課": {"signed": 0, "wpipe": 660266}, "業務二課": {"signed": 29652313, "wpipe": 2998292}, "媒體產品課": {"signed": 0, "wpipe": 1338745}, "設計課": {"signed": 1427191, "wpipe": 329906}, "業務一課": {"signed": 49660573, "wpipe": 4085136}}}, "2026-W33": {"date": "2026/08/13", "cls": {"行銷策略課": {"signed": 0, "wpipe": 589553}, "設計課": {"signed": 1427191, "wpipe": 325906}, "業務二課": {"signed": 29652313, "wpipe": 2856192}, "業務一課": {"signed": 49660573, "wpipe": 4629476}, "媒體產品課": {"signed": 0, "wpipe": 457610}}}, "2026-W34": {"date": "2026/08/23", "cls": {"設計課": {"signed": 1427191, "wpipe": 325906, "perf": 14916356, "rem": 976224}, "業務一課": {"signed": 49660573, "wpipe": 4629476, "perf": 51955607, "rem": 4918454}, "媒體產品課": {"signed": 0, "wpipe": 457610, "perf": 0, "rem": 0}, "業務二課": {"signed": 29652313, "wpipe": 2856192, "perf": 32150758, "rem": 3543194}, "行銷策略課": {"signed": 0, "wpipe": 589553, "perf": 0, "rem": 0}}}, "2026-W35": {"date": "2026/08/26", "cls": {"業務二課": {"signed": 36118329, "wpipe": 2856192, "perf": 44657809, "rem": 4864540}, "媒體產品課": {"signed": 0, "wpipe": 457610, "perf": 0, "rem": 0}, "業務一課": {"signed": 62641412, "wpipe": 4629476, "perf": 70352835, "rem": 6205417}, "行銷策略課": {"signed": 0, "wpipe": 589553, "perf": 0, "rem": 0}, "設計課": {"signed": 1434923, "wpipe": 325906, "perf": 17092215, "rem": 1105264}}}, "2026-W36": {"date": "2026/09/04", "cls": {"行銷策略課": {"signed": 0, "wpipe": 681710, "perf": 0, "rem": 0}, "業務二課": {"signed": 36118329, "wpipe": 1187335, "perf": 44657809, "rem": 4864540}, "設計課": {"signed": 1434923, "wpipe": 325906, "perf": 17092215, "rem": 1105264}, "業務一課": {"signed": 62641412, "wpipe": 2111296, "perf": 70352835, "rem": 6205417}, "資訊技術中心": {"signed": 0, "wpipe": 41441, "perf": 0, "rem": 0}, "媒體產品課": {"signed": 0, "wpipe": 474890, "perf": 0, "rem": 0}}}, "2026-W37": {"date": "2026/09/07", "cls": {"設計課": {"signed": 1434923, "wpipe": 327558, "perf": 17092215, "rem": 1105264}, "業務二課": {"signed": 36118329, "wpipe": 979488, "perf": 44657809, "rem": 4864540}, "業務一課": {"signed": 62641412, "wpipe": 1899990, "perf": 70352835, "rem": 6205417}, "行銷策略課": {"signed": 0, "wpipe": 683810, "perf": 0, "rem": 0}, "資訊技術中心": {"signed": 0, "wpipe": 41441, "perf": 0, "rem": 0}, "媒體產品課": {"signed": 0, "wpipe": 474890, "perf": 0, "rem": 0}}}}};
+const PDATA = {"snapshot":"2026/09/07","growth":{"業務一課 - 業務一組":{"growth":-1.2,"arpu2026":225671},"業務一課 - 業務二組":{"growth":-10.6,"arpu2026":223539},"業務二課 - 業務三組":{"growth":-18.8,"arpu2026":148632},"業務二課 - 業務四組":{"growth":-12.6,"arpu2026":124484},"設計課 - 設計組":{"growth":5.9,"arpu2026":180463}},"pipe":{"曾方音":{"f":0,"q":981176,"p":149039,"grp":"業務一課 - 業務二組"},"曾家羚":{"f":17000,"q":600555,"p":216894,"grp":"業務二課 - 業務三組"},"黃淑萍":{"f":26381,"q":651305,"p":597400,"grp":"業務一課 - 業務一組"},"楊儀菲":{"f":0,"q":212367,"p":0,"grp":"業務一課 - 業務二組"},"彭莉芳":{"f":1696,"q":246675,"p":83307,"grp":"業務一課 - 業務一組"},"呂佩宜":{"f":0,"q":592694,"p":26821,"grp":"業務二課 - 業務三組"},"王振豪":{"f":0,"q":8258,"p":0,"grp":"設計課 - 設計組"},"簡艷華":{"f":12143,"q":51384,"p":25257,"grp":"業務二課 - 業務四組"},"陳琬臻":{"f":0,"q":1614540,"p":97551,"grp":"業務二課 - 業務三組"},"簡順隆":{"f":0,"q":138957,"p":44898,"grp":"業務一課 - 業務二組"},"姚蘋芸":{"f":10654,"q":73890,"p":9260,"grp":"業務二課 - 業務四組"},"鄧瑋婷":{"f":51908,"q":45314,"p":0,"grp":"業務二課 - 業務四組"},"趙紹亨":{"f":37007,"q":59734,"p":254619,"grp":"業務一課 - 業務一組"},"張淑瑜":{"f":0,"q":0,"p":326362,"grp":"業務一課"},"許孟瑋":{"f":0,"q":0,"p":70434,"grp":"業務二課"},"吳子敬":{"f":0,"q":0,"p":187500,"grp":"業務一課 - 業務二組"},"程湣傑":{"f":0,"q":0,"p":678414,"grp":"媒體產品課 - 站台產品組"},"李抒姮":{"f":0,"q":0,"p":151238,"grp":"設計課 - 設計組"},"仲綨柱":{"f":81694,"q":0,"p":90412,"grp":"業務一課 - 業務一組"},"陳文昕":{"f":0,"q":0,"p":976871,"grp":"行銷策略課 - 行銷一組"},"郭彥孝":{"f":0,"q":0,"p":11,"grp":"業務二課"},"劉美恩":{"f":0,"q":0,"p":16343,"grp":"資訊技術中心"},"陳怡雯 Mina":{"f":0,"q":0,"p":87619,"grp":"業務一課 - 業務一組"},"趙斯蓓":{"f":0,"q":0,"p":314342,"grp":"設計課 - 設計組"},"李佳隆":{"f":0,"q":0,"p":42858,"grp":"資訊技術中心"},"陳怡雯":{"f":0,"q":0,"p":91991,"grp":"業務一課 - 業務二組"},"邱佳鈴":{"f":6000,"q":0,"p":4371,"grp":"業務二課 - 業務四組"}},"weekly":{"2026-W32":{"date":"2026/08/07","cls":{"行銷策略課":{"signed":0,"wpipe":660266},"業務二課":{"signed":29652313,"wpipe":2998292},"媒體產品課":{"signed":0,"wpipe":1338745},"設計課":{"signed":1427191,"wpipe":329906},"業務一課":{"signed":49660573,"wpipe":4085136}}},"2026-W33":{"date":"2026/08/13","cls":{"行銷策略課":{"signed":0,"wpipe":589553},"設計課":{"signed":1427191,"wpipe":325906},"業務二課":{"signed":29652313,"wpipe":2856192},"業務一課":{"signed":49660573,"wpipe":4629476},"媒體產品課":{"signed":0,"wpipe":457610}}},"2026-W34":{"date":"2026/08/23","cls":{"設計課":{"signed":1427191,"wpipe":325906,"perf":14916356,"rem":976224},"業務一課":{"signed":49660573,"wpipe":4629476,"perf":51955607,"rem":4918454},"媒體產品課":{"signed":0,"wpipe":457610,"perf":0,"rem":0},"業務二課":{"signed":29652313,"wpipe":2856192,"perf":32150758,"rem":3543194},"行銷策略課":{"signed":0,"wpipe":589553,"perf":0,"rem":0}}},"2026-W35":{"date":"2026/08/26","cls":{"業務二課":{"signed":36118329,"wpipe":2856192,"perf":44657809,"rem":4864540},"媒體產品課":{"signed":0,"wpipe":457610,"perf":0,"rem":0},"業務一課":{"signed":62641412,"wpipe":4629476,"perf":70352835,"rem":6205417},"行銷策略課":{"signed":0,"wpipe":589553,"perf":0,"rem":0},"設計課":{"signed":1434923,"wpipe":325906,"perf":17092215,"rem":1105264}}},"2026-W36":{"date":"2026/09/04","cls":{"行銷策略課":{"signed":0,"wpipe":681710,"perf":0,"rem":0},"業務二課":{"signed":36118329,"wpipe":1187335,"perf":44657809,"rem":4864540},"設計課":{"signed":1434923,"wpipe":325906,"perf":17092215,"rem":1105264},"業務一課":{"signed":62641412,"wpipe":2111296,"perf":70352835,"rem":6205417},"資訊技術中心":{"signed":0,"wpipe":41441,"perf":0,"rem":0},"媒體產品課":{"signed":0,"wpipe":474890,"perf":0,"rem":0}}},"2026-W37":{"date":"2026/09/07","cls":{"設計課":{"signed":1434923,"wpipe":327558,"perf":17092215,"rem":1105264},"業務二課":{"signed":36118329,"wpipe":979488,"perf":44657809,"rem":4864540},"業務一課":{"signed":62641412,"wpipe":1899990,"perf":70352835,"rem":6205417},"行銷策略課":{"signed":0,"wpipe":683810,"perf":0,"rem":0},"資訊技術中心":{"signed":0,"wpipe":41441,"perf":0,"rem":0},"媒體產品課":{"signed":0,"wpipe":474890,"perf":0,"rem":0}}}}};
 const fmtN=n=>Math.round(n).toLocaleString("en-US");
 const fmtWan=n=>{const x=Math.round(n);if(Math.abs(x)>=1e8)return (x/1e8).toLocaleString("en-US",{maximumFractionDigits:2})+"億";if(Math.abs(x)>=1e4)return (x/1e4).toLocaleString("en-US",{maximumFractionDigits:1})+"萬";return x.toLocaleString("en-US");};
 const fmtBoth=n=>`${fmtWan(n)}<span style="display:block;font-size:10px;color:#9aa3ad;font-weight:400">${fmtN(n)}</span>`;
@@ -970,6 +973,9 @@ function qKey(g,q){return "dm_qtgt_2026_"+g+"_q"+q;}
 function getQ(g,q){const v=localStorage.getItem(qKey(g,q));return v?+v:null;}
 function hasQ(g){return [1,2,3,4].some(q=>getQ(g,q)!=null);}
 function yearQ(g){return [1,2,3,4].reduce((s,q)=>s+(getQ(g,q)||0),0);}
+// ── 再行銷／合作建案 Q3-Q4 目標（新制，跟業績季目標同一套「留空＝沿用內建值」邏輯）──
+function extKey(g,metric,q){return "dm_qtgt_ext_2026_"+metric+"_"+g+"_q"+q;}
+function getExt(g,metric,q){const v=localStorage.getItem(extKey(g,metric,q));return v!==null&&v!==""?+v:null;}
 // 依目前篩選期間算目標：逐月累加（該月所屬季目標÷3）；無季目標則回退舊全年目標按月比例
 function periodTarget(g){
   const ms=curMonths()||[1,2,3,4,5,6,7,8,9,10,11,12];
@@ -987,8 +993,25 @@ function renderQtgt(){
   });
   tb.querySelectorAll("input").forEach(i=>i.addEventListener("input",()=>{const v=i.value?+i.value:null;if(v)localStorage.setItem(qKey(i.dataset.g,i.dataset.q),v);else localStorage.removeItem(qKey(i.dataset.g,i.dataset.q));renderQtgt();renderTeam();}));
 }
+function renderQtgtExt(){
+  const tb=document.querySelector("#qtgt-ext-tbl tbody"); if(!tb)return; tb.innerHTML="";
+  ORDER.forEach(g=>{
+    const nm=g.replace("業務","").replace(" - ","-");
+    const inp=(metric,q)=>`<input type="number" data-g="${g}" data-metric="${metric}" data-q="${q}" value="${getExt(g,metric,q)!=null?getExt(g,metric,q):''}" placeholder="—" style="width:90px;text-align:right;padding:4px 6px;border:1px solid #d1d5db;border-radius:6px;font:inherit;font-size:12.5px">`;
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${nm}</td><td>${inp("remkt",3)}</td><td>${inp("remkt",4)}</td><td>${inp("coop",3)}</td><td>${inp("coop",4)}</td>`;
+    tb.appendChild(tr);
+  });
+  tb.querySelectorAll("input").forEach(i=>i.addEventListener("input",()=>{
+    const k=extKey(i.dataset.g,i.dataset.metric,i.dataset.q);
+    const v=i.value?+i.value:null;
+    if(v)localStorage.setItem(k,v);else localStorage.removeItem(k);
+    if(typeof renderWar==="function"&&!document.getElementById("page-war").classList.contains("hide"))renderWar();
+  }));
+}
 function renderTeam(){
   renderQtgt();
+  renderQtgtExt();
   const rows=fRows(); const byg={};
   rows.forEach(r=>{(byg[r.grp]=byg[r.grp]||[]).push(r);});
   // 房產（滲透率）依篩選
@@ -1535,6 +1558,16 @@ function gtVal(g,k){const gt=GRP_TARGETS[g]||{};
   if(k==="q3"){const v=getQ(g,3);return v!=null?Math.round(v/1e4):(gt.q3||0);}
   if(k==="q4"){const v=getQ(g,4);return v!=null?Math.round(v/1e4):(gt.q4||0);}
   if(k==="h2"){const a=getQ(g,3),b=getQ(g,4);if(a!=null||b!=null)return Math.round(((a||0)+(b||0))/1e4);return gt.h2||0;}
+  // 再行銷／合作建案：畫面填過（本機）就用畫面的，沒填才退回內建 GRP_TARGETS
+  if(k==="remkt_q3"||k==="remkt_q4"||k==="coop_q3"||k==="coop_q4"){
+    const [metric,q]=k.split("_q"); const v=getExt(g,metric,+q);
+    return v!=null?v:(gt[k]||0);
+  }
+  if(k==="remkt_h2"||k==="coop_h2"){
+    const metric=k.split("_")[0]; const a=getExt(g,metric,3),b=getExt(g,metric,4);
+    if(a!=null||b!=null)return (a||0)+(b||0);
+    return gt[k]||0;
+  }
   return gt[k]||0;}
 function buildWar(){const s=document.getElementById("war-cls");s.innerHTML="";[...new Set(ROWS.map(r=>r.cls))].filter(x=>x&&x!=="(其他)").sort().forEach(c=>{const o=document.createElement("option");o.value=c;o.textContent=c;if(c==="業務二課")o.selected=true;s.appendChild(o);});s.addEventListener("change",renderWar);const pb=document.getElementById("war-pdf");if(pb)pb.addEventListener("click",async()=>{const cls=document.getElementById("war-cls").value;pb.textContent="準備中…";
   try{await loadHtml2Pdf();}catch(e){pb.textContent="🖨️ 下載 PDF";alert("PDF 元件載入失敗，請檢查網路後重試");return;}
@@ -1585,10 +1618,10 @@ function renderWar(){
   const h2s=wSum(R,H2)/1e4,tH2=T("h2"),h2r=wSum(R,H2,r=>r.ad==="remarketing"||r.ad==="agent")/1e4,tRe=T("remkt_h2"),h2c=wHouse(H,H2).coop,tCo=T("coop_h2");
   const okrCard=(nm,val,unit,tgt)=>{const rate=tgt?val/tgt*100:null;const col=rate==null?"#5a6271":rate>=100?"#1f7a4d":"#263E44";return `<div class="kpi" style="border-top-color:#263E44"><div class="k">${nm}</div><div class="v">${unit==="家"?fmtN(val)+"家":wanT(val)}</div><div class="n">目標 ${unit==="家"?fmtN(tgt)+"家":wanT(tgt)}｜達成 <b style="color:${col}">${rate!=null?rate.toFixed(1)+"%":"—"}</b>｜缺口 ${tgt?(unit==="家"?fmtN(Math.max(0,tgt-val))+"家":wanT(Math.max(0,tgt-val))):"—"}</div></div>`;};
   // 組拆解
-  const grpRow=(g)=>{const rg=R.filter(r=>r.grp===g),hg=H.filter(r=>r.grp===g),gt=GRP_TARGETS[g]||{};
+  const grpRow=(g)=>{const rg=R.filter(r=>r.grp===g),hg=H.filter(r=>r.grp===g);
     const s=wSum(rg,H2)/1e4,re=wSum(rg,H2,r=>r.ad==="remarketing"||r.ad==="agent")/1e4,co=wHouse(hg,H2).coop;
     const cell=(v,t,u)=>`<td>${u==="家"?fmtN(v):wanT(v)}</td><td>${t?(u==="家"?fmtN(t):wanT(t)):"—"}</td><td>${t?(v/t*100).toFixed(1)+"%":"—"}</td>`;
-    return `<tr><td>${g.split(" - ")[1]||g}</td>${cell(s,gtVal(g,"h2"),"萬")}${cell(re,gt.remkt_h2,"萬")}${cell(co,gt.coop_h2,"家")}</tr>`;};
+    return `<tr><td>${g.split(" - ")[1]||g}</td>${cell(s,gtVal(g,"h2"),"萬")}${cell(re,gtVal(g,"remkt_h2"),"萬")}${cell(co,gtVal(g,"coop_h2"),"家")}</tr>`;};
   // 個人拆解
   const people=[...new Set(R.filter(r=>r.sales).map(r=>r.sales))];
   const persRow=(p)=>{const hp=H.filter(r=>r.sales===p);const q=wHouse(hp,Q3);const x=PIPE[p]||{f:0,q:0,p:0};const short=x.f+x.q,wt=q.sale+x.f*0.7+x.q*0.2+x.p*0.7;return `<tr><td>${p}</td><td>${fmtWan(q.sale)}</td><td>${fmtWan(short)}</td><td>${fmtWan(x.p)}</td><td>${fmtWan(wt)}</td><td>${fmtN(q.coop)}</td><td>${fmtWan(wArpu(q))}</td></tr>`;};
@@ -1597,10 +1630,10 @@ function renderWar(){
     const ac=(v,t,u)=>{const c=t?(v/t*100>=100?"#1f7a4d":"#263E44"):"#9aa3ad";return `<td>${u==="家"?fmtN(v):wanT(v)}</td><td style="color:${c};font-weight:600">${t?(v/t*100).toFixed(1)+"%":"—"}</td>`;};
     // 課別合計
     const cs=wSum(R,ms)/1e4,cre=wSum(R,ms,r=>r.ad==="remarketing"||r.ad==="agent")/1e4,cco=wHouse(H,ms).coop;
-    const ct=grps.reduce((s,g)=>s+gtVal(g,qk),0),crt=grps.reduce((s,g)=>s+((GRP_TARGETS[g]||{})["remkt_"+qk]||0),0),cct=grps.reduce((s,g)=>s+((GRP_TARGETS[g]||{})["coop_"+qk]||0),0);
-    const body=grps.map(g=>{const rg=R.filter(r=>r.grp===g),hg=H.filter(r=>r.grp===g),gt=GRP_TARGETS[g]||{};
+    const ct=grps.reduce((s,g)=>s+gtVal(g,qk),0),crt=grps.reduce((s,g)=>s+gtVal(g,"remkt_"+qk),0),cct=grps.reduce((s,g)=>s+gtVal(g,"coop_"+qk),0);
+    const body=grps.map(g=>{const rg=R.filter(r=>r.grp===g),hg=H.filter(r=>r.grp===g);
       const s=wSum(rg,ms)/1e4,re=wSum(rg,ms,r=>r.ad==="remarketing"||r.ad==="agent")/1e4,co=wHouse(hg,ms).coop;
-      return `<tr><td>${g.split(" - ")[1]||g}</td>${ac(s,gtVal(g,qk),"萬")}${ac(re,gt["remkt_"+qk],"萬")}${ac(co,gt["coop_"+qk],"家")}</tr>`;}).join("");
+      return `<tr><td>${g.split(" - ")[1]||g}</td>${ac(s,gtVal(g,qk),"萬")}${ac(re,gtVal(g,"remkt_"+qk),"萬")}${ac(co,gtVal(g,"coop_"+qk),"家")}</tr>`;}).join("");
     return `<div class="tbl-wrap"><table><thead><tr><th>組別</th><th>業績</th><th>達成</th><th>再行銷</th><th>達成</th><th>合作建案</th><th>達成</th></tr></thead><tbody>${body}<tr style="font-weight:700;background:#fafbfc"><td>課合計</td>${ac(cs,ct,"萬")}${ac(cre,crt,"萬")}${ac(cco,cct,"家")}</tr></tbody></table></div>`;
   };
   // 產品線 Q3 房產
