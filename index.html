@@ -232,11 +232,11 @@ tbody tr:hover { background: #f8fafc; }
     <section id="page-team" class="hide">
       <div class="pagetitle">課組戰情（隨篩選即時算；成長率為全年 2025 vs 2026）</div>
       <div class="note" style="margin-bottom:12px">💡 <b>目標按季輸入</b>（存本機）：在下方面板填各組 Q1–Q4 目標，表格「目標／達成率」會依你上方選的期間自動累加（H1=Q1+Q2、全年=四季總和、單月=該季÷3）。業績/客單價/占比隨篩選變；滲透率、有無價值為房產7月、客單價成長率為全年。</div>
-      <details style="margin-bottom:12px"><summary style="cursor:pointer;font-weight:700;color:#263E44;padding:8px 0">⚙️ 設定各季目標（Q1–Q4，單位：元）</summary>
-        <div class="card" style="margin-top:8px"><div class="tbl-wrap"><table id="qtgt-tbl"><thead><tr><th>組別</th><th>Q1</th><th>Q2</th><th>Q3</th><th>Q4</th><th>全年合計</th></tr></thead><tbody></tbody></table></div></div>
+      <details style="margin-bottom:12px"><summary style="cursor:pointer;font-weight:700;color:#263E44;padding:8px 0">⚙️ 各季業績目標（Q1–Q2 手動填／Q3–Q4 唯讀，來自 Sheet 加總）</summary>
+        <div class="card" style="margin-top:8px"><div class="note" style="margin-bottom:8px">Q3／Q4 由業務個人在 Google Sheet「目標設定」分頁填自己的季度目標，這裡自動加總成組（唯讀，改不了）；Sheet 該組沒人填才會退回內建預設值。Q1／Q2 目前沒有 Sheet 來源，維持手動填、單位元。</div><div class="tbl-wrap"><table id="qtgt-tbl"><thead><tr><th>組別</th><th>Q1</th><th>Q2</th><th>Q3</th><th>Q4</th><th>全年合計</th></tr></thead><tbody></tbody></table></div></div>
       </details>
-      <details style="margin-bottom:12px"><summary style="cursor:pointer;font-weight:700;color:#263E44;padding:8px 0">⚙️ 設定再行銷／合作建案 Q3–Q4 目標（給「業務戰報」季度節奏拆解用；再行銷單位：萬，合作建案單位：家）</summary>
-        <div class="card" style="margin-top:8px"><div class="note" style="margin-bottom:8px">留空＝沿用內建預設值；填了就以這裡為準。目前只有「業務戰報」的季度節奏拆解會用到 Q3／Q4，所以沒有 Q1／Q2 欄位。</div><div class="tbl-wrap"><table id="qtgt-ext-tbl"><thead><tr><th>組別</th><th>再行銷 Q3</th><th>再行銷 Q4</th><th>合作建案 Q3</th><th>合作建案 Q4</th></tr></thead><tbody></tbody></table></div></div>
+      <details style="margin-bottom:12px"><summary style="cursor:pointer;font-weight:700;color:#263E44;padding:8px 0">🎯 再行銷／合作建案 Q3–Q4 目標（唯讀，來自 Sheet 加總）</summary>
+        <div class="card" style="margin-top:8px"><div class="note" style="margin-bottom:8px">同樣來自 Google Sheet「目標設定」分頁，業務個人填自己的再行銷／合作建案 Q3、Q4，這裡由下而上加總成組；沒人填的組顯示內建預設值。給「業務戰報」季度節奏拆解用。</div><div class="tbl-wrap"><table id="qtgt-ext-tbl"><thead><tr><th>組別</th><th>再行銷 Q3</th><th>再行銷 Q4</th><th>合作建案 Q3</th><th>合作建案 Q4</th></tr></thead><tbody></tbody></table></div></div>
       </details>
       <div class="card"><div class="card-head"><h2>🎯 各課組達成戰情</h2><button onclick="dlTeam()">⬇ 下載 CSV</button></div>
         <div class="cap" id="cap-team"></div>
@@ -971,15 +971,18 @@ function tKey(g){return "dm_target_2026_"+g;} function getTarget(g){const v=loca
 // ── 各季目標（新制）──
 function qKey(g,q){return "dm_qtgt_2026_"+g+"_q"+q;}
 function getQ(g,q){const v=localStorage.getItem(qKey(g,q));return v?+v:null;}
-function hasQ(g){return [1,2,3,4].some(q=>getQ(g,q)!=null);}
-function yearQ(g){return [1,2,3,4].reduce((s,q)=>s+(getQ(g,q)||0),0);}
-// ── 再行銷／合作建案 Q3-Q4 目標（新制，跟業績季目標同一套「留空＝沿用內建值」邏輯）──
-function extKey(g,metric,q){return "dm_qtgt_ext_2026_"+metric+"_"+g+"_q"+q;}
-function getExt(g,metric,q){const v=localStorage.getItem(extKey(g,metric,q));return v!==null&&v!==""?+v:null;}
-// 依目前篩選期間算目標：逐月累加（該月所屬季目標÷3）；無季目標則回退舊全年目標按月比例
+function hasQ(g){return [1,2].some(q=>getQ(g,q)!=null);} // Q1/Q2 沒有 Sheet 來源，仍用舊制 localStorage
+// 依目前篩選期間算目標：逐月累加（該月所屬季目標÷3）；Q3/Q4 走 gtVal（Sheet 由下而上加總，沒有才退回內建 GRP_TARGETS），
+// Q1/Q2 沒有 Sheet 來源，維持舊制 localStorage；三者都沒有才回退最早的全年目標按月比例
 function periodTarget(g){
   const ms=curMonths()||[1,2,3,4,5,6,7,8,9,10,11,12];
-  if(hasQ(g)){let s=0;ms.forEach(m=>{const q=Math.ceil(m/3);s+=(getQ(g,q)||0)/3;});return Math.round(s);}
+  const qYuan=q=>{
+    if(q===3||q===4){const v=gtVal(g,"q"+q);return v?v*1e4:null;} // gtVal 回傳萬，換算元
+    return getQ(g,q); // Q1/Q2：舊制，localStorage 存元
+  };
+  if([...new Set(ms.map(m=>Math.ceil(m/3)))].some(q=>qYuan(q)!=null)){
+    let s=0;ms.forEach(m=>{const q=Math.ceil(m/3);s+=(qYuan(q)||0)/3;});return Math.round(s);
+  }
   const old=getTarget(g); if(old==null)return null; return Math.round(old*ms.length/12);
 }
 function renderQtgt(){
@@ -987,27 +990,26 @@ function renderQtgt(){
   ORDER.forEach(g=>{
     const nm=g.replace("業務","").replace(" - ","-");
     const inp=q=>`<input type="number" data-g="${g}" data-q="${q}" value="${getQ(g,q)!=null?getQ(g,q):''}" placeholder="—" style="width:104px;text-align:right;padding:4px 6px;border:1px solid #d1d5db;border-radius:6px;font:inherit;font-size:12.5px">`;
+    const ro=q=>`<span style="color:#5a6271">${fmtN(gtVal(g,"q"+q))}萬</span>`;
+    const yearTotal=(getQ(g,1)||0)+(getQ(g,2)||0)+gtVal(g,"q3")*1e4+gtVal(g,"q4")*1e4;
     const tr=document.createElement("tr");
-    tr.innerHTML=`<td>${nm}</td><td>${inp(1)}</td><td>${inp(2)}</td><td>${inp(3)}</td><td>${inp(4)}</td><td style="font-weight:700;color:#263E44">${fmtN(yearQ(g))}</td>`;
-    tb.appendChild(tr);
-  });
-  tb.querySelectorAll("input").forEach(i=>i.addEventListener("input",()=>{const v=i.value?+i.value:null;if(v)localStorage.setItem(qKey(i.dataset.g,i.dataset.q),v);else localStorage.removeItem(qKey(i.dataset.g,i.dataset.q));renderQtgt();renderTeam();}));
-}
-function renderQtgtExt(){
-  const tb=document.querySelector("#qtgt-ext-tbl tbody"); if(!tb)return; tb.innerHTML="";
-  ORDER.forEach(g=>{
-    const nm=g.replace("業務","").replace(" - ","-");
-    const inp=(metric,q)=>`<input type="number" data-g="${g}" data-metric="${metric}" data-q="${q}" value="${getExt(g,metric,q)!=null?getExt(g,metric,q):''}" placeholder="—" style="width:90px;text-align:right;padding:4px 6px;border:1px solid #d1d5db;border-radius:6px;font:inherit;font-size:12.5px">`;
-    const tr=document.createElement("tr");
-    tr.innerHTML=`<td>${nm}</td><td>${inp("remkt",3)}</td><td>${inp("remkt",4)}</td><td>${inp("coop",3)}</td><td>${inp("coop",4)}</td>`;
+    tr.innerHTML=`<td>${nm}</td><td>${inp(1)}</td><td>${inp(2)}</td><td>${ro(3)}</td><td>${ro(4)}</td><td style="font-weight:700;color:#263E44">${fmtN(yearTotal)}</td>`;
     tb.appendChild(tr);
   });
   tb.querySelectorAll("input").forEach(i=>i.addEventListener("input",()=>{
-    const k=extKey(i.dataset.g,i.dataset.metric,i.dataset.q);
     const v=i.value?+i.value:null;
-    if(v)localStorage.setItem(k,v);else localStorage.removeItem(k);
-    if(typeof renderWar==="function"&&!document.getElementById("page-war").classList.contains("hide"))renderWar();
+    if(v)localStorage.setItem(qKey(i.dataset.g,i.dataset.q),v);else localStorage.removeItem(qKey(i.dataset.g,i.dataset.q));
+    const tr=i.closest("tr"),cells=tr.querySelectorAll("td");
+    cells[cells.length-1].textContent=fmtN((getQ(i.dataset.g,1)||0)+(getQ(i.dataset.g,2)||0)+gtVal(i.dataset.g,"q3")*1e4+gtVal(i.dataset.g,"q4")*1e4); // 只更新這列的全年合計，不重建整張表格，打字才不會失焦
   }));
+}
+function renderQtgtExt(){
+  const tb=document.querySelector("#qtgt-ext-tbl tbody"); if(!tb)return;
+  tb.innerHTML=ORDER.map(g=>{
+    const nm=g.replace("業務","").replace(" - ","-");
+    const c=v=>`<span style="color:#5a6271">${fmtN(v)}</span>`;
+    return `<tr><td>${nm}</td><td>${c(gtVal(g,"remkt_q3"))}萬</td><td>${c(gtVal(g,"remkt_q4"))}萬</td><td>${c(gtVal(g,"coop_q3"))}家</td><td>${c(gtVal(g,"coop_q4"))}家</td></tr>`;
+  }).join("");
 }
 function renderTeam(){
   renderQtgt();
@@ -1048,17 +1050,51 @@ let SHEETDATA={pkg:null,act:null,tgt:null};
 function csvParse(t){return t.replace(/\r/g,"").split("\n").filter(x=>x.trim()).map(l=>{const o=[];let c="",q=false;for(let i=0;i<l.length;i++){const ch=l[i];if(ch==='"'){if(q&&l[i+1]==='"'){c+='"';i++;}else q=!q;}else if(ch===","&&!q){o.push(c);c="";}else c+=ch;}o.push(c);return o.map(x=>x.trim());});}
 function sheetRows(rows,headKey,cols){if(!Array.isArray(rows))return [];let hi=rows.findIndex(r=>r.some(c=>c===headKey));if(hi<0)return [];const hdr=rows[hi],ix={};cols.forEach(c=>ix[c]=hdr.indexOf(c));return rows.slice(hi+1).filter(r=>r.some(c=>c&&c.trim())).map(r=>{const o={};cols.forEach(c=>o[c]=ix[c]>=0?(r[ix[c]]||""):"");return o;});}
 const numOf=v=>+String(v||"").replace(/[^0-9.]/g,"")||0;
+const numOrNull=v=>{const s=String(v||"").trim();if(!s)return null;const n=+s.replace(/[^0-9.]/g,"");return isNaN(n)?null:n;}; // 空白格＝沒填(null)，跟填 0 分開，往上加總才知道「這組沒人填」該退回內建預設
 function sheetId(){const eu=localStorage.getItem("dm_sheet_edit")||"";const m=eu.match(/\/d\/([a-zA-Z0-9_-]{20,})/);return m?m[1]:"";}
-async function wkFetchSheets(force){const id=sheetId();if(!id){SHEETDATA={pkg:null,act:null,tgt:null};renderWeek();if(typeof renderGoal==="function")renderGoal();return;}
+// 目標設定分頁載入/重載後，除了週會/目標中心，課組戰情/業務戰報/經營總覽/會議指南/OKR 的目標
+// 現在也是從這份 Sheet 由下而上加總，一起刷新，不然使用者要手動切頁才會看到新數字
+function refreshTargetViews(){
+  renderWeek();
+  if(typeof renderGoal==="function")renderGoal();
+  renderTeam();
+  const vis=id=>{const el=document.getElementById(id);return el&&!el.classList.contains("hide");};
+  if(vis("page-war")&&typeof renderWar==="function")renderWar();
+  if(SESSION&&vis("page-overview"))renderOverview(PREVIEW_ROLE||SESSION.role,SESSION);
+  if(vis("page-meet")&&typeof renderMeet==="function")renderMeet();
+  if(vis("page-okr")&&typeof renderOKR==="function")renderOKR();
+}
+async function wkFetchSheets(force){const id=sheetId();if(!id){SHEETDATA={pkg:null,act:null,tgt:null};refreshTargetViews();return;}
   const gv=name=>`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(name)}`;
   const go=async u=>{try{const t=await fetch(u,{cache:"no-store"}).then(r=>r.text());return t.trim().startsWith("<")?"err":csvParse(t);}catch(e){return "err";}};
   if(force||SHEETDATA.pkg===null)SHEETDATA.pkg=await go(gv("包套登錄"));
   if(force||SHEETDATA.act===null)SHEETDATA.act=await go(gv("行動事項"));
   if(force||SHEETDATA.tgt===null)SHEETDATA.tgt=await go(gv("目標設定"));
-  renderWeek();if(typeof renderGoal==="function")renderGoal();}
+  refreshTargetViews();}
+// 個人目標，H2 拆 Q3/Q4 兩欄各自填（業績/再行銷單位萬，合作建案單位家）；
+// perf/rem 是 Q3+Q4 加總，給目標中心頁既有的「H2 現況」用，不用改那頁的程式碼
 function targetsMap(){const m={};if(!Array.isArray(SHEETDATA.tgt))return m;
-  if(!SHEETDATA.tgt.some(r=>r.includes("業務")&&r.includes("業績")))return m; // 沒有「業績」表頭＝不是目標設定分頁(gviz 找不到會回傳預設分頁)
-  sheetRows(SHEETDATA.tgt,"業務",["業務","業績","再行銷","包套","客戶"]).forEach(o=>{if(o.業務&&o.業務.trim())m[o.業務.trim()]={perf:numOf(o.業績),rem:numOf(o.再行銷),pkg:numOf(o.包套),cust:numOf(o.客戶)};});return m;}
+  if(!SHEETDATA.tgt.some(r=>r.includes("業務")&&r.includes("業績Q3")))return m; // 沒有「業績Q3」表頭＝不是新版目標設定分頁(gviz 找不到會回傳預設分頁)
+  sheetRows(SHEETDATA.tgt,"業務",["業務","業績Q3","業績Q4","再行銷Q3","再行銷Q4","合作建案Q3","合作建案Q4","包套","客戶"]).forEach(o=>{
+    if(!o.業務||!o.業務.trim())return;
+    const perfQ3=numOrNull(o.業績Q3),perfQ4=numOrNull(o.業績Q4),remQ3=numOrNull(o.再行銷Q3),remQ4=numOrNull(o.再行銷Q4);
+    m[o.業務.trim()]={
+      perfQ3,perfQ4,perf:(perfQ3||0)+(perfQ4||0),
+      remQ3,remQ4,rem:(remQ3||0)+(remQ4||0),
+      coopQ3:numOrNull(o.合作建案Q3),coopQ4:numOrNull(o.合作建案Q4),
+      pkg:numOf(o.包套),cust:numOf(o.客戶)
+    };
+  });return m;}
+// 由下而上：組底下（依 orgMap 的 grp）在 Sheet 有填該欄位的業務加總；一個人都沒填回傳 null（讓呼叫端知道要退回內建預設，不是真的 0）
+function groupTarget(g,metric,q){
+  const om=orgMap(),tm=targetsMap(),key=metric+"Q"+q;
+  let sum=0,any=false;
+  Object.keys(tm).forEach(name=>{
+    const info=om[name];
+    if(info&&info.grp===g&&tm[name][key]!=null){sum+=tm[name][key];any=true;}
+  });
+  return any?sum:null;
+}
 function wkT(k,def){const v=localStorage.getItem("dm_wk_"+k);return v!==null&&v!==""?+v:def;}
 function weekNo(){const s=PDATA.snapshot?new Date(PDATA.snapshot):new Date();const jul1=new Date(s.getFullYear(),6,1);return Math.max(1,Math.min(NWK,Math.ceil((s-jul1)/(7*864e5))));}
 function ctxWk(){const p=[];if(selSales.size)p.push(selSales.size+" 業務");if(selRegion.size)p.push(selRegion.size+" 區");const ch=val("f-ch");if(ch)p.push("站台 "+ch);return p.length?p.join("・"):"全台全業務";}
@@ -1312,7 +1348,7 @@ function renderGoal(){
   const byS={};R.forEach(r=>{const s=r.sales||"(未填)";const d=byS[s]=byS[s]||{tot:0,rem:0,cust:new Set()};d.tot+=r.sale;if(r.ad==="remarketing"||r.ad==="agent")d.rem+=r.sale;if(r.cust!=-1)d.cust.add(r.cust);});
   const pkgBy={};if(Array.isArray(SHEETDATA.pkg))sheetRows(SHEETDATA.pkg,"業務",["業務","金額","狀態"]).forEach(o=>{if(o.狀態==="成交"){const n=(o.業務||"").trim();pkgBy[n]=(pkgBy[n]||0)+numOf(o.金額);}});
   const oa=document.getElementById("goal-open"),eu=localStorage.getItem("dm_sheet_edit");if(oa)oa.href=eu||"#";
-  if(!Object.keys(tm).length){setCap("cap-goal",`尚未讀到「目標設定」分頁。請在 Google Sheet 新增分頁 <b>目標設定</b>，第一列欄位：業務 ｜ 業績 ｜ 再行銷 ｜ 包套 ｜ 客戶（金額單位：萬），主管填好各業務目標即可自動帶入。`);
+  if(!Object.keys(tm).length){setCap("cap-goal",`尚未讀到「目標設定」分頁。請在 Google Sheet 新增分頁 <b>目標設定</b>，第一列欄位：業務 ｜ 業績Q3 ｜ 業績Q4 ｜ 再行銷Q3 ｜ 再行銷Q4 ｜ 合作建案Q3 ｜ 合作建案Q4 ｜ 包套 ｜ 客戶（業績/再行銷單位：萬，合作建案單位：家），每位業務填自己的 Q3/Q4 目標即可自動帶入，並往上加總成組/課目標。`);
     document.getElementById("goal-kpi").innerHTML="";document.querySelector("#goal-tbl tbody").innerHTML=`<tr><td colspan="7" class="note">請於 Sheet 新增「目標設定」分頁並填各業務目標。</td></tr>`;return;}
   const names=[...new Set([...Object.keys(tm),...Object.keys(byS)])].filter(n=>byS[n]||tm[n]).sort((a,b)=>((byS[b]?.tot||0)-(byS[a]?.tot||0)));
   const cel=(act,tgt)=>{const rt=tgt?act/tgt*100:0;return `<td>${fmtN(act)}<span style="color:#9aa3ad">/${fmtN(tgt)}</span><span style="font-size:10px;color:${rt>=100?'#1f7a4d':rt>=85?'#caa500':'#b53b65'}"> ${tgt?rt.toFixed(0)+'%':'—'}</span></td>`;};
@@ -1367,7 +1403,15 @@ function autoVal(k,rows){
   if(k==="arpu"){const c=new Set();let s=0;rows.forEach(r=>{if(H.includes(r.m)){s+=r.sale;if(r.cust!=-1)c.add(r.cust);}});return c.size?s/c.size:0;}
   return 0;
 }
-function sumTarget(key,people,ratio){const ts=people.map(p=>(OKR_TARGETS[p]||{})[key]).filter(v=>v!=null);if(!ts.length)return null;return ratio?Math.max(...ts):ts.reduce((a,b)=>a+b,0);}
+// q3/q4/remkt 現在併進「目標設定」Sheet（跟課組戰情/業務戰報同一份資料）：Sheet 有該人資料才用 Sheet，
+// 沒有才退回舊制 OKR_TARGETS（保底，現有 6 人不會突然沒目標）。combo1/combo2/cust/arpu 這幾個 KR 不在 Sheet
+// 涵蓋範圍內，繼續吃 OKR_TARGETS。
+function personTarget(p,key){
+  if(key==="q3"||key==="q4"){const t=targetsMap()[p];if(t){const v=t["perf"+key.toUpperCase()];if(v!=null)return v;}return (OKR_TARGETS[p]||{})[key];}
+  if(key==="remkt"){const t=targetsMap()[p];if(t&&(t.remQ3!=null||t.remQ4!=null))return t.rem;return (OKR_TARGETS[p]||{})[key];}
+  return (OKR_TARGETS[p]||{})[key];
+}
+function sumTarget(key,people,ratio){const ts=people.map(p=>personTarget(p,key)).filter(v=>v!=null);if(!ts.length)return null;return ratio?Math.max(...ts):ts.reduce((a,b)=>a+b,0);}
 function tierLv(rate,t){if(rate>=t.opt)return"優";if(rate>=t.good)return"佳";if(rate>=t.ok)return"可";return"未達";}
 function mKey(id){return "okr_"+(selOkr.size?[...selOkr].sort().join("|"):"all")+"_"+id;}
 function fmtKR(v,unit){if(unit==="元")return fmtN(Math.round(v))+"元";if(unit==="萬")return (Math.round(v*10)/10).toLocaleString("en-US")+"萬";return fmtN(v)+unit;}
@@ -1553,18 +1597,17 @@ const GRP_TARGETS={
  "設計課 - 設計組":{q3:1110}
 };
 const wanT=w=>Math.round(w).toLocaleString("en-US")+"萬";
-// 業績目標(萬)：優先讀課組戰情頁「各季目標」(元)，未設才用內建 GRP_TARGETS
+// 業績／再行銷／合作建案目標(萬)：由下而上——先算「組底下、Sheet 有填的業務」加總(groupTarget)，
+// 沒人填（該組在 Sheet 裡完全查無目標）才退回內建 GRP_TARGETS 當保底，不會讓數字突然消失。
 function gtVal(g,k){const gt=GRP_TARGETS[g]||{};
-  if(k==="q3"){const v=getQ(g,3);return v!=null?Math.round(v/1e4):(gt.q3||0);}
-  if(k==="q4"){const v=getQ(g,4);return v!=null?Math.round(v/1e4):(gt.q4||0);}
-  if(k==="h2"){const a=getQ(g,3),b=getQ(g,4);if(a!=null||b!=null)return Math.round(((a||0)+(b||0))/1e4);return gt.h2||0;}
-  // 再行銷／合作建案：畫面填過（本機）就用畫面的，沒填才退回內建 GRP_TARGETS
+  if(k==="q3"||k==="q4"){const v=groupTarget(g,"perf",+k[1]);return v!=null?v:(gt[k]||0);}
+  if(k==="h2"){const a=groupTarget(g,"perf",3),b=groupTarget(g,"perf",4);if(a!=null||b!=null)return (a||0)+(b||0);return gt.h2||0;}
   if(k==="remkt_q3"||k==="remkt_q4"||k==="coop_q3"||k==="coop_q4"){
-    const [metric,q]=k.split("_q"); const v=getExt(g,metric,+q);
+    const [metric,q]=k.split("_q"); const v=groupTarget(g,metric==="remkt"?"rem":"coop",+q);
     return v!=null?v:(gt[k]||0);
   }
   if(k==="remkt_h2"||k==="coop_h2"){
-    const metric=k.split("_")[0]; const a=getExt(g,metric,3),b=getExt(g,metric,4);
+    const metric=k.split("_")[0]==="remkt"?"rem":"coop"; const a=groupTarget(g,metric,3),b=groupTarget(g,metric,4);
     if(a!=null||b!=null)return (a||0)+(b||0);
     return gt[k]||0;
   }
